@@ -3,25 +3,21 @@ package handlers
 import (
 	"github.com/gorilla/mux"
 	"net/http"
+	"webserver/services"
 )
 
-type AccountService interface {
-	getAccountDetails(accountId string)
-	getAccountTransactions(accountId string)
-}
-
-func AccountDetailsHandler(s AccountService) http.HandlerFunc {
+func AccountDetailsHandler(s services.AccountService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]
-		s.getAccountDetails(accountID)
+		s.GetAccountDetails(accountID)
 		// TODO: Implement a return struct and encode into JSON
 	}
 }
 
-func AccountTransactionsHandler(s AccountService) http.HandlerFunc {
+func AccountTransactionsHandler(s services.AccountService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]
-		s.getAccountTransactions(accountID)
+		s.GetAccountTransactions(accountID)
 		// TODO: Implement a return struct and encode into JSON
 	}
 }

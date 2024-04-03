@@ -4,11 +4,12 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"webserver/handlers"
+	"webserver/services"
 )
 
 func createRouter(
-	accountService handlers.AccountService,
-	transactionService handlers.TransactionService,
+	accountService services.AccountService,
+	transactionService services.TransactionService,
 ) http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/accounts/{accountID}", handlers.AccountDetailsHandler(accountService)).Methods("GET")
