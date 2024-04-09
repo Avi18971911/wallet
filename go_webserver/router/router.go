@@ -7,7 +7,7 @@ import (
 	"webserver/services"
 )
 
-func createRouter(
+func CreateRouter(
 	accountService services.AccountService,
 	transactionService services.TransactionService,
 ) http.Handler {

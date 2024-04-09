@@ -8,16 +8,20 @@ import (
 	"net/http"
 	"time"
 	"webserver/repositories"
+	"webserver/router"
+	"webserver/services"
 )
 
 func main() {
 	db, cleanup, ctx := createDatabase()
 	accountCollection := db.Database("bank").Collection("account")
-	transactionCollection := db.Database("bank").Collection("bank")
+	// transactionCollection := db.Database("bank").Collection("bank")
 	defer cleanup()
 
 	ar := repositories.CreateNewAccountRepositoryMongodb(ctx, accountCollection)
-	r := createRouter()
+	as := services.CreateNewAccountServiceImpl(ar)
+	ts := services.CreateNewTransactionServiceImpl()
+	r := router.CreateRouter(as, ts)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
