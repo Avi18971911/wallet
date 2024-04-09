@@ -12,11 +12,11 @@ type DB interface {
 	GetOne(ctx context.Context, accountId string)
 }
 type AccountRepositoryMongodb struct {
-	col mongo.Collection
+	col *mongo.Collection
 	ctx context.Context
 }
 
-func CreateNewAccountRepository(ctx context.Context, col mongo.Collection) *AccountRepositoryMongodb {
+func CreateNewAccountRepositoryMongodb(ctx context.Context, col *mongo.Collection) *AccountRepositoryMongodb {
 	ar := AccountRepositoryMongodb{col: col, ctx: ctx}
 	return &ar
 }

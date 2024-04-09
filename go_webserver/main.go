@@ -7,17 +7,21 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"webserver/repositories"
 )
 
 func main() {
-	db, cleanup := createDatabase()
-	db.Database("yo").Collection("numbers")
+	db, cleanup, ctx := createDatabase()
+	accountCollection := db.Database("bank").Collection("account")
+	transactionCollection := db.Database("bank").Collection("bank")
 	defer cleanup()
+
+	ar := repositories.CreateNewAccountRepositoryMongodb(ctx, accountCollection)
 	r := createRouter()
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
-func createDatabase() (*mongo.Client, func()) {
+func createDatabase() (*mongo.Client, func(), context.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	// Connect to MongoDB
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -30,5 +34,5 @@ func createDatabase() (*mongo.Client, func()) {
 			log.Fatalf("Failed to disconnect from MongoDB: %v", err)
 		}
 	}
-	return client, cleanup
+	return client, cleanup, ctx
 }
