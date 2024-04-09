@@ -33,3 +33,7 @@ func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string) *domain.
 	}
 	return &accountDetails
 }
+
+func (ar *AccountRepositoryMongodb) GetAccountTransactions(accountId string) []*domain.AccountTransaction {
+	return []*domain.AccountTransaction{}
+}
