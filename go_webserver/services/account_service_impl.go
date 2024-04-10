@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"webserver/domain"
 	"webserver/repositories"
 )
@@ -13,12 +14,12 @@ func CreateNewAccountServiceImpl(repo repositories.AccountRepository) *AccountSe
 	return &AccountServiceImpl{repo: repo}
 }
 
-func (a *AccountServiceImpl) GetAccountDetails(accountId string) *domain.AccountDetails {
-	deets := a.repo.GetAccountDetails(accountId)
-	return deets
+func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails {
+	return a.repo.GetAccountDetails(accountId)
 }
 
-func (a *AccountServiceImpl) GetAccountTransactions(accountId string) []*domain.AccountTransaction {
-	transactions := a.repo.GetAccountTransactions(accountId)
-	return transactions
+func (a *AccountServiceImpl) GetAccountTransactions(
+	accountId string, ctx context.Context,
+) []*domain.AccountTransaction {
+	return a.repo.GetAccountTransactions(accountId)
 }

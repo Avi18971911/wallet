@@ -15,13 +15,13 @@ import (
 func main() {
 	db, cleanup, ctx := createDatabase()
 	accountCollection := db.Database("bank").Collection("account")
-	// transactionCollection := db.Database("bank").Collection("bank")
+	// transactionCollection := db.Database("bank").Collection("transaction")
 	defer cleanup()
 
 	ar := repositories.CreateNewAccountRepositoryMongodb(ctx, accountCollection)
 	as := services.CreateNewAccountServiceImpl(ar)
 	ts := services.CreateNewTransactionServiceImpl()
-	r := router.CreateRouter(as, ts)
+	r := router.CreateRouter(as, ts, ctx)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 

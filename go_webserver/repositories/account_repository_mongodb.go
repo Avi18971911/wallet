@@ -13,17 +13,16 @@ type DB interface {
 }
 type AccountRepositoryMongodb struct {
 	col *mongo.Collection
-	ctx context.Context
 }
 
 func CreateNewAccountRepositoryMongodb(ctx context.Context, col *mongo.Collection) *AccountRepositoryMongodb {
-	ar := AccountRepositoryMongodb{col: col, ctx: ctx}
+	ar := AccountRepositoryMongodb{col: col}
 	return &ar
 }
 
-func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string) *domain.AccountDetails {
+func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails {
 	var accountDetails domain.AccountDetails
-	record, err := ar.col.Find(ar.ctx, bson.D{{"accountId", accountId}})
+	record, err := ar.col.Find(ctx, bson.D{{"accountId", accountId}})
 	if err != nil {
 		log.Fatalf("Failed to connect to Collection %s with error: %v", ar.col.Name(), err)
 	}
@@ -34,6 +33,8 @@ func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string) *domain.
 	return &accountDetails
 }
 
-func (ar *AccountRepositoryMongodb) GetAccountTransactions(accountId string) []*domain.AccountTransaction {
+func (ar *AccountRepositoryMongodb) GetAccountTransactions(
+	accountId string, ctx context.Context,
+) []*domain.AccountTransaction {
 	return []*domain.AccountTransaction{}
 }

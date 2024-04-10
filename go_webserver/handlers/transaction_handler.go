@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -14,7 +15,7 @@ type TransactionRequest struct {
 	Amount      float64 `json:"amount"`
 }
 
-func TransactionInsertHandler(s services.TransactionService) http.HandlerFunc {
+func TransactionInsertHandler(s services.TransactionService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req TransactionRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
@@ -30,7 +31,7 @@ func TransactionInsertHandler(s services.TransactionService) http.HandlerFunc {
 			}
 		}(r.Body)
 
-		s.AddTransaction(req.ToAccount, req.FromAccount, req.Amount)
+		s.AddTransaction(req.ToAccount, req.FromAccount, req.Amount, ctx)
 		w.WriteHeader(http.StatusAccepted)
 		// TODO: Think if anything else is required
 	}
