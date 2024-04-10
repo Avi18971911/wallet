@@ -1,12 +1,17 @@
 package services
 
-import "context"
+import (
+	"context"
+	"webserver/domain"
+	"webserver/repositories"
+)
 
 type TransactionServiceImpl struct {
+	tr repositories.TransactionRepository
 }
 
-func CreateNewTransactionServiceImpl() *TransactionServiceImpl {
-	return &TransactionServiceImpl{}
+func CreateNewTransactionServiceImpl(tr repositories.TransactionRepository) *TransactionServiceImpl {
+	return &TransactionServiceImpl{tr}
 }
 
 func (t *TransactionServiceImpl) AddTransaction(
@@ -15,5 +20,9 @@ func (t *TransactionServiceImpl) AddTransaction(
 	amount float64,
 	ctx context.Context,
 ) {
-	// do nothing
+	t.tr.AddTransaction(domain.TransactionDetails{
+		FromAccount: fromAccount,
+		ToAccount:   toAccount,
+		Amount:      amount,
+	}, ctx)
 }

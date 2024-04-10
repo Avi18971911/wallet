@@ -15,11 +15,11 @@ func CreateNewAccountServiceImpl(repo repositories.AccountRepository) *AccountSe
 }
 
 func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails {
-	return a.repo.GetAccountDetails(accountId)
+	return a.repo.GetAccountDetails(accountId, ctx)
 }
 
 func (a *AccountServiceImpl) GetAccountTransactions(
 	accountId string, ctx context.Context,
 ) []*domain.AccountTransaction {
-	return a.repo.GetAccountTransactions(accountId)
+	return a.repo.GetAccountTransactions(accountId, ctx)
 }

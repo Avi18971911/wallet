@@ -8,14 +8,11 @@ import (
 	"webserver/domain"
 )
 
-type DB interface {
-	GetOne(ctx context.Context, accountId string)
-}
 type AccountRepositoryMongodb struct {
 	col *mongo.Collection
 }
 
-func CreateNewAccountRepositoryMongodb(ctx context.Context, col *mongo.Collection) *AccountRepositoryMongodb {
+func CreateNewAccountRepositoryMongodb(col *mongo.Collection) *AccountRepositoryMongodb {
 	ar := AccountRepositoryMongodb{col: col}
 	return &ar
 }
