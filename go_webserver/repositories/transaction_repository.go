@@ -9,5 +9,5 @@ type TransactionRepository interface {
 	AddTransaction(
 		details domain.TransactionDetails,
 		ctx context.Context,
-	)
+	) error
 }

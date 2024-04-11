@@ -1,7 +1,14 @@
 package services
 
-import "context"
+import (
+	"context"
+)
 
 type TransactionService interface {
-	AddTransaction(toAccount string, fromAccount string, amount float64, ctx context.Context)
+	AddTransaction(
+		toAccount string,
+		fromAccount string,
+		amount float64,
+		ctx context.Context,
+	)
 }

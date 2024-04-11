@@ -10,18 +10,22 @@ import (
 	"webserver/repositories"
 	"webserver/router"
 	"webserver/services"
+	"webserver/transactional"
 )
 
 func main() {
-	db, cleanup, ctx := createDatabase()
-	accountCollection := db.Database("bank").Collection("account")
-	transactionCollection := db.Database("bank").Collection("transaction")
+	cli, cleanup, ctx := createDatabase()
+	accountCollection := cli.Database("bank").Collection("account")
+	transactionCollection := cli.Database("bank").Collection("transaction")
 	defer cleanup()
 
 	ar := repositories.CreateNewAccountRepositoryMongodb(accountCollection)
 	tr := repositories.CreateNewTransactionRepositoryMongodb(transactionCollection)
+
+	tra := transactional.NewMongoTransactional(cli)
+
 	as := services.CreateNewAccountServiceImpl(ar)
-	ts := services.CreateNewTransactionServiceImpl(tr)
+	ts := services.CreateNewTransactionServiceImpl(tr, ar, tra)
 	r := router.CreateRouter(as, ts, ctx)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

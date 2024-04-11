@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"webserver/domain"
 )
 
@@ -19,10 +18,10 @@ func CreateNewTransactionRepositoryMongodb(col *mongo.Collection) *TransactionRe
 func (ar *TransactionRepositoryMongodb) AddTransaction(
 	details domain.TransactionDetails,
 	ctx context.Context,
-) {
+) error {
 	_, err := ar.col.InsertOne(ctx, details)
 	if err != nil {
-		log.Fatalf("Failed to connect to Collection %s with error: %v", ar.col.Name(), err)
+		return err
 	}
-	// TODO: Think about whether I want to return a bool or throw an exception potentially
+	return nil
 }
