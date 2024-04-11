@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"log"
 	"webserver/domain"
 	"webserver/repositories"
 )
@@ -15,11 +16,19 @@ func CreateNewAccountServiceImpl(repo repositories.AccountRepository) *AccountSe
 }
 
 func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails {
-	return a.repo.GetAccountDetails(accountId, ctx)
+	accountDetails, err := a.repo.GetAccountDetails(accountId, ctx)
+	if err != nil {
+		log.Printf("Unable to get account details for Account %s with error: %v", accountId, err)
+	}
+	return accountDetails
 }
 
 func (a *AccountServiceImpl) GetAccountTransactions(
 	accountId string, ctx context.Context,
 ) []*domain.AccountTransaction {
-	return a.repo.GetAccountTransactions(accountId, ctx)
+	accountTransactions, err := a.repo.GetAccountTransactions(accountId, ctx)
+	if err != nil {
+		log.Printf("Unable to get transaction details for Account %s with error: %v", accountId, err)
+	}
+	return accountTransactions
 }

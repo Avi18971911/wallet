@@ -58,7 +58,8 @@ func (t *TransactionServiceImpl) AddTransaction(
 		Amount:      amount,
 	}
 	if err = t.tr.AddTransaction(transactionDetails, txnCtx); err != nil {
-		log.Printf("Error adding transaction to the database from Account %s to Account %s: %v", fromAccount, toAccount, err)
+		log.Printf("Error adding transaction to the database from Account %s to "+
+			"Account %s: %v", fromAccount, toAccount, err)
 		return
 	}
 

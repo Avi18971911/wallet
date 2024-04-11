@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -19,23 +18,20 @@ func CreateNewAccountRepositoryMongodb(col *mongo.Collection) *AccountRepository
 	return &ar
 }
 
-func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails {
+func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string, ctx context.Context) (*domain.AccountDetails, error) {
 	var accountDetails domain.AccountDetails
-	record, err := ar.col.Find(ctx, bson.D{{"accountId", accountId}})
+	filter := bson.M{"accountId": accountId}
+	err := ar.col.FindOne(ctx, filter).Decode(&accountDetails)
 	if err != nil {
-		log.Fatalf("Failed to connect to Collection %s with error: %v", ar.col.Name(), err)
+		return nil, err
 	}
-	err = record.Decode(&accountDetails)
-	if err != nil {
-		log.Fatalf("Failed to decode the Document %s with error: %v", record.ID(), err)
-	}
-	return &accountDetails
+	return &accountDetails, nil
 }
 
 func (ar *AccountRepositoryMongodb) GetAccountTransactions(
 	accountId string, ctx context.Context,
-) []*domain.AccountTransaction {
-	return []*domain.AccountTransaction{}
+) ([]*domain.AccountTransaction, error) {
+	return []*domain.AccountTransaction{}, nil
 }
 
 func (ar *AccountRepositoryMongodb) AddBalance(
@@ -55,7 +51,7 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 	} else if result.ModifiedCount == 0 {
 		return errors.New("no update made to the account balance")
 	} else {
-		fmt.Printf("Successfully updated balance for account %s\n", accountId)
+		log.Printf("Successfully updated balance for account %s\n", accountId)
 		return nil
 	}
 }
