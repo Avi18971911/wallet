@@ -3,16 +3,15 @@ package services
 import (
 	"context"
 	"log"
-	"time"
 	"webserver/domain"
 	"webserver/repositories"
 	"webserver/transactional"
 )
 
 type TransactionServiceImpl struct {
-	tr            repositories.TransactionRepository
-	ar            repositories.AccountRepository
-	transactional transactional.Transactional
+	tr   repositories.TransactionRepository
+	ar   repositories.AccountRepository
+	tran transactional.Transactional
 }
 
 func CreateNewTransactionServiceImpl(
@@ -29,11 +28,10 @@ func (t *TransactionServiceImpl) AddTransaction(
 	amount float64,
 	ctx context.Context,
 ) {
-	addTimeout := 5 * time.Second
 	addCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
-	txnCtx, err := t.transactional.BeginTransaction(addCtx)
+	txnCtx, err := t.tran.BeginTransaction(addCtx)
 	if err != nil {
 		log.Printf("Error encountered when starting Add Transaction database transaction from "+
 			"Account %s to Account %s: %v", fromAccount, toAccount, err)
@@ -42,12 +40,12 @@ func (t *TransactionServiceImpl) AddTransaction(
 
 	defer func() {
 		if err != nil {
-			if rollErr := t.transactional.Rollback(txnCtx); rollErr != nil {
+			if rollErr := t.tran.Rollback(txnCtx); rollErr != nil {
 				log.Printf("Error rolling back transaction: %v", rollErr)
 			}
 			return
 		}
-		if commitErr := t.transactional.Commit(txnCtx); commitErr != nil {
+		if commitErr := t.tran.Commit(txnCtx); commitErr != nil {
 			log.Printf("Error committing Add Transaction database transaction: %v", commitErr)
 		}
 	}()

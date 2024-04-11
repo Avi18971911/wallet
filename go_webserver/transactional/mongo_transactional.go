@@ -28,7 +28,7 @@ func (m *mongoTransactional) BeginTransaction(ctx context.Context) (TransactionC
 	}
 	m.session = session
 
-	txnOpts := options.Transaction().SetReadConcern(readconcern.Local()).SetWriteConcern(writeconcern.Majority())
+	txnOpts := options.Transaction().SetReadConcern(readconcern.Snapshot()).SetWriteConcern(writeconcern.Majority())
 	err = session.StartTransaction(txnOpts)
 	if err != nil {
 		return nil, err

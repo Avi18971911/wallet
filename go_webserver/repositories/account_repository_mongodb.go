@@ -18,7 +18,10 @@ func CreateNewAccountRepositoryMongodb(col *mongo.Collection) *AccountRepository
 	return &ar
 }
 
-func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string, ctx context.Context) (*domain.AccountDetails, error) {
+func (ar *AccountRepositoryMongodb) GetAccountDetails(
+	accountId string,
+	ctx context.Context,
+) (*domain.AccountDetails, error) {
 	var accountDetails domain.AccountDetails
 	filter := bson.M{"accountId": accountId}
 	err := ar.col.FindOne(ctx, filter).Decode(&accountDetails)
@@ -26,12 +29,6 @@ func (ar *AccountRepositoryMongodb) GetAccountDetails(accountId string, ctx cont
 		return nil, err
 	}
 	return &accountDetails, nil
-}
-
-func (ar *AccountRepositoryMongodb) GetAccountTransactions(
-	accountId string, ctx context.Context,
-) ([]*domain.AccountTransaction, error) {
-	return []*domain.AccountTransaction{}, nil
 }
 
 func (ar *AccountRepositoryMongodb) AddBalance(

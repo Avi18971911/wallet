@@ -7,5 +7,5 @@ import (
 
 type AccountService interface {
 	GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails
-	GetAccountTransactions(accountId string, ctx context.Context) []*domain.AccountTransaction
+	GetAccountTransactions(accountId string, ctx context.Context) []domain.AccountTransaction
 }
