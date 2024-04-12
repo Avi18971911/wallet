@@ -41,7 +41,7 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 		}}},
 		// Add a new field 'type' to indicate debit or credit transaction
 		{{"$addFields", bson.D{
-			{"type", bson.D{{"$cond", bson.A{
+			{"transactionType", bson.D{{"$cond", bson.A{
 				bson.D{{"$eq", bson.A{"$fromAccount", accountId}}},
 				"debit",
 				"credit",
@@ -50,14 +50,16 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 		// Project desired fields, excluding the irrelevant account field
 		{{"$project", bson.D{
 			{"_id", 1},
+			{"_createdAt", 1},
 			{"type", 1},
 			{"amount", 1},
-			{"account", bson.D{{"$cond", bson.A{
-				bson.D{{"$eq", bson.A{"$type", "debit"}}},
+			{"transactionType", 1},
+			{"accountId", bson.D{{"$cond", bson.A{
+				bson.D{{"$eq", bson.A{"$transactionType", "debit"}}},
 				"$toAccount",
 				"$fromAccount",
-			}}}}},
-		}}}
+			}}}},
+		}}}}
 
 	cursor, err := tr.col.Aggregate(ctx, pipeline)
 	if err != nil {

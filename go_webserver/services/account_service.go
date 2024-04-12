@@ -6,6 +6,6 @@ import (
 )
 
 type AccountService interface {
-	GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails
-	GetAccountTransactions(accountId string, ctx context.Context) []domain.AccountTransaction
+	GetAccountDetails(accountId string, ctx context.Context) (*domain.AccountDetails, error)
+	GetAccountTransactions(accountId string, ctx context.Context) ([]domain.AccountTransaction, error)
 }

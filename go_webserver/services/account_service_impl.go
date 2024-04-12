@@ -18,19 +18,20 @@ func CreateNewAccountServiceImpl(repo repositories.AccountRepository) *AccountSe
 	return &AccountServiceImpl{ar: repo}
 }
 
-func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) *domain.AccountDetails {
+func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) (*domain.AccountDetails, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 	accountDetails, err := a.ar.GetAccountDetails(accountId, getCtx)
 	if err != nil {
 		log.Printf("Unable to get account details for Account %s with error: %v", accountId, err)
+		return nil, err
 	}
-	return accountDetails
+	return accountDetails, nil
 }
 
 func (a *AccountServiceImpl) GetAccountTransactions(
 	accountId string, ctx context.Context,
-) []domain.AccountTransaction {
+) ([]domain.AccountTransaction, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
@@ -38,7 +39,7 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 	if err != nil {
 		log.Printf("Error encountered when starting Get Account Transactions database transaction for "+
 			"Account %s: %v", accountId, err)
-		return nil
+		return nil, err
 	}
 
 	defer func() {
@@ -50,6 +51,7 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 	accountTransactions, err := a.tr.GetAccountTransactions(accountId, getCtx)
 	if err != nil {
 		log.Printf("Unable to get transaction details for Account %s with error: %v", accountId, err)
+		return nil, err
 	}
-	return accountTransactions
+	return accountTransactions, nil
 }

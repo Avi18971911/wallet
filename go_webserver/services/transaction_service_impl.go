@@ -27,7 +27,7 @@ func (t *TransactionServiceImpl) AddTransaction(
 	fromAccount string,
 	amount float64,
 	ctx context.Context,
-) {
+) error {
 	addCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
@@ -35,7 +35,7 @@ func (t *TransactionServiceImpl) AddTransaction(
 	if err != nil {
 		log.Printf("Error encountered when starting Add Transaction database transaction from "+
 			"Account %s to Account %s: %v", fromAccount, toAccount, err)
-		return
+		return err
 	}
 
 	defer func() {
@@ -58,16 +58,18 @@ func (t *TransactionServiceImpl) AddTransaction(
 	if err = t.tr.AddTransaction(transactionDetails, txnCtx); err != nil {
 		log.Printf("Error adding transaction to the database from Account %s to "+
 			"Account %s: %v", fromAccount, toAccount, err)
-		return
+		return err
 	}
 
 	if err = t.ar.AddBalance(toAccount, amount, txnCtx); err != nil {
 		log.Printf("Error adding balance to Account %s: %v", toAccount, err)
-		return
+		return err
 	}
 
 	if err = t.ar.DeductBalance(fromAccount, amount, txnCtx); err != nil {
 		log.Printf("Error deducting balance from Account %s: %v", fromAccount, err)
-		return
+		return err
 	}
+
+	return nil
 }

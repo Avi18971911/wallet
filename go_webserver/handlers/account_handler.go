@@ -2,23 +2,76 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
+	"webserver/domain"
 	"webserver/services"
 )
+
+type AccountDetailsDTO struct {
+	Id               string  `json:"id"`
+	AvailableBalance float64 `json:"availableBalance"`
+}
+
+type AccountTransactionDTO struct {
+	Id        string  `json:"id"`
+	AccountId string  `json:"accountId"`
+	Amount    float64 `json:"amount"`
+	CreatedAt int64   `json:"createdAt"`
+}
+
+func accountDetailsToDTO(tx *domain.AccountDetails) AccountDetailsDTO {
+	return AccountDetailsDTO{
+		Id:               tx.Id,
+		AvailableBalance: tx.AvailableBalance,
+	}
+}
+
+func accountTransactionToDTO(tx []domain.AccountTransaction) []AccountTransactionDTO {
+	accountTransactionDTOList := make([]AccountTransactionDTO, len(tx))
+	for i, element := range tx {
+		accountTransactionDTOList[i] = AccountTransactionDTO{
+			Id:        element.Id,
+			AccountId: element.AccountId,
+			Amount:    element.Amount,
+			CreatedAt: element.CreatedAt,
+		}
+	}
+	return accountTransactionDTOList
+}
 
 func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]
-		s.GetAccountDetails(accountID, ctx)
-		// TODO: Implement a return struct and encode into JSON
+		accountDetails, err := s.GetAccountDetails(accountID, ctx)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		jsonAccountDetails := accountDetailsToDTO(accountDetails)
+		err = json.NewEncoder(w).Encode(jsonAccountDetails)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
 func AccountTransactionsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]
-		s.GetAccountTransactions(accountID, ctx)
-		// TODO: Implement a return struct and encode into JSON
+		accountTransactions, err := s.GetAccountTransactions(accountID, ctx)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		jsonAccountTransactions := accountTransactionToDTO(accountTransactions)
+
+		err = json.NewEncoder(w).Encode(jsonAccountTransactions)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }

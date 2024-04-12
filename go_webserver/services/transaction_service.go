@@ -10,5 +10,5 @@ type TransactionService interface {
 		fromAccount string,
 		amount float64,
 		ctx context.Context,
-	)
+	) error
 }
