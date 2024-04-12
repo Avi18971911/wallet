@@ -14,8 +14,12 @@ type AccountServiceImpl struct {
 	tran transactional.Transactional
 }
 
-func CreateNewAccountServiceImpl(repo repositories.AccountRepository) *AccountServiceImpl {
-	return &AccountServiceImpl{ar: repo}
+func CreateNewAccountServiceImpl(
+	ar repositories.AccountRepository,
+	tr repositories.TransactionRepository,
+	tran transactional.Transactional,
+) *AccountServiceImpl {
+	return &AccountServiceImpl{ar: ar, tr: tr, tran: tran}
 }
 
 func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) (*domain.AccountDetails, error) {

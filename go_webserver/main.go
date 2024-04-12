@@ -24,7 +24,7 @@ func main() {
 
 	tra := transactional.NewMongoTransactional(cli)
 
-	as := services.CreateNewAccountServiceImpl(ar)
+	as := services.CreateNewAccountServiceImpl(ar, tr, tra)
 	ts := services.CreateNewTransactionServiceImpl(tr, ar, tra)
 	r := router.CreateRouter(as, ts, ctx)
 	log.Fatal(http.ListenAndServe(":8080", r))
