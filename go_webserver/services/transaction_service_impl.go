@@ -45,9 +45,6 @@ func (t *TransactionServiceImpl) AddTransaction(
 			}
 			return
 		}
-		if commitErr := t.tran.Commit(txnCtx); commitErr != nil {
-			log.Printf("Error committing Add Transaction database transaction: %v", commitErr)
-		}
 	}()
 
 	transactionDetails := domain.TransactionDetails{
@@ -69,6 +66,11 @@ func (t *TransactionServiceImpl) AddTransaction(
 	if err = t.ar.DeductBalance(fromAccount, amount, txnCtx); err != nil {
 		log.Printf("Error deducting balance from Account %s: %v", fromAccount, err)
 		return err
+	}
+
+	if commitErr := t.tran.Commit(txnCtx); commitErr != nil {
+		log.Printf("Error committing Add Transaction database transaction: %v", commitErr)
+		return commitErr
 	}
 
 	return nil
