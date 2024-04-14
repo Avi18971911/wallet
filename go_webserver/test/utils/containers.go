@@ -6,6 +6,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -74,3 +75,19 @@ func CreateMongoRuntime(ctx context.Context) (*mongo.Client, func()) {
 	}
 	return client, cleanup
 }
+
+func CleanupDatabase(client *mongo.Client, ctx context.Context) error {
+	collections, err := client.Database(testDatabaseName).ListCollectionNames(ctx, bson.D{})
+	if err != nil {
+		return err
+	}
+	for _, collection := range collections {
+		err := client.Database(testDatabaseName).Collection(collection).Drop(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+const testDatabaseName = "test"
