@@ -11,9 +11,8 @@ import (
 )
 
 func TestAddTransaction(t *testing.T) {
-
 	t.Run("Doesn't return error if transaction is successful", func(t *testing.T) {
-		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeMocks()
+		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
@@ -27,8 +26,20 @@ func TestAddTransaction(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
+	t.Run("Returns error immediately if starting transaction is unsuccessful", func(t *testing.T) {
+		mockTranRepo, _, mockTran, service, ctx, cancel := initializeTransactionMocks()
+		defer cancel()
+		mockTran.On("BeginTransaction", mock.Anything).
+			Return(ctx, errors.New("can't start transaction"))
+
+		err := service.AddTransaction("toAccountID", "fromAccountID", 100.00, ctx)
+		assert.ErrorContains(t, err, "can't start transaction")
+		mockTran.AssertNumberOfCalls(t, "Rollback", 0)
+		mockTranRepo.AssertNumberOfCalls(t, "AddTransaction", 0)
+	})
+
 	t.Run("Returns error if repository Add Transaction is unsuccessful", func(t *testing.T) {
-		mockTranRepo, _, mockTran, service, ctx, cancel := initializeMocks()
+		mockTranRepo, _, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(assert.AnError)
@@ -39,7 +50,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 
 	t.Run("Returns error if repository Add Balance is unsuccessful", func(t *testing.T) {
-		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeMocks()
+		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
@@ -52,7 +63,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 
 	t.Run("Returns error if repository Deduct Balance is unsuccessful", func(t *testing.T) {
-		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeMocks()
+		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
@@ -67,7 +78,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 
 	t.Run("Commits if no errors are encountered", func(t *testing.T) {
-		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeMocks()
+		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
@@ -83,7 +94,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 
 	t.Run("Rollback if errors are encountered", func(t *testing.T) {
-		mockTranRepo, _, mockTran, service, ctx, cancel := initializeMocks()
+		mockTranRepo, _, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(assert.AnError)
@@ -95,7 +106,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 
 	t.Run("Returns error if error is encountered during commit", func(t *testing.T) {
-		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeMocks()
+		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
@@ -113,7 +124,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 }
 
-func initializeMocks() (
+func initializeTransactionMocks() (
 	*mocks.MockTransactionRepository,
 	*mocks.MockAccountRepository,
 	*mocks.MockTransactional,

@@ -20,5 +20,9 @@ func (m *MockTransactionRepository) GetAccountTransactions(
 	ctx context.Context,
 ) ([]domain.AccountTransaction, error) {
 	args := m.Called(accountId, ctx)
-	return []domain.AccountTransaction{}, args.Error(0)
+	var accountTransactions []domain.AccountTransaction
+	if args.Get(0) != nil {
+		accountTransactions = args.Get(0).([]domain.AccountTransaction)
+	}
+	return accountTransactions, args.Error(1)
 }
