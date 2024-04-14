@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
-	"webserver/domain"
-	"webserver/mocks"
+	"webserver/internal/pkg/domain"
+	mocks2 "webserver/test/mocks"
 )
 
 func TestGetAccountDetails(t *testing.T) {
@@ -40,8 +40,7 @@ func TestGetAccountTransaction(t *testing.T) {
 	t.Run("Returns correct output assuming happy path", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		stubTransactions := []domain.
-			AccountTransaction{{Id: "1234", AccountId: "123", Amount: 123.12, CreatedAt: time.Now()}}
+		stubTransactions := []domain.AccountTransaction{{Id: "1234", AccountId: "123", Amount: 123.12, CreatedAt: time.Now()}}
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
 			Return(stubTransactions, nil)
@@ -91,16 +90,16 @@ func TestGetAccountTransaction(t *testing.T) {
 }
 
 func initializeAccountMocks() (
-	*mocks.MockTransactionRepository,
-	*mocks.MockAccountRepository,
-	*mocks.MockTransactional,
+	*mocks2.MockTransactionRepository,
+	*mocks2.MockAccountRepository,
+	*mocks2.MockTransactional,
 	*AccountServiceImpl,
 	context.Context,
 	context.CancelFunc,
 ) {
-	mockTranRepo := new(mocks.MockTransactionRepository)
-	mockAccRepo := &mocks.MockAccountRepository{}
-	mockTran := &mocks.MockTransactional{}
+	mockTranRepo := new(mocks2.MockTransactionRepository)
+	mockAccRepo := &mocks2.MockAccountRepository{}
+	mockTran := &mocks2.MockTransactional{}
 
 	service := CreateNewAccountServiceImpl(mockAccRepo, mockTranRepo, mockTran)
 	addCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

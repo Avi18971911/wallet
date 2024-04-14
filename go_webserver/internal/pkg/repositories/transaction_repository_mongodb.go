@@ -5,7 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"webserver/domain"
+	domain2 "webserver/internal/pkg/domain"
 )
 
 type TransactionRepositoryMongodb struct {
@@ -18,7 +18,7 @@ func CreateNewTransactionRepositoryMongodb(col *mongo.Collection) *TransactionRe
 }
 
 func (tr *TransactionRepositoryMongodb) AddTransaction(
-	details domain.TransactionDetails,
+	details domain2.TransactionDetails,
 	ctx context.Context,
 ) error {
 	_, err := tr.col.InsertOne(ctx, details)
@@ -30,7 +30,7 @@ func (tr *TransactionRepositoryMongodb) AddTransaction(
 
 func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 	accountId string, ctx context.Context,
-) ([]domain.AccountTransaction, error) {
+) ([]domain2.AccountTransaction, error) {
 	pipeline := mongo.Pipeline{
 		// Match transactions involving the accountId in either fromAccount or toAccount
 		{{"$match", bson.D{
@@ -66,7 +66,7 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 		return nil, err
 	}
 
-	var results []domain.AccountTransaction
+	var results []domain2.AccountTransaction
 
 	defer func() {
 		err := cursor.Close(ctx)

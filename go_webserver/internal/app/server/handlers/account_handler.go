@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
-	"webserver/domain"
-	"webserver/services"
+	"time"
+	"webserver/internal/pkg/domain"
+	"webserver/internal/pkg/services"
 )
 
 type AccountDetailsDTO struct {
@@ -15,10 +16,10 @@ type AccountDetailsDTO struct {
 }
 
 type AccountTransactionDTO struct {
-	Id        string  `json:"id"`
-	AccountId string  `json:"accountId"`
-	Amount    float64 `json:"amount"`
-	CreatedAt int64   `json:"createdAt"`
+	Id        string    `json:"id"`
+	AccountId string    `json:"accountId"`
+	Amount    float64   `json:"amount"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 func accountDetailsToDTO(tx *domain.AccountDetails) AccountDetailsDTO {

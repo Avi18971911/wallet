@@ -3,20 +3,20 @@ package services
 import (
 	"context"
 	"log"
-	"webserver/domain"
-	"webserver/repositories"
-	"webserver/transactional"
+	"webserver/internal/pkg/domain"
+	repositories2 "webserver/internal/pkg/repositories"
+	"webserver/internal/pkg/transactional"
 )
 
 type AccountServiceImpl struct {
-	ar   repositories.AccountRepository
-	tr   repositories.TransactionRepository
+	ar   repositories2.AccountRepository
+	tr   repositories2.TransactionRepository
 	tran transactional.Transactional
 }
 
 func CreateNewAccountServiceImpl(
-	ar repositories.AccountRepository,
-	tr repositories.TransactionRepository,
+	ar repositories2.AccountRepository,
+	tr repositories2.TransactionRepository,
 	tran transactional.Transactional,
 ) *AccountServiceImpl {
 	return &AccountServiceImpl{ar: ar, tr: tr, tran: tran}

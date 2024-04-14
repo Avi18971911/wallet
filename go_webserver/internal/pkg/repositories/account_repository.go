@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"webserver/domain"
+	"webserver/internal/pkg/domain"
 )
 
 type AccountRepository interface {

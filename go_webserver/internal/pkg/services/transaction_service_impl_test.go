@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
-	"webserver/mocks"
+	mocks2 "webserver/test/mocks"
 )
 
 func TestAddTransaction(t *testing.T) {
@@ -125,16 +125,16 @@ func TestAddTransaction(t *testing.T) {
 }
 
 func initializeTransactionMocks() (
-	*mocks.MockTransactionRepository,
-	*mocks.MockAccountRepository,
-	*mocks.MockTransactional,
+	*mocks2.MockTransactionRepository,
+	*mocks2.MockAccountRepository,
+	*mocks2.MockTransactional,
 	*TransactionServiceImpl,
 	context.Context,
 	context.CancelFunc,
 ) {
-	mockTranRepo := new(mocks.MockTransactionRepository)
-	mockAccRepo := &mocks.MockAccountRepository{}
-	mockTran := &mocks.MockTransactional{}
+	mockTranRepo := new(mocks2.MockTransactionRepository)
+	mockAccRepo := &mocks2.MockAccountRepository{}
+	mockTran := &mocks2.MockTransactional{}
 
 	service := CreateNewTransactionServiceImpl(mockTranRepo, mockAccRepo, mockTran)
 	addCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

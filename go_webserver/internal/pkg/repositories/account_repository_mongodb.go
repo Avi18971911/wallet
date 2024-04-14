@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"webserver/domain"
+	"webserver/internal/pkg/domain"
 )
 
 type AccountRepositoryMongodb struct {

@@ -4,13 +4,13 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	"net/http"
-	"webserver/handlers"
-	"webserver/services"
+	"webserver/internal/app/server/handlers"
+	services2 "webserver/internal/pkg/services"
 )
 
 func CreateRouter(
-	accountService services.AccountService,
-	transactionService services.TransactionService,
+	accountService services2.AccountService,
+	transactionService services2.TransactionService,
 	ctx context.Context,
 ) http.Handler {
 	r := mux.NewRouter()

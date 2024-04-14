@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 	"github.com/stretchr/testify/mock"
-	"webserver/domain"
+	"webserver/internal/pkg/domain"
 )
 
 type MockAccountRepository struct {

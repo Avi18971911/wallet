@@ -7,10 +7,10 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"webserver/repositories"
-	"webserver/router"
-	"webserver/services"
-	"webserver/transactional"
+	"webserver/internal/app/server/router"
+	repositories2 "webserver/internal/pkg/repositories"
+	services2 "webserver/internal/pkg/services"
+	"webserver/internal/pkg/transactional"
 )
 
 func main() {
@@ -19,13 +19,13 @@ func main() {
 	transactionCollection := cli.Database("bank").Collection("transaction")
 	defer cleanup()
 
-	ar := repositories.CreateNewAccountRepositoryMongodb(accountCollection)
-	tr := repositories.CreateNewTransactionRepositoryMongodb(transactionCollection)
+	ar := repositories2.CreateNewAccountRepositoryMongodb(accountCollection)
+	tr := repositories2.CreateNewTransactionRepositoryMongodb(transactionCollection)
 
 	tra := transactional.NewMongoTransactional(cli)
 
-	as := services.CreateNewAccountServiceImpl(ar, tr, tra)
-	ts := services.CreateNewTransactionServiceImpl(tr, ar, tra)
+	as := services2.CreateNewAccountServiceImpl(ar, tr, tra)
+	ts := services2.CreateNewTransactionServiceImpl(tr, ar, tra)
 	r := router.CreateRouter(as, ts, ctx)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

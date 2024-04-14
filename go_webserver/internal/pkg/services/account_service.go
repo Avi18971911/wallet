@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"webserver/domain"
+	"webserver/internal/pkg/domain"
 )
 
 type AccountService interface {
