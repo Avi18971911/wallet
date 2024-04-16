@@ -6,8 +6,8 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/services"
-	"webserver/internal/pkg/infrastructure/mongodb"
 )
 
 type AccountDetailsDTO struct {
@@ -22,14 +22,14 @@ type AccountTransactionDTO struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-func accountDetailsToDTO(tx *mongodb.MongoAccountDetails) AccountDetailsDTO {
+func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
 	return AccountDetailsDTO{
 		Id:               tx.Id,
 		AvailableBalance: tx.AvailableBalance,
 	}
 }
 
-func accountTransactionToDTO(tx []mongodb.MongoAccountTransaction) []AccountTransactionDTO {
+func accountTransactionToDTO(tx []model.AccountTransaction) []AccountTransactionDTO {
 	accountTransactionDTOList := make([]AccountTransactionDTO, len(tx))
 	for i, element := range tx {
 		accountTransactionDTOList[i] = AccountTransactionDTO{
