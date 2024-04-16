@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 	"github.com/stretchr/testify/mock"
-	"webserver/internal/pkg/transactional"
+	"webserver/internal/pkg/infrastructure/transactional"
 )
 
 type MockTransactional struct {

@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 	"github.com/stretchr/testify/mock"
-	"webserver/internal/pkg/domain"
+	"webserver/internal/pkg/domain/model"
 )
 
 type MockAccountRepository struct {
@@ -13,11 +13,11 @@ type MockAccountRepository struct {
 func (m *MockAccountRepository) GetAccountDetails(
 	accountId string,
 	ctx context.Context,
-) (*domain.AccountDetails, error) {
+) (*model.AccountDetails, error) {
 	args := m.Called(accountId, ctx)
-	var accountDetails *domain.AccountDetails
+	var accountDetails *model.AccountDetails
 	if args.Get(0) != nil {
-		accountDetails = args.Get(0).(*domain.AccountDetails)
+		accountDetails = args.Get(0).(*model.AccountDetails)
 	}
 	return accountDetails, args.Error(1)
 }

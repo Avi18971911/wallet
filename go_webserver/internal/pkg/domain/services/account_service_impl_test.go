@@ -7,15 +7,15 @@ import (
 	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
-	"webserver/internal/pkg/domain"
-	mocks2 "webserver/test/mocks"
+	"webserver/internal/pkg/domain/model"
+	"webserver/test/mocks"
 )
 
 func TestGetAccountDetails(t *testing.T) {
 	t.Run("Doesn't return error if GetAccountDetails is successful", func(t *testing.T) {
 		_, mockAccRepo, _, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		stubDetails := &domain.AccountDetails{Id: "1234", AvailableBalance: 38.43}
+		stubDetails := &model.AccountDetails{Id: "accountId", AvailableBalance: 38.43}
 		mockAccRepo.On("GetAccountDetails", mock.Anything, mock.Anything).Return(stubDetails, nil)
 
 		res, err := service.GetAccountDetails("accountId", ctx)
@@ -40,7 +40,9 @@ func TestGetAccountTransaction(t *testing.T) {
 	t.Run("Returns correct output assuming happy path", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		stubTransactions := []domain.AccountTransaction{{Id: "1234", AccountId: "123", Amount: 123.12, CreatedAt: time.Now()}}
+		stubTransactions := []model.AccountTransaction{
+			{Id: "transactionId", AccountId: "accountId", Amount: 123.12, CreatedAt: time.Now()},
+		}
 		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
 			Return(stubTransactions, nil)
@@ -90,16 +92,16 @@ func TestGetAccountTransaction(t *testing.T) {
 }
 
 func initializeAccountMocks() (
-	*mocks2.MockTransactionRepository,
-	*mocks2.MockAccountRepository,
-	*mocks2.MockTransactional,
+	*mocks.MockTransactionRepository,
+	*mocks.MockAccountRepository,
+	*mocks.MockTransactional,
 	*AccountServiceImpl,
 	context.Context,
 	context.CancelFunc,
 ) {
-	mockTranRepo := new(mocks2.MockTransactionRepository)
-	mockAccRepo := &mocks2.MockAccountRepository{}
-	mockTran := &mocks2.MockTransactional{}
+	mockTranRepo := new(mocks.MockTransactionRepository)
+	mockAccRepo := &mocks.MockAccountRepository{}
+	mockTran := &mocks.MockTransactional{}
 
 	service := CreateNewAccountServiceImpl(mockAccRepo, mockTranRepo, mockTran)
 	addCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

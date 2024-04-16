@@ -6,7 +6,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"webserver/internal/pkg/domain"
+	"webserver/internal/pkg/domain/model"
+	"webserver/internal/pkg/infrastructure/mongodb"
+	"webserver/internal/pkg/utils"
 )
 
 type AccountRepositoryMongodb struct {
@@ -21,14 +23,20 @@ func CreateNewAccountRepositoryMongodb(col *mongo.Collection) *AccountRepository
 func (ar *AccountRepositoryMongodb) GetAccountDetails(
 	accountId string,
 	ctx context.Context,
-) (*domain.AccountDetails, error) {
-	var accountDetails domain.AccountDetails
-	filter := bson.M{"accountId": accountId}
-	err := ar.col.FindOne(ctx, filter).Decode(&accountDetails)
+) (*model.AccountDetails, error) {
+	var accountDetails mongodb.MongoAccountDetails
+	var res *model.AccountDetails
+	objectId, err := utils.StringToObjectId(accountId)
 	if err != nil {
 		return nil, err
 	}
-	return &accountDetails, nil
+	filter := bson.M{"_id": objectId}
+	err = ar.col.FindOne(ctx, filter).Decode(&accountDetails)
+	if err != nil {
+		return nil, err
+	}
+	res, err = fromMongoAccountDetails(&accountDetails)
+	return res, nil
 }
 
 func (ar *AccountRepositoryMongodb) AddBalance(
@@ -36,7 +44,11 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 	amount float64,
 	ctx context.Context,
 ) error {
-	filter := bson.M{"accountId": accountId}
+	objectId, err := utils.StringToObjectId(accountId)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"_id": objectId}
 	update := bson.M{"$inc": bson.M{"availableBalance": amount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -58,8 +70,12 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 	amount float64,
 	ctx context.Context,
 ) error {
+	objectId, err := utils.StringToObjectId(accountId)
+	if err != nil {
+		return err
+	}
 	negativeAmount := amount * -1
-	filter := bson.M{"accountId": accountId}
+	filter := bson.M{"_id": objectId}
 	update := bson.M{"$inc": bson.M{"availableBalance": negativeAmount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -74,4 +90,15 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 		log.Printf("Successfully updated balance for account %s\n", accountId)
 		return nil
 	}
+}
+
+func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {
+	accountId, err := utils.ObjectIdToString(details.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &model.AccountDetails{
+		Id:               accountId,
+		AvailableBalance: details.AvailableBalance,
+	}, nil
 }

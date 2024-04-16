@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"webserver/internal/pkg/services"
+	"webserver/internal/pkg/domain/services"
 )
 
 type TransactionRequest struct {

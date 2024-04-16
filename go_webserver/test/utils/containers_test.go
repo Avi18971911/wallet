@@ -16,7 +16,7 @@ func TestMongoDBIntegration(t *testing.T) {
 		client, cleanup := CreateMongoRuntime(ctx)
 		defer cleanup()
 
-		collection := client.Database(testDatabaseName).Collection("testcol")
+		collection := client.Database(TestDatabaseName).Collection("testcol")
 		_, err := collection.InsertOne(ctx, bson.M{"name": "test", "value": "value"})
 		if err != nil {
 			t.Fatalf("Failed to insert document: %v", err)
@@ -40,7 +40,7 @@ func TestMongoDBIntegration(t *testing.T) {
 		client, cleanup := CreateMongoRuntime(ctx)
 		defer cleanup()
 
-		database := client.Database(testDatabaseName)
+		database := client.Database(TestDatabaseName)
 		collection := database.Collection("testcol")
 		_, err := collection.InsertOne(ctx, bson.M{"name": "test", "value": "value"})
 		if err != nil {

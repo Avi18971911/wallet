@@ -3,26 +3,26 @@ package services
 import (
 	"context"
 	"log"
-	"webserver/internal/pkg/domain"
-	repositories2 "webserver/internal/pkg/repositories"
-	"webserver/internal/pkg/transactional"
+	"webserver/internal/pkg/domain/model"
+	"webserver/internal/pkg/domain/repositories"
+	"webserver/internal/pkg/infrastructure/transactional"
 )
 
 type AccountServiceImpl struct {
-	ar   repositories2.AccountRepository
-	tr   repositories2.TransactionRepository
+	ar   repositories.AccountRepository
+	tr   repositories.TransactionRepository
 	tran transactional.Transactional
 }
 
 func CreateNewAccountServiceImpl(
-	ar repositories2.AccountRepository,
-	tr repositories2.TransactionRepository,
+	ar repositories.AccountRepository,
+	tr repositories.TransactionRepository,
 	tran transactional.Transactional,
 ) *AccountServiceImpl {
 	return &AccountServiceImpl{ar: ar, tr: tr, tran: tran}
 }
 
-func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) (*domain.AccountDetails, error) {
+func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) (*model.AccountDetails, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 	accountDetails, err := a.ar.GetAccountDetails(accountId, getCtx)
@@ -35,7 +35,7 @@ func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Con
 
 func (a *AccountServiceImpl) GetAccountTransactions(
 	accountId string, ctx context.Context,
-) ([]domain.AccountTransaction, error) {
+) ([]model.AccountTransaction, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 

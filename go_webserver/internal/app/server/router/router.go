@@ -5,12 +5,12 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"webserver/internal/app/server/handlers"
-	services2 "webserver/internal/pkg/services"
+	"webserver/internal/pkg/domain/services"
 )
 
 func CreateRouter(
-	accountService services2.AccountService,
-	transactionService services2.TransactionService,
+	accountService services.AccountService,
+	transactionService services.TransactionService,
 	ctx context.Context,
 ) http.Handler {
 	r := mux.NewRouter()

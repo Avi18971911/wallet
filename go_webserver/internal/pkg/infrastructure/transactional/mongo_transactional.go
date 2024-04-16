@@ -9,19 +9,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 )
 
-type mongoTransactional struct {
+type MongoTransactional struct {
 	client  *mongo.Client
 	session mongo.Session
 }
 
 // NewMongoTransactional creates a new MongoDB transaction manager.
-func NewMongoTransactional(client *mongo.Client) Transactional {
-	return &mongoTransactional{
+func NewMongoTransactional(client *mongo.Client) *MongoTransactional {
+	return &MongoTransactional{
 		client: client,
 	}
 }
 
-func (m *mongoTransactional) BeginTransaction(ctx context.Context) (TransactionContext, error) {
+func (m *MongoTransactional) BeginTransaction(ctx context.Context) (TransactionContext, error) {
 	session, err := m.client.StartSession()
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (m *mongoTransactional) BeginTransaction(ctx context.Context) (TransactionC
 	return txnCtx, nil
 }
 
-func (m *mongoTransactional) Commit(ctx context.Context) error {
+func (m *MongoTransactional) Commit(ctx context.Context) error {
 	if m.session != nil {
 		err := m.session.CommitTransaction(ctx)
 		m.session.EndSession(ctx)
@@ -48,7 +48,7 @@ func (m *mongoTransactional) Commit(ctx context.Context) error {
 	return errors.New("no session found, please start a transaction before committing")
 }
 
-func (m *mongoTransactional) Rollback(ctx context.Context) error {
+func (m *MongoTransactional) Rollback(ctx context.Context) error {
 	if m.session != nil {
 		err := m.session.AbortTransaction(ctx)
 		m.session.EndSession(ctx)

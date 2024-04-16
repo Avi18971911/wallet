@@ -3,9 +3,9 @@ package services
 import (
 	"context"
 	"log"
-	"webserver/internal/pkg/domain"
-	repositories2 "webserver/internal/pkg/repositories"
-	"webserver/internal/pkg/transactional"
+	"webserver/internal/pkg/domain/model"
+	repositories2 "webserver/internal/pkg/domain/repositories"
+	"webserver/internal/pkg/infrastructure/transactional"
 )
 
 type TransactionServiceImpl struct {
@@ -47,12 +47,12 @@ func (t *TransactionServiceImpl) AddTransaction(
 		}
 	}()
 
-	transactionDetails := domain.TransactionDetails{
+	transactionDetails := model.TransactionDetails{
 		FromAccount: fromAccount,
 		ToAccount:   toAccount,
 		Amount:      amount,
 	}
-	if err = t.tr.AddTransaction(transactionDetails, txnCtx); err != nil {
+	if err = t.tr.AddTransaction(&transactionDetails, txnCtx); err != nil {
 		log.Printf("Error adding transaction to the database from Account %s to "+
 			"Account %s: %v", fromAccount, toAccount, err)
 		return err
