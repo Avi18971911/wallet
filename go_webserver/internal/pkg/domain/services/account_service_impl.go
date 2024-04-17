@@ -39,7 +39,7 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
-	txnCtx, err := a.tran.BeginTransaction(getCtx)
+	txnCtx, err := a.tran.BeginTransaction(getCtx, transactional.IsolationHigh, transactional.DurabilityHigh)
 	if err != nil {
 		log.Printf("Error encountered when starting Get Account Transactions database transaction for "+
 			"Account %s: %v", accountId, err)

@@ -14,29 +14,57 @@ type MongoTransactional struct {
 	session mongo.Session
 }
 
-// NewMongoTransactional creates a new MongoDB transaction manager.
 func NewMongoTransactional(client *mongo.Client) *MongoTransactional {
 	return &MongoTransactional{
 		client: client,
 	}
 }
 
-func (m *MongoTransactional) BeginTransaction(ctx context.Context) (TransactionContext, error) {
+func (m *MongoTransactional) BeginTransaction(
+	ctx context.Context,
+	readConcern int,
+	writeConcern int,
+) (TransactionContext, error) {
 	session, err := m.client.StartSession()
 	if err != nil {
 		return nil, err
 	}
 	m.session = session
 
-	txnOpts := options.Transaction().SetReadConcern(readconcern.Snapshot()).SetWriteConcern(writeconcern.Majority())
+	determinedReadConcern := determineReadConcern(readConcern)
+	determinedWriteConcern := determineWriteConcern(writeConcern)
+	txnOpts := options.Transaction().SetReadConcern(determinedReadConcern).SetWriteConcern(determinedWriteConcern)
 	err = session.StartTransaction(txnOpts)
 	if err != nil {
 		return nil, err
 	}
 
-	// Use the session as part of your transaction context, ensuring operations use this session.
 	txnCtx := mongo.NewSessionContext(ctx, session)
 	return txnCtx, nil
+}
+
+func determineReadConcern(readConcern int) *readconcern.ReadConcern {
+	switch readConcern {
+	case IsolationLow:
+		return readconcern.Local()
+	case IsolationMedium:
+		return readconcern.Majority()
+	case IsolationHigh:
+		return readconcern.Snapshot()
+	default:
+		return readconcern.Majority()
+	}
+}
+
+func determineWriteConcern(writeConcern int) *writeconcern.WriteConcern {
+	switch writeConcern {
+	case DurabilityLow:
+		return writeconcern.W1()
+	case DurabilityHigh:
+		return writeconcern.Majority()
+	default:
+		return writeconcern.Majority()
+	}
 }
 
 func (m *MongoTransactional) Commit(ctx context.Context) error {

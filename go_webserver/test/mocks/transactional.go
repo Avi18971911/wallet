@@ -10,8 +10,12 @@ type MockTransactional struct {
 	mock.Mock
 }
 
-func (m *MockTransactional) BeginTransaction(ctx context.Context) (transactional.TransactionContext, error) {
-	args := m.Called(ctx)
+func (m *MockTransactional) BeginTransaction(
+	ctx context.Context,
+	isolationLevel int,
+	durabilityLevel int,
+) (transactional.TransactionContext, error) {
+	args := m.Called(ctx, isolationLevel, durabilityLevel)
 	return args.Get(0).(context.Context), args.Error(1)
 }
 

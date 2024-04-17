@@ -31,7 +31,7 @@ func (t *TransactionServiceImpl) AddTransaction(
 	addCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
-	txnCtx, err := t.tran.BeginTransaction(addCtx)
+	txnCtx, err := t.tran.BeginTransaction(addCtx, transactional.IsolationLow, transactional.DurabilityHigh)
 	if err != nil {
 		log.Printf("Error encountered when starting Add Transaction database transaction from "+
 			"Account %s to Account %s: %v", fromAccount, toAccount, err)

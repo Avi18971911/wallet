@@ -43,7 +43,7 @@ func TestGetAccountTransaction(t *testing.T) {
 		stubTransactions := []model.AccountTransaction{
 			{Id: "transactionId", AccountId: "accountId", Amount: 123.12, CreatedAt: time.Now()},
 		}
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
 			Return(stubTransactions, nil)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
@@ -56,7 +56,7 @@ func TestGetAccountTransaction(t *testing.T) {
 	t.Run("Returns error immediately if starting transaction is unsuccessful", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).
 			Return(ctx, errors.New("can't start transaction"))
 
 		_, err := service.GetAccountTransactions("accountId", ctx)
@@ -68,7 +68,7 @@ func TestGetAccountTransaction(t *testing.T) {
 	t.Run("Returns error if GetAccountTransactions isn't successful", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
 			Return(nil, errors.New("can't GetAccountTransactions"))
@@ -81,7 +81,7 @@ func TestGetAccountTransaction(t *testing.T) {
 	t.Run("Rollback even if returning an error", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
 			Return(nil, errors.New("can't GetAccountTransactions"))

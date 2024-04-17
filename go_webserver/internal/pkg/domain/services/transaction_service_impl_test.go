@@ -14,7 +14,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Doesn't return error if transaction is successful", func(t *testing.T) {
 		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
 		mockAccRepo.On("AddBalance", mock.Anything, mock.Anything, mock.Anything).
 			Return(nil)
@@ -29,7 +29,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Returns error immediately if starting transaction is unsuccessful", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).
 			Return(ctx, errors.New("can't start transaction"))
 
 		err := service.AddTransaction("toAccountID", "fromAccountID", 100.00, ctx)
@@ -41,7 +41,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Returns error if repository Add Transaction is unsuccessful", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(assert.AnError)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
@@ -52,7 +52,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Returns error if repository Add Balance is unsuccessful", func(t *testing.T) {
 		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
 		mockAccRepo.On("AddBalance", mock.Anything, mock.Anything, mock.Anything).
 			Return(assert.AnError)
@@ -65,7 +65,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Returns error if repository Deduct Balance is unsuccessful", func(t *testing.T) {
 		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
 		mockAccRepo.On("AddBalance", mock.Anything, mock.Anything, mock.Anything).
 			Return(nil)
@@ -80,7 +80,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Commits if no errors are encountered", func(t *testing.T) {
 		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
 		mockAccRepo.On("AddBalance", mock.Anything, mock.Anything, mock.Anything).
 			Return(nil)
@@ -96,7 +96,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Rollback if errors are encountered", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(assert.AnError)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
@@ -108,7 +108,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Returns error if error is encountered during commit", func(t *testing.T) {
 		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
-		mockTran.On("BeginTransaction", mock.Anything).Return(ctx, nil)
+		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(nil)
 		mockAccRepo.On("AddBalance", mock.Anything, mock.Anything, mock.Anything).
 			Return(nil)
