@@ -40,7 +40,7 @@ func TestAddTransaction(t *testing.T) {
 	input := model.TransactionDetails{
 		ToAccount:   samAccountName,
 		FromAccount: tomAccountName,
-		Amount:      50.42,
+		Amount:      transferAmount,
 	}
 
 	err := service.AddTransaction(input.ToAccount, input.FromAccount, input.Amount, ctx)
@@ -56,6 +56,13 @@ func TestAddTransaction(t *testing.T) {
 	}
 	assert.Equal(t, baseAmount+transferAmount, samFind.AvailableBalance)
 	assert.Equal(t, baseAmount-transferAmount, tomFind.AvailableBalance)
+
+	var tranRes = mongodb.MongoTransactionDetails{}
+	err = tranCollection.FindOne(ctx, bson.M{"fromAccount": tomRes.InsertedID}).Decode(&tranRes)
+	if err != nil {
+		t.Errorf("Error in decoding transaction result into tranRes: %v", err)
+	}
+	assert.Equal(t, transferAmount, tranRes.Amount)
 }
 
 func setupService(
