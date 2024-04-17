@@ -35,7 +35,7 @@ func TestAddTransaction(t *testing.T) {
 
 	tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
 	samAccountName, _ := pkgutils.ObjectIdToString(samRes.InsertedID)
-	service := setupService(mongoClient, tranCollection, accCollection)
+	service := setupTransactionService(mongoClient, tranCollection, accCollection)
 	transferAmount, baseAmount := 50.42, 1000.0
 	input := model.TransactionDetails{
 		ToAccount:   samAccountName,
@@ -65,7 +65,7 @@ func TestAddTransaction(t *testing.T) {
 	assert.Equal(t, transferAmount, tranRes.Amount)
 }
 
-func setupService(
+func setupTransactionService(
 	mongoClient *mongo.Client,
 	tranCollection *mongo.Collection,
 	accCollection *mongo.Collection,
