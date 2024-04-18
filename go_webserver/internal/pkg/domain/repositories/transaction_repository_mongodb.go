@@ -39,18 +39,22 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 	accountId string, ctx context.Context,
 ) ([]model.AccountTransaction, error) {
 	var res []model.AccountTransaction
+	objectAccountId, err := utils.StringToObjectId(accountId)
+	if err != nil {
+		return nil, err
+	}
 	pipeline := mongo.Pipeline{
 		// Match transactions involving the accountId in either fromAccount or toAccount
 		{{"$match", bson.D{
 			{"$or", bson.A{
-				bson.D{{"fromAccount", accountId}},
-				bson.D{{"toAccount", accountId}},
+				bson.D{{"fromAccount", objectAccountId}},
+				bson.D{{"toAccount", objectAccountId}},
 			}},
 		}}},
 		// Add a new field 'type' to indicate debit or credit transaction
 		{{"$addFields", bson.D{
 			{"transactionType", bson.D{{"$cond", bson.A{
-				bson.D{{"$eq", bson.A{"$fromAccount", accountId}}},
+				bson.D{{"$eq", bson.A{"$fromAccount", objectAccountId}}},
 				"debit",
 				"credit",
 			}}}}},
@@ -66,6 +70,11 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 				bson.D{{"$eq", bson.A{"$transactionType", "debit"}}},
 				"$toAccount",
 				"$fromAccount",
+			}}}},
+			{"otherAccountId", bson.D{{"$cond", bson.A{
+				bson.D{{"$eq", bson.A{"$transactionType", "debit"}}},
+				"$fromAccount",
+				"$toAccount",
 			}}}},
 		}}}}
 
