@@ -11,8 +11,9 @@ type MongoAccountDetails struct {
 }
 
 type MongoAccountTransaction struct {
-	Id        primitive.ObjectID `bson:"_id"`
-	AccountId primitive.ObjectID `bson:"accountId"`
-	Amount    float64            `bson:"amount"`
-	CreatedAt time.Time          `bson:"_createdAt"`
+	Id             primitive.ObjectID `bson:"_id"`
+	AccountId      primitive.ObjectID `bson:"accountId"`
+	OtherAccountId primitive.ObjectID `bson:"otherAccountId"`
+	Amount         float64            `bson:"amount"`
+	CreatedAt      time.Time          `bson:"_createdAt"`
 }

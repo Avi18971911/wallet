@@ -125,7 +125,7 @@ func fromMongoAccountTransaction(
 ) ([]model.AccountTransaction, error) {
 	var res = make([]model.AccountTransaction, len(accountTransactions))
 	var err error
-	var transactionId, accountId string
+	var transactionId, accountId, otherAccountId string
 	for i, elem := range accountTransactions {
 		transactionId, err = utils.ObjectIdToString(elem.Id)
 		if err != nil {
@@ -135,11 +135,16 @@ func fromMongoAccountTransaction(
 		if err != nil {
 			return res, err
 		}
+		otherAccountId, err = utils.ObjectIdToString(elem.OtherAccountId)
+		if err != nil {
+			return res, err
+		}
 		res[i] = model.AccountTransaction{
-			Id:        transactionId,
-			AccountId: accountId,
-			Amount:    elem.Amount,
-			CreatedAt: elem.CreatedAt,
+			Id:             transactionId,
+			AccountId:      accountId,
+			OtherAccountId: otherAccountId,
+			Amount:         elem.Amount,
+			CreatedAt:      elem.CreatedAt,
 		}
 	}
 	return res, nil
