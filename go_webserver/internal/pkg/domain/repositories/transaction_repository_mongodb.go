@@ -51,7 +51,7 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 				bson.D{{"toAccount", objectAccountId}},
 			}},
 		}}},
-		// Add a new field 'type' to indicate debit or credit transaction
+		// Add a new field 'transactionType' to indicate debit or credit transaction
 		{{"$addFields", bson.D{
 			{"transactionType", bson.D{{"$cond", bson.A{
 				bson.D{{"$eq", bson.A{"$fromAccount", objectAccountId}}},
@@ -59,18 +59,12 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 				"credit",
 			}}}}},
 		}},
-		// Project desired fields, excluding the irrelevant account field
 		{{"$project", bson.D{
 			{"_id", 1},
 			{"_createdAt", 1},
-			{"type", 1},
 			{"amount", 1},
 			{"transactionType", 1},
-			{"accountId", bson.D{{"$cond", bson.A{
-				bson.D{{"$eq", bson.A{"$transactionType", "debit"}}},
-				"$toAccount",
-				"$fromAccount",
-			}}}},
+			{"accountId", objectAccountId},
 			{"otherAccountId", bson.D{{"$cond", bson.A{
 				bson.D{{"$eq", bson.A{"$transactionType", "debit"}}},
 				"$fromAccount",
@@ -140,11 +134,12 @@ func fromMongoAccountTransaction(
 			return res, err
 		}
 		res[i] = model.AccountTransaction{
-			Id:             transactionId,
-			AccountId:      accountId,
-			OtherAccountId: otherAccountId,
-			Amount:         elem.Amount,
-			CreatedAt:      elem.CreatedAt,
+			Id:              transactionId,
+			AccountId:       accountId,
+			OtherAccountId:  otherAccountId,
+			TransactionType: elem.TransactionType,
+			Amount:          elem.Amount,
+			CreatedAt:       elem.CreatedAt,
 		}
 	}
 	return res, nil

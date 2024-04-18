@@ -16,11 +16,12 @@ type AccountDetailsDTO struct {
 }
 
 type AccountTransactionDTO struct {
-	Id             string    `json:"id"`
-	AccountId      string    `json:"accountId"`
-	OtherAccountId string    `json:"otherAccountId"`
-	Amount         float64   `json:"amount"`
-	CreatedAt      time.Time `json:"createdAt"`
+	Id              string    `json:"id"`
+	AccountId       string    `json:"accountId"`
+	OtherAccountId  string    `json:"otherAccountId"`
+	TransactionType string    `json:"transactionType"`
+	Amount          float64   `json:"amount"`
+	CreatedAt       time.Time `json:"createdAt"`
 }
 
 func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
@@ -34,11 +35,12 @@ func accountTransactionToDTO(tx []model.AccountTransaction) []AccountTransaction
 	accountTransactionDTOList := make([]AccountTransactionDTO, len(tx))
 	for i, element := range tx {
 		accountTransactionDTOList[i] = AccountTransactionDTO{
-			Id:             element.Id,
-			AccountId:      element.AccountId,
-			OtherAccountId: element.OtherAccountId,
-			Amount:         element.Amount,
-			CreatedAt:      element.CreatedAt,
+			Id:              element.Id,
+			AccountId:       element.AccountId,
+			OtherAccountId:  element.OtherAccountId,
+			TransactionType: element.TransactionType,
+			Amount:          element.Amount,
+			CreatedAt:       element.CreatedAt,
 		}
 	}
 	return accountTransactionDTOList
