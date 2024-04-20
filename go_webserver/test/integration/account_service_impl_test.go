@@ -4,9 +4,11 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"testing"
 	"time"
+	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/repositories"
 	"webserver/internal/pkg/domain/services"
 	"webserver/internal/pkg/infrastructure/transactional"
@@ -22,7 +24,7 @@ func TestGetAccountDetails(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	tomRes, tomErr := accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0, "accountHolderFirstName": "Tom"})
+	tomRes, tomErr := accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0})
 	if tomErr != nil {
 		t.Errorf("Error inserting Tom's record %v", tomErr)
 	}
@@ -42,22 +44,25 @@ func TestGetAccountTransactions(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	tomRes, tomErr := accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0, "accountHolderFirstName": "Tom"})
-	if tomErr != nil {
-		t.Errorf("Error inserting Tom's record %v", tomErr)
-	}
-	samRes, samErr := accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0, "accountHolderFirstName": "Sam"})
-	if samErr != nil {
-		t.Errorf("Error inserting Tom's record %v", samErr)
-	}
+	tomAccountId := primitive.NewObjectID()
+	samAccountId := primitive.NewObjectID()
+	accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0, "_id": tomAccountId})
+	accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0, "_id": samAccountId})
 
-	tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
-	// samAccountName, _ := pkgutils.ObjectIdToString(samRes.InsertedID)
+	tomAccountName, err := pkgutils.ObjectIdToString(tomAccountId)
+	samAccountName, err := pkgutils.ObjectIdToString(samAccountId)
 
-	_, err := tranCollection.InsertMany(ctx, bson.A{
-		bson.M{"fromAccount": tomRes.InsertedID, "toAccount": samRes.InsertedID, "amount": 50.32},
-		bson.M{"fromAccount": samRes.InsertedID, "toAccount": tomRes.InsertedID, "amount": 23.89},
-		bson.M{"fromAccount": tomRes.InsertedID, "toAccount": samRes.InsertedID, "amount": 10.88},
+	tranId1 := primitive.NewObjectID()
+	tranId2 := primitive.NewObjectID()
+	tranId3 := primitive.NewObjectID()
+	tranString1, err := pkgutils.ObjectIdToString(tranId1)
+	tranString2, err := pkgutils.ObjectIdToString(tranId2)
+	tranString3, err := pkgutils.ObjectIdToString(tranId3)
+
+	_, err = tranCollection.InsertMany(ctx, bson.A{
+		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": 50.32, "_id": tranId1},
+		bson.M{"fromAccount": samAccountId, "toAccount": tomAccountId, "amount": 23.89, "_id": tranId2},
+		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": 10.88, "_id": tranId3},
 	})
 	if err != nil {
 		t.Errorf("Error inserting transactions: %v", err)
@@ -66,8 +71,34 @@ func TestGetAccountTransactions(t *testing.T) {
 	accountService := setupAccountService(mongoClient, tranCollection, accCollection)
 
 	res, err := accountService.GetAccountTransactions(tomAccountName, ctx)
-	assert.Nil(t, err)
-	assert.Equal(t, 50.32, res[0].Amount)
+	expectedCreatedAt := res[0].CreatedAt
+	expectedResults := []model.AccountTransaction{
+		{
+			Id:              tranString1,
+			AccountId:       tomAccountName,
+			TransactionType: "debit",
+			OtherAccountId:  samAccountName,
+			Amount:          50.32,
+			CreatedAt:       expectedCreatedAt,
+		},
+		{
+			Id:              tranString2,
+			AccountId:       tomAccountName,
+			TransactionType: "credit",
+			OtherAccountId:  samAccountName,
+			Amount:          23.89,
+			CreatedAt:       expectedCreatedAt,
+		},
+		{
+			Id:              tranString3,
+			AccountId:       tomAccountName,
+			TransactionType: "debit",
+			OtherAccountId:  samAccountName,
+			Amount:          10.88,
+			CreatedAt:       expectedCreatedAt,
+		},
+	}
+	assert.ElementsMatch(t, expectedResults, res)
 }
 
 func setupAccountService(
