@@ -55,8 +55,8 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 		{{"$addFields", bson.D{
 			{"transactionType", bson.D{{"$cond", bson.A{
 				bson.D{{"$eq", bson.A{"$fromAccount", objectAccountId}}},
-				"debit",
 				"credit",
+				"debit",
 			}}}}},
 		}},
 		{{"$project", bson.D{

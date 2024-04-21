@@ -44,13 +44,14 @@ func TestGetAccountTransactions(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	tomAccountId := primitive.NewObjectID()
-	samAccountId := primitive.NewObjectID()
-	accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0, "_id": tomAccountId})
-	accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0, "_id": samAccountId})
+	baseAmounts := []float64{1000.0, 1000.0}
+	accountIds, err := createAccounts(accCollection, ctx, baseAmounts)
+	tomAccountId, samAccountId := accountIds[0], accountIds[1]
 
 	tomAccountName, err := pkgutils.ObjectIdToString(tomAccountId)
 	samAccountName, err := pkgutils.ObjectIdToString(samAccountId)
+
+	tranAmounts := []float64{50.32, 23.89, 10.88}
 
 	tranId1 := primitive.NewObjectID()
 	tranId2 := primitive.NewObjectID()
@@ -58,11 +59,12 @@ func TestGetAccountTransactions(t *testing.T) {
 	tranString1, err := pkgutils.ObjectIdToString(tranId1)
 	tranString2, err := pkgutils.ObjectIdToString(tranId2)
 	tranString3, err := pkgutils.ObjectIdToString(tranId3)
+	tranStrings := []string{tranString1, tranString2, tranString3}
 
 	_, err = tranCollection.InsertMany(ctx, bson.A{
-		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": 50.32, "_id": tranId1},
-		bson.M{"fromAccount": samAccountId, "toAccount": tomAccountId, "amount": 23.89, "_id": tranId2},
-		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": 10.88, "_id": tranId3},
+		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": tranAmounts[0], "_id": tranId1},
+		bson.M{"fromAccount": samAccountId, "toAccount": tomAccountId, "amount": tranAmounts[1], "_id": tranId2},
+		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": tranAmounts[2], "_id": tranId3},
 	})
 	if err != nil {
 		t.Errorf("Error inserting transactions: %v", err)
@@ -72,33 +74,64 @@ func TestGetAccountTransactions(t *testing.T) {
 
 	res, err := accountService.GetAccountTransactions(tomAccountName, ctx)
 	expectedCreatedAt := res[0].CreatedAt
-	expectedResults := []model.AccountTransaction{
-		{
-			Id:              tranString1,
-			AccountId:       tomAccountName,
-			TransactionType: "debit",
-			OtherAccountId:  samAccountName,
-			Amount:          50.32,
-			CreatedAt:       expectedCreatedAt,
-		},
-		{
-			Id:              tranString2,
-			AccountId:       tomAccountName,
-			TransactionType: "credit",
-			OtherAccountId:  samAccountName,
-			Amount:          23.89,
-			CreatedAt:       expectedCreatedAt,
-		},
-		{
-			Id:              tranString3,
-			AccountId:       tomAccountName,
-			TransactionType: "debit",
-			OtherAccountId:  samAccountName,
-			Amount:          10.88,
-			CreatedAt:       expectedCreatedAt,
-		},
-	}
+	expectedTransactionTypes := []string{"credit", "debit", "credit"}
+	expectedResults := createExpectedAccountTranResult(
+		tomAccountName,
+		samAccountName,
+		expectedCreatedAt,
+		tranStrings,
+		tranAmounts,
+		expectedTransactionTypes,
+	)
 	assert.ElementsMatch(t, expectedResults, res)
+}
+
+func createExpectedAccountTranResult(
+	accountId string,
+	otherAccountId string,
+	expectedCreatedAt time.Time,
+	tranStrings []string,
+	tranAmounts []float64,
+	transactionTypes []string,
+) []model.AccountTransaction {
+	expectedResults := make([]model.AccountTransaction, len(tranAmounts))
+	for i, _ := range tranAmounts {
+		expectedResults[i] = model.AccountTransaction{
+			Id:              tranStrings[i],
+			AccountId:       accountId,
+			TransactionType: transactionTypes[i],
+			OtherAccountId:  otherAccountId,
+			Amount:          tranAmounts[i],
+			CreatedAt:       expectedCreatedAt,
+		}
+	}
+	return expectedResults
+}
+
+func createAccounts(
+	accCollection *mongo.Collection,
+	ctx context.Context,
+	amounts []float64,
+) (accountIds []primitive.ObjectID, err error) {
+	res := make([]primitive.ObjectID, len(amounts))
+	for i, _ := range amounts {
+		currentAmount := amounts[i]
+		res[i] = primitive.NewObjectID()
+		_, err := insertAccount(accCollection, ctx, res[i], currentAmount)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func insertAccount(
+	accCollection *mongo.Collection,
+	ctx context.Context,
+	accountId primitive.ObjectID,
+	amount float64,
+) (*mongo.InsertOneResult, error) {
+	return accCollection.InsertOne(ctx, bson.M{"availableBalance": amount, "_id": accountId})
 }
 
 func setupAccountService(
