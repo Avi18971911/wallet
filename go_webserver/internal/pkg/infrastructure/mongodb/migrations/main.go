@@ -32,6 +32,17 @@ func main() {
 		}
 	}(client, ctx)
 
+	applyMigrations(client, ctx, mainDatabaseName, migrationDatabaseName, migrationsToRun)
+	log.Println("Migration completed successfully")
+}
+
+func applyMigrations(
+	client *mongo.Client,
+	ctx context.Context,
+	mainDatabaseName string,
+	migrationDatabaseName string,
+	migrationsToRun []versions.Migration,
+) {
 	for _, elem := range migrationsToRun {
 		hasBeenApplied, err := checkIfApplied(client, ctx, migrationDatabaseName, elem.Version)
 		if err != nil {
@@ -48,6 +59,4 @@ func main() {
 			}
 		}
 	}
-
-	log.Println("Migration completed successfully")
 }

@@ -10,7 +10,7 @@ import (
 	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions"
 )
 
-const collection = "Transaction"
+const collection = "transaction"
 
 var Migration2 = versions.Migration{
 	Version: "2",

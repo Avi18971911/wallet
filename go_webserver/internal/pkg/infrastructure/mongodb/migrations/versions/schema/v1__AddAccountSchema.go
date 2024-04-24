@@ -16,7 +16,7 @@ var Migration1 = versions.Migration{
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, time.Minute*5)
 		defer cancel()
-		collection := "Account"
+		collection := "account"
 		validation := bson.M{
 			"validator": bson.M{
 				"$jsonSchema": bson.M{
