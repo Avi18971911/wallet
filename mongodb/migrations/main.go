@@ -25,11 +25,20 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error in connecting to database: %v", err)
 	}
-	defer client.Disconnect(ctx)
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+			log.Printf("Error encountered when closing database connection: %v", err)
+		}
+	}(client, ctx)
 
 	for _, elem := range migrationsToRun {
-		if !checkIfApplied(client, ctx, migrationDatabaseName, elem.Version) {
-			err := elem.Up(client, ctx, mainDatabaseName)
+		hasBeenApplied, err := checkIfApplied(client, ctx, migrationDatabaseName, elem.Version)
+		if err != nil {
+			log.Fatalf("Error when checking if migration has been applied: %v", err)
+		}
+		if !hasBeenApplied {
+			err = elem.Up(client, ctx, mainDatabaseName)
 			if err != nil {
 				log.Fatalf("Error when applying migration %s: %v", elem.Version, err)
 			}
