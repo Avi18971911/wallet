@@ -8,7 +8,7 @@ import (
 
 const collectionName = "migrations"
 
-func CheckIfApplied(client *mongo.Client, ctx context.Context, databaseName string, version string) bool {
+func checkIfApplied(client *mongo.Client, ctx context.Context, databaseName string, version string) bool {
 	db := client.Database(databaseName)
 	collection := db.Collection(collectionName)
 	filter := bson.M{"version": version}
@@ -16,7 +16,7 @@ func CheckIfApplied(client *mongo.Client, ctx context.Context, databaseName stri
 	return err != nil
 }
 
-func MarkAsApplied(client *mongo.Client, ctx context.Context, databaseName string, version string) error {
+func markAsApplied(client *mongo.Client, ctx context.Context, databaseName string, version string) error {
 	db := client.Database(databaseName)
 	collection := db.Collection(collectionName)
 	_, err := collection.InsertOne(ctx, bson.M{"version": version})

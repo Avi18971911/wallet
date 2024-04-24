@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// TODO: Change these to a file trawler
 var migrationsToRun = []versions.Migration{
 	schema.Migration1,
 	schema.Migration2,
@@ -27,12 +28,12 @@ func main() {
 	defer client.Disconnect(ctx)
 
 	for _, elem := range migrationsToRun {
-		if !CheckIfApplied(client, ctx, migrationDatabaseName, elem.Version) {
+		if !checkIfApplied(client, ctx, migrationDatabaseName, elem.Version) {
 			err := elem.Up(client, ctx, mainDatabaseName)
 			if err != nil {
 				log.Fatalf("Error when applying migration %s: %v", elem.Version, err)
 			}
-			err = MarkAsApplied(client, ctx, migrationDatabaseName, elem.Version)
+			err = markAsApplied(client, ctx, migrationDatabaseName, elem.Version)
 			if err != nil {
 				log.Printf("Error when marking migration %s as applied", elem.Version)
 			}
