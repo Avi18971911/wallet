@@ -5,9 +5,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
-	"migrations/versions"
-	"migrations/versions/schema"
 	"time"
+	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions"
+	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions/schema"
 )
 
 // TODO: Change these to a file trawler
