@@ -17,34 +17,31 @@ var Migration1 = versions.Migration{
 		mongoCtx, cancel := context.WithTimeout(ctx, time.Minute*5)
 		defer cancel()
 		collection := "account"
-		validation := bson.M{
-			"validator": bson.M{
-				"$jsonSchema": bson.M{
-					"bsonType": "object",
-					"required": []string{"availableBalance", "_createdAt"},
-					"properties": bson.M{
-						"availableBalance": bson.M{
-							"bsonType":    "long",
-							"description": "must be a long and is required",
-						},
-						"_createdAt": bson.M{
-							"bsonType":    "timestamp",
-							"description": "must be a timestamp and is required",
-						},
+		validator := bson.M{
+			"$jsonSchema": bson.M{
+				"bsonType": "object",
+				"required": []string{"availableBalance", "_createdAt"},
+				"properties": bson.M{
+					"availableBalance": bson.M{
+						"bsonType":    "double",
+						"description": "must be a long and is required",
+					},
+					"_createdAt": bson.M{
+						"bsonType":    "timestamp",
+						"description": "must be a timestamp and is required",
 					},
 				},
 			},
-			"validationLevel": "strict",
 		}
 
-		opts := options.CreateCollection().SetValidator(validation)
+		opts := options.CreateCollection().SetValidator(validator).SetValidationLevel("strict")
 
 		err := db.CreateCollection(mongoCtx, collection, opts)
 		if err != nil {
 			return err
 		}
 
-		log.Printf("Collection %s created with validation rules", collection)
+		log.Printf("Collection %s created with validator rules", collection)
 		return nil
 	},
 	Down: func(client *mongo.Client, ctx context.Context, databaseName string) error {

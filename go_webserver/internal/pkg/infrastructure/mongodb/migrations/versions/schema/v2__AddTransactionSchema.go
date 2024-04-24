@@ -19,34 +19,31 @@ var Migration2 = versions.Migration{
 		mongoCtx, cancel := context.WithTimeout(ctx, time.Minute*5)
 		defer cancel()
 		validation := bson.M{
-			"validator": bson.M{
-				"$jsonSchema": bson.M{
-					"bsonType": "object",
-					"required": []string{"amount", "_createdAt", "fromAccount", "toAccount"},
-					"properties": bson.M{
-						"amount": bson.M{
-							"bsonType":    "long",
-							"description": "the amount transferred",
-						},
-						"_createdAt": bson.M{
-							"bsonType":    "timestamp",
-							"description": "the time the transactions has been created",
-						},
-						"fromAccount": bson.M{
-							"bsonType":    "objectId",
-							"description": "the account from which the amount is coming",
-						},
-						"toAccount": bson.M{
-							"bsonType":    "objectId",
-							"description": "the account to which the amount is going",
-						},
+			"$jsonSchema": bson.M{
+				"bsonType": "object",
+				"required": []string{"amount", "_createdAt", "fromAccount", "toAccount"},
+				"properties": bson.M{
+					"amount": bson.M{
+						"bsonType":    "double",
+						"description": "the amount transferred",
+					},
+					"_createdAt": bson.M{
+						"bsonType":    "timestamp",
+						"description": "the time the transactions has been created",
+					},
+					"fromAccount": bson.M{
+						"bsonType":    "objectId",
+						"description": "the account from which the amount is coming",
+					},
+					"toAccount": bson.M{
+						"bsonType":    "objectId",
+						"description": "the account to which the amount is going",
 					},
 				},
 			},
-			"validationLevel": "strict",
 		}
 
-		opts := options.CreateCollection().SetValidator(validation)
+		opts := options.CreateCollection().SetValidator(validation).SetValidationLevel("strict")
 
 		err := db.CreateCollection(mongoCtx, collection, opts)
 		if err != nil {

@@ -6,11 +6,13 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"testing"
 	"time"
 	"webserver/internal/pkg/infrastructure/mongodb/migrations"
 	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions/schema"
+	pkgutils "webserver/internal/pkg/utils"
 	"webserver/test/utils"
 )
 
@@ -78,8 +80,42 @@ func TestV1Migration(t *testing.T) {
 	collection := db.Collection("account")
 	migration := schema.Migration1
 
-	t.Run("")
+	// TODO: Add further tests once the schema has been finalized
+	t.Run("Should be able to add accounts with balances and _createdAt", func(t *testing.T) {
+		err := migration.Up(mongoClient, ctx, utils.TestDatabaseName)
+		assert.Nil(t, err)
+		mongoTimestamp := pkgutils.GetCurrentTimestamp()
+		_, err = collection.InsertOne(ctx, bson.M{"_createdAt": mongoTimestamp, "availableBalance": 1000.00})
+		assert.Nil(t, err)
+		cleanupMigrations(collection, ctx)
+	})
+}
 
+func TestV2Migration(t *testing.T) {
+	if mongoClient == nil {
+		t.Error("mongoClient is uninitialized or otherwise nil")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	defer cancel()
+	db := mongoClient.Database(utils.TestDatabaseName)
+	collection := db.Collection("transaction")
+	migration := schema.Migration2
+
+	// TODO: Add further tests once the schema has been finalized
+	t.Run("Should be able to add transactions with required fields", func(t *testing.T) {
+		err := migration.Up(mongoClient, ctx, utils.TestDatabaseName)
+		assert.Nil(t, err)
+		mongoTimestamp := pkgutils.GetCurrentTimestamp()
+		accountId1, accountId2 := primitive.NewObjectID(), primitive.NewObjectID()
+		_, err = collection.InsertOne(ctx, bson.M{
+			"_createdAt":  mongoTimestamp,
+			"amount":      1000.00,
+			"fromAccount": accountId1,
+			"toAccount":   accountId2,
+		})
+		assert.Nil(t, err)
+		cleanupMigrations(collection, ctx)
+	})
 }
 
 func cleanupMigrations(collection *mongo.Collection, ctx context.Context) {
