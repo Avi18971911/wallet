@@ -24,6 +24,7 @@ var Migration1 = versions.Migration{
 				"properties": bson.M{
 					"availableBalance": bson.M{
 						"bsonType":    "double",
+						"minimum":     0,
 						"description": "must be a long and is required",
 					},
 					"_createdAt": bson.M{
