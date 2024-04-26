@@ -111,6 +111,7 @@ func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.M
 		FromAccount: fromAccount,
 		ToAccount:   toAccount,
 		Amount:      details.Amount,
+		CreatedAt:   utils.GetCurrentTimestamp(),
 	}, err
 }
 
