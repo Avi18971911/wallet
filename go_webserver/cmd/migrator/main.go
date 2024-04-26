@@ -1,4 +1,4 @@
-package migrations
+package main
 
 import (
 	"context"
@@ -6,8 +6,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"time"
-	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions"
-	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions/schema"
+	"webserver/migrations"
+	"webserver/migrations/versions"
+	"webserver/migrations/versions/schema"
 )
 
 // TODO: Change these to a file trawler
@@ -21,7 +22,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	// TODO: Set URI in config
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongo:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatalf("Error in connecting to database: %v", err)
 	}
@@ -44,7 +45,7 @@ func applyMigrations(
 	migrationsToRun []versions.Migration,
 ) {
 	for _, elem := range migrationsToRun {
-		hasBeenApplied, err := checkIfApplied(client, ctx, migrationDatabaseName, elem.Version)
+		hasBeenApplied, err := migrations.CheckIfApplied(client, ctx, migrationDatabaseName, elem.Version)
 		if err != nil {
 			log.Fatalf("Error when checking if migration has been applied: %v", err)
 		}
@@ -53,7 +54,7 @@ func applyMigrations(
 			if err != nil {
 				log.Fatalf("Error when applying migration %s: %v", elem.Version, err)
 			}
-			err = markAsApplied(client, ctx, migrationDatabaseName, elem.Version)
+			err = migrations.MarkAsApplied(client, ctx, migrationDatabaseName, elem.Version)
 			if err != nil {
 				log.Printf("Error when marking migration %s as applied", elem.Version)
 			}

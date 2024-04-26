@@ -10,9 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"testing"
 	"time"
-	"webserver/internal/pkg/infrastructure/mongodb/migrations"
-	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions/schema"
 	pkgutils "webserver/internal/pkg/utils"
+	"webserver/migrations"
+	"webserver/migrations/versions/schema"
 	"webserver/test/utils"
 )
 

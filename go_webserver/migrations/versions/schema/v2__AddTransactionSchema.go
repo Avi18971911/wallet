@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"time"
-	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions"
+	"webserver/migrations/versions"
 )
 
 const collection = "transaction"

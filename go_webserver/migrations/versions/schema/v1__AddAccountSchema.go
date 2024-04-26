@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"time"
-	"webserver/internal/pkg/infrastructure/mongodb/migrations/versions"
+	"webserver/migrations/versions"
 )
 
 var Migration1 = versions.Migration{
