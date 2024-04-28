@@ -72,8 +72,14 @@ func CreateMongoRuntime(ctx context.Context) (*mongo.Client, func()) {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
 
-	config := bson.D{{"_id", "rs0"}, {"members", bson.A{bson.D{{"_id", 0}, {"host", fmt.Sprintf("localhost:%s", port)}}}}}
-	replicaCommandResult := client.Database("admin").RunCommand(mongoCtx, bson.D{{Key: "replSetInitiate", Value: config}})
+	config := bson.D{
+		{"_id", "rs0"},
+		{"members",
+			bson.A{bson.D{{"_id", 0}, {"host", fmt.Sprintf("localhost:%s", port)}}},
+		},
+	}
+	replicaCommandResult := client.Database("admin").
+		RunCommand(mongoCtx, bson.D{{Key: "replSetInitiate", Value: config}})
 
 	if replicaCommandResult.Err() != nil {
 		log.Fatalf("Failed to create Replica Set: %v", replicaCommandResult.Err())

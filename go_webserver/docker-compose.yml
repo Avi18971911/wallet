@@ -1,11 +1,17 @@
 version: '3.8'
 services:
-  mongodb:
+  mongo:
     image: mongo:7.0.8
-    volumes:
-      - mongo-data:/data/db
+    command: [--replSet, rs0, --bind_ip_all, --port, "30001"]
     ports:
-      - "27017:27017"
+      - "30001:30001"
+    # volumes:
+    #   - ../mongodb/initiate_replica_set.js:/docker-entrypoint-initdb.d/initiate_replica_set.js:ro
+    healthcheck:
+      test: test $$(mongosh --port 30001 --quiet --eval "try {rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongo:30001\"}]})} catch(e) {rs.status().ok}") -eq 1
+      # test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      start_period: 30s
 
   migrations:
     build:
@@ -14,9 +20,9 @@ services:
       args:
         MAIN_DIR: migrator
     depends_on:
-      - mongodb
+      - mongo
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/
+      - MONGO_URL=mongodb://mongo:30001
 
   webserver:
     build:
@@ -29,7 +35,4 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/
-
-volumes:
-  mongo-data:
+      - MONGO_URL=mongodb://mongo:30001

@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"os"
 	"time"
 	"webserver/migrations"
 	"webserver/migrations/versions"
@@ -19,10 +20,11 @@ var migrationsToRun = []versions.Migration{
 
 func main() {
 	mainDatabaseName, migrationDatabaseName := "wallet", "migrations"
+	mongoURL := os.Getenv("MONGO_URL")
+	log.Printf("Attempting to connect to Mongo URL %s", mongoURL)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
-	// TODO: Set URI in config
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
 	if err != nil {
 		log.Fatalf("Error in connecting to database: %v", err)
 	}

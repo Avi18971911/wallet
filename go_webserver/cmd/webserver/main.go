@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
+	"os"
 	"time"
 	"webserver/internal/app/server/router"
 	repositories2 "webserver/internal/pkg/domain/repositories"
@@ -14,7 +15,8 @@ import (
 )
 
 func main() {
-	cli, cleanup, ctx := createDatabase()
+	mongoURL := os.Getenv("MONGO_URL")
+	cli, cleanup, ctx := createDatabase(mongoURL)
 	accountCollection := cli.Database("bank").Collection("account")
 	transactionCollection := cli.Database("bank").Collection("transaction")
 	defer cleanup()
@@ -27,13 +29,14 @@ func main() {
 	as := services.CreateNewAccountServiceImpl(ar, tr, tra)
 	ts := services.CreateNewTransactionServiceImpl(tr, ar, tra)
 	r := router.CreateRouter(as, ts, ctx)
+	log.Printf("Starting webserver")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
-func createDatabase() (*mongo.Client, func(), context.Context) {
+func createDatabase(mongoURL string) (*mongo.Client, func(), context.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	// Connect to MongoDB
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
