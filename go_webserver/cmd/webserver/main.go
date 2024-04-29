@@ -17,8 +17,8 @@ import (
 func main() {
 	mongoURL := os.Getenv("MONGO_URL")
 	cli, cleanup, ctx := createDatabase(mongoURL)
-	accountCollection := cli.Database("bank").Collection("account")
-	transactionCollection := cli.Database("bank").Collection("transaction")
+	accountCollection := cli.Database("wallet").Collection("account")
+	transactionCollection := cli.Database("wallet").Collection("transaction")
 	defer cleanup()
 
 	ar := repositories2.CreateNewAccountRepositoryMongodb(accountCollection)
@@ -34,7 +34,8 @@ func main() {
 }
 
 func createDatabase(mongoURL string) (*mongo.Client, func(), context.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// TODO: Do not pass this context down, figure out another way
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	// Connect to MongoDB
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
 	if err != nil {

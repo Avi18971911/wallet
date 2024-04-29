@@ -10,8 +10,8 @@ import (
 	"webserver/migrations/versions"
 )
 
-var Migration1 = versions.Migration{
-	Version: "1",
+var MigrationSchema1 = versions.Migration{
+	Version: "1__Schema",
 	Up: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, time.Minute*5)

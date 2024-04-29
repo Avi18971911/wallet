@@ -12,8 +12,8 @@ import (
 
 const collection = "transaction"
 
-var Migration2 = versions.Migration{
-	Version: "2",
+var MigrationSchema2 = versions.Migration{
+	Version: "2__Schema",
 	Up: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, time.Minute*5)

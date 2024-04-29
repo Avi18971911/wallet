@@ -5,6 +5,7 @@ import "time"
 type AccountDetails struct {
 	Id               string
 	AvailableBalance float64
+	CreatedAt        time.Time
 }
 
 type AccountTransaction struct {

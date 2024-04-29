@@ -11,8 +11,9 @@ import (
 )
 
 type AccountDetailsDTO struct {
-	Id               string  `json:"id"`
-	AvailableBalance float64 `json:"availableBalance"`
+	Id               string    `json:"id"`
+	AvailableBalance float64   `json:"availableBalance"`
+	CreatedAt        time.Time `json:"createdAt"`
 }
 
 type AccountTransactionDTO struct {

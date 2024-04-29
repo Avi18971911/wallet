@@ -14,9 +14,9 @@ func CreateRouter(
 	ctx context.Context,
 ) http.Handler {
 	r := mux.NewRouter()
-	r.HandleFunc("/accounts/{accountID}", handlers.AccountDetailsHandler(accountService, ctx)).Methods("GET")
+	r.HandleFunc("/accounts/{accountId}", handlers.AccountDetailsHandler(accountService, ctx)).Methods("GET")
 	r.Handle("/transactions", handlers.TransactionInsertHandler(transactionService, ctx)).Methods("POST")
-	r.Handle("/accounts/{accountID}/transactions", handlers.AccountTransactionsHandler(accountService, ctx)).
+	r.Handle("/accounts/{accountId}/transactions", handlers.AccountTransactionsHandler(accountService, ctx)).
 		Methods("GET")
 
 	return r

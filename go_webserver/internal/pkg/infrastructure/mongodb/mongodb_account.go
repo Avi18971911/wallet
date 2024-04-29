@@ -6,8 +6,9 @@ import (
 )
 
 type MongoAccountDetails struct {
-	Id               primitive.ObjectID `bson:"_id"`
-	AvailableBalance float64            `bson:"availableBalance"`
+	Id               primitive.ObjectID  `bson:"_id"`
+	AvailableBalance float64             `bson:"availableBalance"`
+	CreatedAt        primitive.Timestamp `bson:"_createdAt"`
 }
 
 type MongoAccountTransaction struct {

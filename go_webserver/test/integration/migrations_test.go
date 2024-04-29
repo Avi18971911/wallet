@@ -70,7 +70,7 @@ func TestMigrationService(t *testing.T) {
 	})
 }
 
-func TestV1Migration(t *testing.T) {
+func TestV1SchemaMigration(t *testing.T) {
 	if mongoClient == nil {
 		t.Error("mongoClient is uninitialized or otherwise nil")
 	}
@@ -78,7 +78,7 @@ func TestV1Migration(t *testing.T) {
 	defer cancel()
 	db := mongoClient.Database(utils.TestDatabaseName)
 	collection := db.Collection("account")
-	migration := schema.Migration1
+	migration := schema.MigrationSchema1
 
 	// TODO: Add further tests once the schema has been finalized
 	t.Run("Should be able to add accounts with balances and _createdAt", func(t *testing.T) {
@@ -91,7 +91,7 @@ func TestV1Migration(t *testing.T) {
 	})
 }
 
-func TestV2Migration(t *testing.T) {
+func TestV2SchemaMigration(t *testing.T) {
 	if mongoClient == nil {
 		t.Error("mongoClient is uninitialized or otherwise nil")
 	}
@@ -99,7 +99,7 @@ func TestV2Migration(t *testing.T) {
 	defer cancel()
 	db := mongoClient.Database(utils.TestDatabaseName)
 	collection := db.Collection("transaction")
-	migration := schema.Migration2
+	migration := schema.MigrationSchema2
 
 	// TODO: Add further tests once the schema has been finalized
 	t.Run("Should be able to add transactions with required fields", func(t *testing.T) {

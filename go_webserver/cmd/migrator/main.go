@@ -9,13 +9,15 @@ import (
 	"time"
 	"webserver/migrations"
 	"webserver/migrations/versions"
+	"webserver/migrations/versions/data"
 	"webserver/migrations/versions/schema"
 )
 
 // TODO: Change these to a file trawler
 var migrationsToRun = []versions.Migration{
-	schema.Migration1,
-	schema.Migration2,
+	schema.MigrationSchema1,
+	schema.MigrationSchema2,
+	data.MigrationData1,
 }
 
 func main() {
