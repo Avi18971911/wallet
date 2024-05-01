@@ -6,9 +6,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"time"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/utils"
+	"webserver/migrations"
 	"webserver/migrations/versions"
 )
 
@@ -34,7 +34,7 @@ var MigrationData1 = versions.Migration{
 	Version: "1__Data",
 	Up: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
-		mongoCtx, cancel := context.WithTimeout(ctx, time.Minute*5)
+		mongoCtx, cancel := context.WithTimeout(ctx, migrations.MigrationTimeout)
 		defer cancel()
 		collectionName := "account"
 		coll := db.Collection(collectionName)
@@ -49,7 +49,7 @@ var MigrationData1 = versions.Migration{
 	},
 	Down: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
-		mongoCtx, cancel := context.WithTimeout(ctx, time.Minute*5)
+		mongoCtx, cancel := context.WithTimeout(ctx, migrations.MigrationTimeout)
 		defer cancel()
 		collectionName := "account"
 		coll := db.Collection(collectionName)

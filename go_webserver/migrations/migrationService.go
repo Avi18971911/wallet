@@ -5,15 +5,19 @@ import (
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 const collectionName = "migrations"
+const MigrationTimeout = time.Minute * 1
 
 func CheckIfApplied(client *mongo.Client, ctx context.Context, databaseName string, version string) (bool, error) {
 	db := client.Database(databaseName)
 	collection := db.Collection(collectionName)
+	mongoCtx, cancel := context.WithTimeout(ctx, MigrationTimeout)
+	defer cancel()
 	filter := bson.M{"version": version}
-	err := collection.FindOne(ctx, filter).Err()
+	err := collection.FindOne(mongoCtx, filter).Err()
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return false, nil
 	}
@@ -26,7 +30,9 @@ func CheckIfApplied(client *mongo.Client, ctx context.Context, databaseName stri
 func MarkAsApplied(client *mongo.Client, ctx context.Context, databaseName string, version string) error {
 	db := client.Database(databaseName)
 	collection := db.Collection(collectionName)
-	_, err := collection.InsertOne(ctx, bson.M{"version": version})
+	mongoCtx, cancel := context.WithTimeout(ctx, MigrationTimeout)
+	defer cancel()
+	_, err := collection.InsertOne(mongoCtx, bson.M{"version": version})
 	if err != nil {
 		return err
 	}

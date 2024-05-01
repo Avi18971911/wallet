@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 	"webserver/internal/app/server/router"
 	repositories2 "webserver/internal/pkg/domain/repositories"
 	"webserver/internal/pkg/domain/services"
@@ -35,7 +34,7 @@ func main() {
 
 func createDatabase(mongoURL string) (*mongo.Client, func(), context.Context) {
 	// TODO: Do not pass this context down, figure out another way
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	ctx, cancel := context.WithCancel(context.Background())
 	// Connect to MongoDB
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
 	if err != nil {

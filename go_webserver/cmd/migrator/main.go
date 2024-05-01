@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
-	"time"
 	"webserver/migrations"
 	"webserver/migrations/versions"
 	"webserver/migrations/versions/data"
@@ -24,7 +23,7 @@ func main() {
 	mainDatabaseName, migrationDatabaseName := "wallet", "migrations"
 	mongoURL := os.Getenv("MONGO_URL")
 	log.Printf("Attempting to connect to Mongo URL %s", mongoURL)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
 	if err != nil {
