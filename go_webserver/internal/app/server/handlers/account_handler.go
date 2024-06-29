@@ -47,6 +47,16 @@ func accountTransactionToDTO(tx []model.AccountTransaction) []AccountTransaction
 	return accountTransactionDTOList
 }
 
+// AccountDetailsHandler creates a handler for fetching account details.
+// @Summary Get account details
+// @Description Retrieves the details of a specific account by its ID.
+// @Tags accounts
+// @Accept json
+// @Produce json
+// @Param accountId path string true "Account ID"
+// @Success 200 {object} AccountDetailsDTO "Successful retrieval of account details"
+// @Failure 500 {string} string "Internal server error"
+// @Router /accounts/{accountId} [get]
 func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]
@@ -64,6 +74,16 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 	}
 }
 
+// AccountTransactionsHandler creates a handler for fetching account transactions.
+// @Summary Get account transactions
+// @Description Retrieves a list of transactions for a specific account by its ID.
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param accountId path string true "Account ID"
+// @Success 200 {object} []AccountTransactionDTO "Successful retrieval of account transactions"
+// @Failure 500 {string} string "Internal server error"
+// @Router /accounts/{accountId}/transactions [get]
 func AccountTransactionsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]

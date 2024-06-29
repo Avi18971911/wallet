@@ -1,0 +1,121 @@
+definitions:
+  handlers.AccountDetailsDTO:
+    properties:
+      availableBalance:
+        type: number
+      createdAt:
+        type: string
+      id:
+        type: string
+    type: object
+  handlers.AccountTransactionDTO:
+    properties:
+      accountId:
+        type: string
+      amount:
+        type: number
+      createdAt:
+        type: string
+      id:
+        type: string
+      otherAccountId:
+        type: string
+      transactionType:
+        type: string
+    type: object
+  handlers.TransactionRequest:
+    properties:
+      amount:
+        type: number
+      fromAccount:
+        type: string
+      toAccount:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /accounts/{accountId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a specific account by its ID.
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of account details
+          schema:
+            $ref: '#/definitions/handlers.AccountDetailsDTO'
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get account details
+      tags:
+      - accounts
+  /accounts/{accountId}/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of transactions for a specific account by its
+        ID.
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of account transactions
+          schema:
+            items:
+              $ref: '#/definitions/handlers.AccountTransactionDTO'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get account transactions
+      tags:
+      - transactions
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new transaction to the system.
+      parameters:
+      - description: Transaction request
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.TransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Add a new transaction
+      tags:
+      - transactions
+swagger: "2.0"
