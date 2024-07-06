@@ -4,6 +4,7 @@ import "time"
 
 type AccountDetails struct {
 	Id               string
+	Username         string
 	AvailableBalance float64
 	CreatedAt        time.Time
 }

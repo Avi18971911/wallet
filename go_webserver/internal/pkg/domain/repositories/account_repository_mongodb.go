@@ -99,6 +99,7 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.Accou
 	}
 	return &model.AccountDetails{
 		Id:               accountId,
+		Username:         details.Username,
 		AvailableBalance: details.AvailableBalance,
 		CreatedAt:        details.CreatedAt,
 	}, nil

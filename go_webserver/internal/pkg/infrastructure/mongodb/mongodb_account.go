@@ -8,6 +8,8 @@ import (
 type MongoAccountDetails struct {
 	Id               primitive.ObjectID `bson:"_id"`
 	AvailableBalance float64            `bson:"availableBalance"`
+	Username         string             `bson:"username"`
+	Password         string             `bson:"password"`
 	CreatedAt        time.Time          `bson:"_createdAt"`
 }
 

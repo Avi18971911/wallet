@@ -6,8 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"time"
 	"webserver/internal/pkg/infrastructure/mongodb"
-	"webserver/internal/pkg/utils"
 	"webserver/migrations"
 	"webserver/migrations/versions"
 )
@@ -16,17 +16,23 @@ var accounts = []interface{}{
 	mongodb.MongoAccountDetails{
 		Id:               primitive.NewObjectID(),
 		AvailableBalance: 123.32,
-		CreatedAt:        utils.GetCurrentTimestamp(),
+		Username:         "Olly",
+		Password:         "password",
+		CreatedAt:        time.Now(),
 	},
 	mongodb.MongoAccountDetails{
 		Id:               primitive.NewObjectID(),
 		AvailableBalance: 275.11,
-		CreatedAt:        utils.GetCurrentTimestamp(),
+		Username:         "Bob",
+		Password:         "bob'spassword",
+		CreatedAt:        time.Now(),
 	},
 	mongodb.MongoAccountDetails{
 		Id:               primitive.NewObjectID(),
 		AvailableBalance: 1004.55,
-		CreatedAt:        utils.GetCurrentTimestamp(),
+		Username:         "Hilda",
+		Password:         "Hilda",
+		CreatedAt:        time.Now(),
 	},
 }
 

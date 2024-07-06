@@ -20,16 +20,24 @@ var MigrationSchema1 = versions.Migration{
 		validator := bson.M{
 			"$jsonSchema": bson.M{
 				"bsonType": "object",
-				"required": []string{"availableBalance", "_createdAt"},
+				"required": []string{"availableBalance", "username", "password", "_createdAt"},
 				"properties": bson.M{
 					"availableBalance": bson.M{
 						"bsonType":    "double",
 						"minimum":     0,
-						"description": "must be a long and is required",
+						"description": "Available Balance for the Account [required]",
+					},
+					"password": bson.M{
+						"bsonType":    "string",
+						"description": "Password for the Account [required]",
+					},
+					"username": bson.M{
+						"bsonType":    "string",
+						"description": "Username for the Account [required]",
 					},
 					"_createdAt": bson.M{
 						"bsonType":    "timestamp",
-						"description": "must be a timestamp and is required",
+						"description": "Date of Account Creation [required]",
 					},
 				},
 			},

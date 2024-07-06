@@ -12,6 +12,7 @@ import (
 
 type AccountDetailsDTO struct {
 	Id               string    `json:"id"`
+	Username         string    `json:"username"`
 	AvailableBalance float64   `json:"availableBalance"`
 	CreatedAt        time.Time `json:"createdAt"`
 }
@@ -29,6 +30,7 @@ func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
 	return AccountDetailsDTO{
 		Id:               tx.Id,
 		AvailableBalance: tx.AvailableBalance,
+		Username:         tx.Username,
 	}
 }
 

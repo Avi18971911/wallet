@@ -81,11 +81,16 @@ func TestV1SchemaMigration(t *testing.T) {
 	migration := schema.MigrationSchema1
 
 	// TODO: Add further tests once the schema has been finalized
-	t.Run("Should be able to add accounts with balances and _createdAt", func(t *testing.T) {
+	t.Run("Should be able to add accounts with balances, username, password and _createdAt", func(t *testing.T) {
 		err := migration.Up(mongoClient, ctx, utils.TestDatabaseName)
 		assert.Nil(t, err)
 		mongoTimestamp := pkgutils.GetCurrentTimestamp()
-		_, err = collection.InsertOne(ctx, bson.M{"_createdAt": mongoTimestamp, "availableBalance": 1000.00})
+		_, err = collection.InsertOne(ctx, bson.M{
+			"_createdAt":       mongoTimestamp,
+			"availableBalance": 1000.00,
+			"username":         "Paula",
+			"password":         "pass",
+		})
 		assert.Nil(t, err)
 		cleanupMigrations(collection, ctx)
 	})
