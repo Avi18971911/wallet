@@ -22,10 +22,15 @@ func TestMain(m *testing.M) {
 
 	var err error
 	mongoClient, cleanup = utils.CreateMongoRuntime(ctx)
+	mongoURI := "mongodb://mongo:30001/?replicaSet=rs0"
 	if err != nil {
 		log.Fatalf("Failed to set up MongoDB runtime: %v", err)
 	}
 
+	err = utils.StartMigrationsContainer(ctx, mongoURI)
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
 	// Run tests
 	code := m.Run()
 

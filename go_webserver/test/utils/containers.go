@@ -4,23 +4,37 @@ import (
 	"context"
 	"fmt"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/network"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"path/filepath"
 	"time"
 )
 
 const port = "30001"
 
+var networkName = ""
+
 func startMongoDBContainer(ctx context.Context) (mongoURI string, stopContainer func(), err error) {
+
+	newNetwork, err := network.New(ctx)
+	if err != nil {
+		log.Fatalf("Error while creating network: %s", err.Error())
+	}
+	networkName = newNetwork.Name
+	log.Printf("Network Name: %s", networkName)
+
 	req := testcontainers.ContainerRequest{
-		Image:        "mongo:7.0.8",
-		Name:         "mongo",
-		ExposedPorts: []string{fmt.Sprintf("%s:%s", port, port)},
-		Cmd:          []string{"mongod", "--replSet", "rs0", "--bind_ip_all", "--port", port},
-		WaitingFor:   wait.ForListeningPort(port),
+		Image:          "mongo:7.0.8",
+		Name:           "mongo",
+		ExposedPorts:   []string{fmt.Sprintf("%s:%s", port, port)},
+		Cmd:            []string{"mongod", "--replSet", "rs0", "--bind_ip_all", "--port", port},
+		WaitingFor:     wait.ForListeningPort(port),
+		Networks:       []string{networkName},
+		NetworkAliases: map[string][]string{networkName: {"mongo"}},
 		// Env:          map[string]string{"MONGO_INITDB_DATABASE": "test"},
 	}
 
@@ -55,6 +69,50 @@ func startMongoDBContainer(ctx context.Context) (mongoURI string, stopContainer 
 	return mongoURI, stopContainer, nil
 }
 
+func StartMigrationsContainer(parentCtx context.Context, mongoURI string) error {
+	ctx, cancel := context.WithTimeout(parentCtx, time.Minute*2)
+	defer cancel()
+
+	mainDir := "migrator"
+
+	buildContext := testcontainers.FromDockerfile{
+		Context:    filepath.Join("../../"),
+		Dockerfile: "Dockerfile",
+		BuildArgs: map[string]*string{
+			"MAIN_DIR": &mainDir,
+		},
+	}
+
+	req := testcontainers.ContainerRequest{
+		FromDockerfile: buildContext,
+		Env: map[string]string{
+			"MONGO_URL": mongoURI,
+		},
+		WaitingFor:     wait.ForLog("Migrations completed").WithStartupTimeout(5 * time.Minute),
+		Networks:       []string{networkName},
+		NetworkAliases: map[string][]string{networkName: {"migrations"}},
+	}
+
+	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to start container: %s", err)
+	}
+
+	defer func(container testcontainers.Container, ctx context.Context) {
+		err := container.Terminate(ctx)
+		if err != nil {
+			fmt.Printf("failed to terminate container: %s\n", err)
+		}
+	}(container, ctx)
+
+	fmt.Println("Migrations ran successfully")
+	return nil
+}
+
 func CreateMongoRuntime(ctx context.Context) (*mongo.Client, func()) {
 	mongoCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 
@@ -75,7 +133,7 @@ func CreateMongoRuntime(ctx context.Context) (*mongo.Client, func()) {
 	config := bson.D{
 		{"_id", "rs0"},
 		{"members",
-			bson.A{bson.D{{"_id", 0}, {"host", fmt.Sprintf("localhost:%s", port)}}},
+			bson.A{bson.D{{"_id", 0}, {"host", fmt.Sprintf("mongo:%s", port)}}},
 		},
 	}
 	replicaCommandResult := client.Database("admin").
