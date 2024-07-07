@@ -24,8 +24,10 @@ func StringToObjectId(stringId string) (primitive.ObjectID, error) {
 }
 
 func GetCurrentTimestamp() primitive.Timestamp {
-	return CreateTimestamp(time.Now())
+	return TimeToTimestamp(time.Now())
 }
-func CreateTimestamp(time time.Time) primitive.Timestamp {
-	return primitive.Timestamp{T: uint32(time.Unix())}
+func TimeToTimestamp(tm time.Time) primitive.Timestamp {
+	return primitive.Timestamp{T: uint32(tm.Unix())}
 }
+
+func TimestampToTime(ts primitive.Timestamp) time.Time { return time.Unix(int64(ts.T), 0) }

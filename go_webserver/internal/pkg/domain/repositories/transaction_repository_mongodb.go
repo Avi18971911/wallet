@@ -140,7 +140,7 @@ func fromMongoAccountTransaction(
 			OtherAccountId:  otherAccountId,
 			TransactionType: elem.TransactionType,
 			Amount:          elem.Amount,
-			CreatedAt:       elem.CreatedAt,
+			CreatedAt:       utils.TimestampToTime(elem.CreatedAt),
 		}
 	}
 	return res, nil

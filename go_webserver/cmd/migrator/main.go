@@ -37,7 +37,7 @@ func main() {
 	}(client, ctx)
 
 	applyMigrations(client, ctx, mainDatabaseName, migrationDatabaseName, migrationsToRun)
-	log.Println("Migration completed successfully")
+	log.Println("Migrations completed successfully")
 }
 
 func applyMigrations(

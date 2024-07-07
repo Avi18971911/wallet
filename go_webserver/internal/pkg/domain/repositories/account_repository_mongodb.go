@@ -101,6 +101,6 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.Accou
 		Id:               accountId,
 		Username:         details.Username,
 		AvailableBalance: details.AvailableBalance,
-		CreatedAt:        details.CreatedAt,
+		CreatedAt:        utils.TimestampToTime(details.CreatedAt),
 	}, nil
 }

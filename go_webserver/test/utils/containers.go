@@ -35,7 +35,6 @@ func startMongoDBContainer(ctx context.Context) (mongoURI string, stopContainer 
 		WaitingFor:     wait.ForListeningPort(port),
 		Networks:       []string{networkName},
 		NetworkAliases: map[string][]string{networkName: {"mongo"}},
-		// Env:          map[string]string{"MONGO_INITDB_DATABASE": "test"},
 	}
 
 	mongoContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
@@ -145,7 +144,7 @@ func CreateMongoRuntime(ctx context.Context) (*mongo.Client, func()) {
 
 	// connect to the replica set instead of the node we know that exists
 	client.Disconnect(mongoCtx)
-	newMongoURI := mongoURI + "/?replicaSet=rs0"
+	newMongoURI := "mongodb://mongo:30001/?replicaSet=rs0"
 	newClientOptions := options.Client().ApplyURI(newMongoURI)
 	newClient, newErr := mongo.Connect(mongoCtx, newClientOptions)
 	if newErr != nil {
@@ -176,4 +175,4 @@ func CleanupDatabase(client *mongo.Client, ctx context.Context) error {
 	return nil
 }
 
-const TestDatabaseName = "test"
+const TestDatabaseName = "wallet"

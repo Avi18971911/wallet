@@ -26,19 +26,33 @@ func TestGetAccountDetails(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	tomRes, tomErr := accCollection.InsertOne(ctx, bson.M{"availableBalance": 1000.0})
-	if tomErr != nil {
-		t.Errorf("Error inserting Tom's record %v", tomErr)
-	}
-	tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
-	service := setupAccountService(mongoClient, tranCollection, accCollection)
+	username := "user"
+	password := "pass"
+	ts := pkgutils.GetCurrentTimestamp()
 
-	accountDetails, err := service.GetAccountDetails(tomAccountName, ctx)
-	if err != nil {
-		t.Errorf("Error getting Tom's accountDetails: %v", err)
-	}
-	assert.Equal(t, 1000.0, accountDetails.AvailableBalance)
-	assert.Equal(t, tomAccountName, accountDetails.Id)
+	t.Run("Allows the insertion of an account with the required details", func(t *testing.T) {
+		input := bson.M{
+			"availableBalance": 1000.0,
+			"username":         username,
+			"password":         password,
+			"_createdAt":       ts,
+		}
+		tomRes, tomErr := accCollection.InsertOne(ctx, input)
+		if tomErr != nil {
+			t.Errorf("Error inserting Tom's record %v", tomErr)
+		}
+		tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
+		service := setupAccountService(mongoClient, tranCollection, accCollection)
+
+		accountDetails, err := service.GetAccountDetails(tomAccountName, ctx)
+		if err != nil {
+			t.Errorf("Error getting Tom's accountDetails: %v", err)
+		}
+		assert.Equal(t, 1000.0, accountDetails.AvailableBalance)
+		assert.Equal(t, username, accountDetails.Username)
+		assert.Equal(t, pkgutils.TimestampToTime(ts), accountDetails.CreatedAt)
+		assert.Equal(t, tomAccountName, accountDetails.Id)
+	})
 }
 
 func TestGetAccountTransactions(t *testing.T) {
@@ -47,45 +61,78 @@ func TestGetAccountTransactions(t *testing.T) {
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
 	baseAmounts := []float64{1000.0, 1000.0}
-	accountIds, err := createAccounts(accCollection, ctx, baseAmounts)
+	users := []string{"Tom", "Sam"}
+	passwords := []string{"pass", "word"}
+	accountIds, err := createAccounts(accCollection, ctx, baseAmounts, users, passwords)
 	tomAccountId, samAccountId := accountIds[0], accountIds[1]
 
 	tomAccountName, err := pkgutils.ObjectIdToString(tomAccountId)
 	samAccountName, err := pkgutils.ObjectIdToString(samAccountId)
 
 	tranAmounts := []float64{50.32, 23.89, 10.88}
-
-	tranId1 := primitive.NewObjectID()
-	tranId2 := primitive.NewObjectID()
-	tranId3 := primitive.NewObjectID()
-	tranString1, err := pkgutils.ObjectIdToString(tranId1)
-	tranString2, err := pkgutils.ObjectIdToString(tranId2)
-	tranString3, err := pkgutils.ObjectIdToString(tranId3)
-	tranStrings := []string{tranString1, tranString2, tranString3}
-
-	_, err = tranCollection.InsertMany(ctx, bson.A{
-		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": tranAmounts[0], "_id": tranId1},
-		bson.M{"fromAccount": samAccountId, "toAccount": tomAccountId, "amount": tranAmounts[1], "_id": tranId2},
-		bson.M{"fromAccount": tomAccountId, "toAccount": samAccountId, "amount": tranAmounts[2], "_id": tranId3},
-	})
-	if err != nil {
-		t.Errorf("Error inserting transactions: %v", err)
+	tranIds := make([]primitive.ObjectID, 3)
+	tranStrings := make([]string, 3)
+	for i, _ := range tranIds {
+		tranIds[i] = primitive.NewObjectID()
+		tranStrings[i], _ = pkgutils.ObjectIdToString(tranIds[i])
 	}
+	transactionsInput := makeTransactionsInput(tomAccountId, samAccountId, tranAmounts, tranIds)
 
-	accountService := setupAccountService(mongoClient, tranCollection, accCollection)
+	t.Run(
+		"Allows the insertion of transactions and the retrieval of all transactions from an account",
+		func(t *testing.T) {
+			_, err = tranCollection.InsertMany(ctx, transactionsInput)
+			if err != nil {
+				t.Errorf("Error inserting transactions: %v", err)
+			}
 
-	res, err := accountService.GetAccountTransactions(tomAccountName, ctx)
-	expectedCreatedAt := res[0].CreatedAt
-	expectedTransactionTypes := []string{"credit", "debit", "credit"}
-	expectedResults := createExpectedAccountTranResult(
-		tomAccountName,
-		samAccountName,
-		expectedCreatedAt,
-		tranStrings,
-		tranAmounts,
-		expectedTransactionTypes,
+			accountService := setupAccountService(mongoClient, tranCollection, accCollection)
+
+			res, _ := accountService.GetAccountTransactions(tomAccountName, ctx)
+			expectedCreatedAt := res[0].CreatedAt
+			expectedTransactionTypes := []string{"credit", "debit", "credit"}
+			expectedResults := createExpectedAccountTranResult(
+				tomAccountName,
+				samAccountName,
+				expectedCreatedAt,
+				tranStrings,
+				tranAmounts,
+				expectedTransactionTypes,
+			)
+			assert.ElementsMatch(t, expectedResults, res)
+		},
 	)
-	assert.ElementsMatch(t, expectedResults, res)
+}
+
+func makeTransactionsInput(
+	tomAccountId primitive.ObjectID,
+	samAccountId primitive.ObjectID,
+	tranAmounts []float64,
+	tranIds []primitive.ObjectID,
+) bson.A {
+	return bson.A{
+		bson.M{
+			"fromAccount": tomAccountId,
+			"toAccount":   samAccountId,
+			"amount":      tranAmounts[0],
+			"_id":         tranIds[0],
+			"_createdAt":  pkgutils.GetCurrentTimestamp(),
+		},
+		bson.M{
+			"fromAccount": samAccountId,
+			"toAccount":   tomAccountId,
+			"amount":      tranAmounts[1],
+			"_id":         tranIds[1],
+			"_createdAt":  pkgutils.GetCurrentTimestamp(),
+		},
+		bson.M{
+			"fromAccount": tomAccountId,
+			"toAccount":   samAccountId,
+			"amount":      tranAmounts[2],
+			"_id":         tranIds[2],
+			"_createdAt":  pkgutils.GetCurrentTimestamp(),
+		},
+	}
 }
 
 func createExpectedAccountTranResult(
@@ -114,12 +161,14 @@ func createAccounts(
 	accCollection *mongo.Collection,
 	ctx context.Context,
 	amounts []float64,
+	users []string,
+	passwords []string,
 ) (accountIds []primitive.ObjectID, err error) {
 	res := make([]primitive.ObjectID, len(amounts))
 	for i, _ := range amounts {
 		currentAmount := amounts[i]
 		res[i] = primitive.NewObjectID()
-		_, err := insertAccount(accCollection, ctx, res[i], currentAmount)
+		_, err := insertAccount(accCollection, ctx, res[i], currentAmount, users[i], passwords[i])
 		if err != nil {
 			return nil, err
 		}
@@ -132,8 +181,16 @@ func insertAccount(
 	ctx context.Context,
 	accountId primitive.ObjectID,
 	amount float64,
+	username string,
+	password string,
 ) (*mongo.InsertOneResult, error) {
-	return accCollection.InsertOne(ctx, bson.M{"availableBalance": amount, "_id": accountId})
+	return accCollection.InsertOne(ctx, bson.M{
+		"availableBalance": amount,
+		"_id":              accountId,
+		"username":         username,
+		"password":         password,
+		"_createdAt":       pkgutils.GetCurrentTimestamp(),
+	})
 }
 
 func setupAccountService(
