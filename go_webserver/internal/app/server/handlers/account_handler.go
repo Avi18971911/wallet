@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"io"
+	"log"
 	"net/http"
 	"time"
 	"webserver/internal/pkg/domain/model"
@@ -24,6 +26,11 @@ type AccountTransactionDTO struct {
 	TransactionType string    `json:"transactionType"`
 	Amount          float64   `json:"amount"`
 	CreatedAt       time.Time `json:"createdAt"`
+}
+
+type AccountLoginDTO struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
@@ -73,6 +80,7 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -101,5 +109,37 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func AccountLoginHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req AccountLoginDTO
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				log.Printf("Failed to close request body: %v", err)
+			}
+		}(r.Body)
+
+		exists, err := s.Login(req.Username, req.Password, ctx)
+		if err != nil {
+			http.Error(w, "Error encountered during login", http.StatusInternalServerError)
+			return
+		}
+
+		if !exists {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }

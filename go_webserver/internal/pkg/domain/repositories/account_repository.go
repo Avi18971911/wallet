@@ -9,4 +9,5 @@ type AccountRepository interface {
 	GetAccountDetails(accountId string, ctx context.Context) (*model.AccountDetails, error)
 	AddBalance(accountId string, amount float64, ctx context.Context) error
 	DeductBalance(accountId string, amount float64, ctx context.Context) error
+	GetPassword(username string, ctx context.Context) (string, error)
 }

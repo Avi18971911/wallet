@@ -18,5 +18,6 @@ func CreateRouter(
 	r.Handle("/transactions", handlers.TransactionInsertHandler(transactionService, ctx)).Methods("POST")
 	r.Handle("/accounts/{accountId}/transactions", handlers.AccountTransactionsHandler(accountService, ctx)).
 		Methods("GET")
+	r.Handle("/accounts/login", handlers.AccountLoginHandler(accountService, ctx)).Methods("POST")
 	return r
 }

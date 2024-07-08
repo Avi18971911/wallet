@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -90,6 +91,16 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 		log.Printf("Successfully updated balance for account %s\n", accountId)
 		return nil
 	}
+}
+
+func (ar *AccountRepositoryMongodb) GetPassword(username string, ctx context.Context) (string, error) {
+	var accountDetails mongodb.MongoAccountDetails
+	filter := bson.M{"username": username}
+	err := ar.col.FindOne(ctx, filter).Decode(&accountDetails)
+	if err != nil {
+		return "", fmt.Errorf("error when finding account by username: %s", err.Error())
+	}
+	return accountDetails.Password, nil
 }
 
 func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {

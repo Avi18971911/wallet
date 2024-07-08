@@ -59,3 +59,29 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 	}
 	return accountTransactions, nil
 }
+
+func (a *AccountServiceImpl) Login(username string, password string, ctx context.Context) (bool, error) {
+	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
+	defer cancel()
+
+	txnCtx, err := a.tran.BeginTransaction(getCtx, transactional.IsolationLow, transactional.DurabilityLow)
+	if err != nil {
+		log.Printf("Error encountered when starting Login database transaction for "+
+			"Username %s: ", username)
+		return false, err
+	}
+
+	defer func() {
+		if rollErr := a.tran.Rollback(txnCtx); rollErr != nil {
+			log.Printf("Error rolling back transaction: %v", rollErr)
+		}
+	}()
+
+	pass, err := a.ar.GetPassword(username, getCtx)
+	if err != nil {
+		log.Printf("Unable to login with error: %v", err)
+		return false, err
+	}
+	exists := pass == password
+	return exists, nil
+}
