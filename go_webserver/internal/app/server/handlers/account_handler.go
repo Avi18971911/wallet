@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"io"
 	"log"
@@ -129,14 +130,19 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 			}
 		}(r.Body)
 
-		exists, err := s.Login(req.Username, req.Password, ctx)
+		accountDetails, err := s.Login(req.Username, req.Password, ctx)
 		if err != nil {
+			if errors.Is(err, model.ErrInvalidCredentials) {
+				http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+				return
+			}
 			http.Error(w, "Error encountered during login", http.StatusInternalServerError)
 			return
 		}
 
-		if !exists {
-			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		err = json.NewEncoder(w).Encode(accountDetails)
+		if err != nil {
+			http.Error(w, "Error encountered during JSON Encoding of Response", http.StatusInternalServerError)
 			return
 		}
 

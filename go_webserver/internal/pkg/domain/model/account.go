@@ -1,10 +1,14 @@
 package model
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type AccountDetails struct {
 	Id               string
 	Username         string
+	Password         string
 	AvailableBalance float64
 	CreatedAt        time.Time
 }
@@ -17,3 +21,7 @@ type AccountTransaction struct {
 	Amount          float64
 	CreatedAt       time.Time
 }
+
+var (
+	ErrInvalidCredentials = errors.New("invalid username or password")
+)

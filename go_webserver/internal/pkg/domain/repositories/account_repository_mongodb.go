@@ -93,14 +93,17 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 	}
 }
 
-func (ar *AccountRepositoryMongodb) GetPassword(username string, ctx context.Context) (string, error) {
+func (ar *AccountRepositoryMongodb) GetAccountDetailsFromUsername(
+	username string,
+	ctx context.Context,
+) (*model.AccountDetails, error) {
 	var accountDetails mongodb.MongoAccountDetails
 	filter := bson.M{"username": username}
 	err := ar.col.FindOne(ctx, filter).Decode(&accountDetails)
 	if err != nil {
-		return "", fmt.Errorf("error when finding account by username: %s", err.Error())
+		return nil, fmt.Errorf("error when finding account by username: %s", err.Error())
 	}
-	return accountDetails.Password, nil
+	return fromMongoAccountDetails(&accountDetails)
 }
 
 func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {

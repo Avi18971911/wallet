@@ -60,7 +60,11 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 	return accountTransactions, nil
 }
 
-func (a *AccountServiceImpl) Login(username string, password string, ctx context.Context) (bool, error) {
+func (a *AccountServiceImpl) Login(
+	username string,
+	password string,
+	ctx context.Context,
+) (*model.AccountDetails, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
@@ -68,7 +72,7 @@ func (a *AccountServiceImpl) Login(username string, password string, ctx context
 	if err != nil {
 		log.Printf("Error encountered when starting Login database transaction for "+
 			"Username %s: ", username)
-		return false, err
+		return nil, err
 	}
 
 	defer func() {
@@ -77,11 +81,15 @@ func (a *AccountServiceImpl) Login(username string, password string, ctx context
 		}
 	}()
 
-	pass, err := a.ar.GetPassword(username, getCtx)
+	accountDetails, err := a.ar.GetAccountDetailsFromUsername(username, getCtx)
 	if err != nil {
 		log.Printf("Unable to login with error: %v", err)
-		return false, err
+		return nil, err
 	}
-	exists := pass == password
-	return exists, nil
+	exists := accountDetails.Password == password
+	if !exists {
+		log.Printf("Login failed for Username %s", username)
+		return nil, model.ErrInvalidCredentials
+	}
+	return accountDetails, nil
 }
