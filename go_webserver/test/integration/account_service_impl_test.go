@@ -104,6 +104,38 @@ func TestGetAccountTransactions(t *testing.T) {
 	)
 }
 
+func TestLogins(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	defer cancel()
+	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
+	baseAmounts := []float64{1000.0, 1000.0}
+	users := []string{"Tom", "Sam"}
+	passwords := []string{"pass", "word"}
+	_, err := createAccounts(accCollection, ctx, baseAmounts, users, passwords)
+	if err != nil {
+		t.Fatalf("Error creating accounts: %v", err)
+	}
+
+	t.Run("Allows the login of a user with the correct password", func(t *testing.T) {
+		service := setupAccountService(mongoClient, tranCollection, accCollection)
+		accountDetails, err := service.Login(users[0], passwords[0], ctx)
+		if err != nil {
+			t.Fatalf("Error logging in: %v", err)
+		}
+		assert.Equal(t, users[0], accountDetails.Username)
+		assert.Equal(t, baseAmounts[0], accountDetails.AvailableBalance)
+	})
+
+	t.Run("Does not allow the login of a user with the incorrect password", func(t *testing.T) {
+		service := setupAccountService(mongoClient, tranCollection, accCollection)
+		_, err := service.Login(users[0], "wrongpassword", ctx)
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "invalid username or password")
+	})
+
+}
+
 func makeTransactionsInput(
 	tomAccountId primitive.ObjectID,
 	samAccountId primitive.ObjectID,

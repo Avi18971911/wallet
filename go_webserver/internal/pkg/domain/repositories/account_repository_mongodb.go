@@ -114,6 +114,7 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.Accou
 	return &model.AccountDetails{
 		Id:               accountId,
 		Username:         details.Username,
+		Password:         details.Password,
 		AvailableBalance: details.AvailableBalance,
 		CreatedAt:        utils.TimestampToTime(details.CreatedAt),
 	}, nil
