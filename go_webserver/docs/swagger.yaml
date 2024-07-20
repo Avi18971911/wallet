@@ -1,3 +1,4 @@
+basePath: /v1
 definitions:
   handlers.AccountDetailsDTO:
     properties:
@@ -6,6 +7,15 @@ definitions:
       createdAt:
         type: string
       id:
+        type: string
+      username:
+        type: string
+    type: object
+  handlers.AccountLoginDTO:
+    properties:
+      password:
+        type: string
+      username:
         type: string
     type: object
   handlers.AccountTransactionDTO:
@@ -32,8 +42,12 @@ definitions:
       toAccount:
         type: string
     type: object
+host: localhost:8080
 info:
   contact: {}
+  description: This is a simple wallet API
+  title: Wallet API
+  version: "1.0"
 paths:
   /accounts/{accountId}:
     get:
@@ -88,6 +102,36 @@ paths:
       summary: Get account transactions
       tags:
       - transactions
+  /accounts/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user with the provided username and password.
+      parameters:
+      - description: Login payload
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AccountLoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login
+          schema:
+            $ref: '#/definitions/handlers.AccountDetailsDTO'
+        "401":
+          description: Invalid credentials
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Login
+      tags:
+      - accounts
   /transactions:
     post:
       consumes:

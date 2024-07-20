@@ -114,6 +114,17 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 	}
 }
 
+// AccountLoginHandler creates a handler for logging in a user.
+// @Summary Login
+// @Description Logs in a user with the provided username and password.
+// @Tags accounts
+// @Accept json
+// @Produce json
+// @Param login body AccountLoginDTO true "Login payload"
+// @Success 200 {object} AccountDetailsDTO "Successful login"
+// @Failure 401 {string} string "Invalid credentials"
+// @Failure 500 {string} string "Internal server error"
+// @Router /accounts/login [post]
 func AccountLoginHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AccountLoginDTO

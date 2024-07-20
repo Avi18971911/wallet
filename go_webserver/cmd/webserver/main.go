@@ -13,6 +13,22 @@ import (
 	"webserver/internal/pkg/infrastructure/transactional"
 )
 
+// @title Wallet API
+// @version 1.0
+// @description This is a simple wallet API
+// termsOfService: http://swagger.io/terms/
+// contact:
+//   name: API Support
+//   url: http://www.swagger.io/support
+//   email: support@swagger.io
+
+// license:
+//   name: Apache 2.0
+//   url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /v1
+
 func main() {
 	mongoURL := os.Getenv("MONGO_URL")
 	cli, cleanup, ctx := createDatabase(mongoURL)
