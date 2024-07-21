@@ -49,13 +49,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Invalid credentials",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/utils.ErrorMessage"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/utils.ErrorMessage"
                         }
                     }
                 }
@@ -93,7 +93,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/utils.ErrorMessage"
                         }
                     }
                 }
@@ -134,7 +134,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/utils.ErrorMessage"
                         }
                     }
                 }
@@ -174,13 +174,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request payload",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/utils.ErrorMessage"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/utils.ErrorMessage"
                         }
                     }
                 }
@@ -249,6 +249,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "toAccount": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.ErrorMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }

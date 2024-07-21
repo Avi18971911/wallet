@@ -42,6 +42,11 @@ definitions:
       toAccount:
         type: string
     type: object
+  utils.ErrorMessage:
+    properties:
+      message:
+        type: string
+    type: object
 host: backendAPI
 info:
   contact: {}
@@ -70,7 +75,7 @@ paths:
         "500":
           description: Internal server error
           schema:
-            type: string
+            $ref: '#/definitions/utils.ErrorMessage'
       summary: Get account details
       tags:
       - accounts
@@ -98,7 +103,7 @@ paths:
         "500":
           description: Internal server error
           schema:
-            type: string
+            $ref: '#/definitions/utils.ErrorMessage'
       summary: Get account transactions
       tags:
       - transactions
@@ -124,11 +129,11 @@ paths:
         "401":
           description: Invalid credentials
           schema:
-            type: string
+            $ref: '#/definitions/utils.ErrorMessage'
         "500":
           description: Internal server error
           schema:
-            type: string
+            $ref: '#/definitions/utils.ErrorMessage'
       summary: Login
       tags:
       - accounts
@@ -154,11 +159,11 @@ paths:
         "400":
           description: Invalid request payload
           schema:
-            type: string
+            $ref: '#/definitions/utils.ErrorMessage'
         "500":
           description: Internal server error
           schema:
-            type: string
+            $ref: '#/definitions/utils.ErrorMessage'
       summary: Add a new transaction
       tags:
       - transactions
