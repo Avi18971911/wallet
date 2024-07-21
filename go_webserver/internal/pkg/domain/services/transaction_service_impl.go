@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"webserver/internal/pkg/domain/model"
 	repositories2 "webserver/internal/pkg/domain/repositories"
@@ -35,7 +36,7 @@ func (t *TransactionServiceImpl) AddTransaction(
 	if err != nil {
 		log.Printf("Error encountered when starting Add Transaction database transaction from "+
 			"Account %s to Account %s: %v", fromAccount, toAccount, err)
-		return err
+		return fmt.Errorf("error when starting Add Transaction database transaction: %w", err)
 	}
 
 	defer func() {
@@ -55,22 +56,22 @@ func (t *TransactionServiceImpl) AddTransaction(
 	if err = t.tr.AddTransaction(&transactionDetails, txnCtx); err != nil {
 		log.Printf("Error adding transaction to the database from Account %s to "+
 			"Account %s: %v", fromAccount, toAccount, err)
-		return err
+		return fmt.Errorf("error when adding transaction to the database: %w", err)
 	}
 
 	if err = t.ar.AddBalance(toAccount, amount, txnCtx); err != nil {
 		log.Printf("Error adding balance to Account %s: %v", toAccount, err)
-		return err
+		return fmt.Errorf("error when adding balance to Account %s: %w", toAccount, err)
 	}
 
 	if err = t.ar.DeductBalance(fromAccount, amount, txnCtx); err != nil {
 		log.Printf("Error deducting balance from Account %s: %v", fromAccount, err)
-		return err
+		return fmt.Errorf("error when deducting balance from Account %s: %w", fromAccount, err)
 	}
 
 	if commitErr := t.tran.Commit(txnCtx); commitErr != nil {
 		log.Printf("Error committing Add Transaction database transaction: %v", commitErr)
-		return commitErr
+		return fmt.Errorf("error when committing Add Transaction database transaction: %w", commitErr)
 	}
 
 	return nil

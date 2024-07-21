@@ -44,7 +44,7 @@ func TransactionInsertHandler(s services.TransactionService, ctx context.Context
 
 		err = s.AddTransaction(req.ToAccount, req.FromAccount, req.Amount, ctx)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Failed to Add Transaction", http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusAccepted)
