@@ -29,12 +29,12 @@ func (ar *AccountRepositoryMongodb) GetAccountDetails(
 	var res *model.AccountDetails
 	objectId, err := utils.StringToObjectId(accountId)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
 	filter := bson.M{"_id": objectId}
 	err = ar.col.FindOne(ctx, filter).Decode(&accountDetails)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error when finding account by ID %s: %w", accountId, err)
 	}
 	res, err = fromMongoAccountDetails(&accountDetails)
 	if err != nil {
@@ -51,19 +51,21 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 ) error {
 	objectId, err := utils.StringToObjectId(accountId)
 	if err != nil {
-		return err
+		return fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
 	filter := bson.M{"_id": objectId}
 	update := bson.M{"$inc": bson.M{"availableBalance": amount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
-		return err
+		return fmt.Errorf(
+			"error when updating account balance for accountId %s: %w", accountId, err,
+		)
 	}
 
 	if result.MatchedCount == 0 {
-		return errors.New("no matching account found")
+		return fmt.Errorf("no matching account found for accountId %s", accountId)
 	} else if result.ModifiedCount == 0 {
-		return errors.New("no update made to the account balance")
+		return fmt.Errorf("update failed to the account balance for accountId %s", accountId)
 	} else {
 		log.Printf("Successfully updated balance for account %s\n", accountId)
 		return nil
@@ -77,20 +79,19 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 ) error {
 	objectId, err := utils.StringToObjectId(accountId)
 	if err != nil {
-		return err
+		return fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
 	negativeAmount := amount * -1
 	filter := bson.M{"_id": objectId}
 	update := bson.M{"$inc": bson.M{"availableBalance": negativeAmount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
-		return err
+		return fmt.Errorf("error when updating account balance for accountId %s: %w", accountId, err)
 	}
-
 	if result.MatchedCount == 0 {
-		return errors.New("no matching account found")
+		return fmt.Errorf("no matching account found for accountId %s", accountId)
 	} else if result.ModifiedCount == 0 {
-		return errors.New("no update made to the account balance")
+		return fmt.Errorf("update failed to the account balance for accountId %s", accountId)
 	} else {
 		log.Printf("Successfully updated balance for account %s\n", accountId)
 		return nil
@@ -116,7 +117,9 @@ func (ar *AccountRepositoryMongodb) GetAccountDetailsFromUsername(
 func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {
 	accountId, err := utils.ObjectIdToString(details.Id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(
+			"error when converting object ID to string for username %s : %w", details.Username, err,
+		)
 	}
 	return &model.AccountDetails{
 		Id:               accountId,

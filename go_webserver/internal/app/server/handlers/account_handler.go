@@ -72,13 +72,13 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 		accountID := mux.Vars(r)["accountId"]
 		accountDetails, err := s.GetAccountDetails(accountID, ctx)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Failed to get Account Details", http.StatusInternalServerError)
 			return
 		}
 		jsonAccountDetails := accountDetailsToDTO(accountDetails)
 		err = json.NewEncoder(w).Encode(jsonAccountDetails)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Error encountered during response payload construction", http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -100,14 +100,14 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 		accountID := mux.Vars(r)["accountId"]
 		accountTransactions, err := s.GetAccountTransactions(accountID, ctx)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Failed to get Account Transactions", http.StatusInternalServerError)
 			return
 		}
 		jsonAccountTransactions := accountTransactionToDTO(accountTransactions)
 
 		err = json.NewEncoder(w).Encode(jsonAccountTransactions)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Error encountered during response payload construction", http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)

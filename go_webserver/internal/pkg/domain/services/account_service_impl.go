@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/repositories"
@@ -29,7 +30,7 @@ func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Con
 	accountDetails, err := a.ar.GetAccountDetails(accountId, getCtx)
 	if err != nil {
 		log.Printf("Unable to get account details for Account %s with error: %v", accountId, err)
-		return nil, err
+		return nil, fmt.Errorf("unable to get account details with error: %w", err)
 	}
 	return accountDetails, nil
 }
@@ -44,7 +45,7 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 	if err != nil {
 		log.Printf("Error encountered when starting Get Account Transactions database transaction for "+
 			"Account %s: %v", accountId, err)
-		return nil, err
+		return nil, fmt.Errorf("unable to begin transaction with error: %w", err)
 	}
 
 	defer func() {
@@ -56,7 +57,7 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 	accountTransactions, err := a.tr.GetAccountTransactions(accountId, getCtx)
 	if err != nil {
 		log.Printf("Unable to get transaction details for Account %s with error: %v", accountId, err)
-		return nil, err
+		return nil, fmt.Errorf("unable to get transaction details with error: %w", err)
 	}
 	return accountTransactions, nil
 }
@@ -73,7 +74,7 @@ func (a *AccountServiceImpl) Login(
 	if err != nil {
 		log.Printf("Error encountered when starting Login database transaction for "+
 			"Username %s: ", username)
-		return nil, err
+		return nil, fmt.Errorf("unable to begin transaction with error: %w", err)
 	}
 
 	defer func() {
@@ -86,9 +87,9 @@ func (a *AccountServiceImpl) Login(
 	if err != nil {
 		log.Printf("Unable to login with error: %v", err)
 		if errors.Is(err, model.ErrNoMatchingUsername) {
-			return nil, errors.New("invalid username or password")
+			return nil, model.ErrInvalidCredentials
 		}
-		return nil, err
+		return nil, fmt.Errorf("unable to login with error: %w", err)
 	}
 	exists := accountDetails.Password == password
 	if !exists {
