@@ -24,8 +24,8 @@ type TransactionRequest struct {
 // @Produce json
 // @Param transaction body TransactionRequest true "Transaction request"
 // @Success 202 {string} string "Accepted"
-// @Failure 400 {string} string "Invalid request payload"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 400 {object} utils.ErrorMessage "Invalid request payload"
+// @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /transactions [post]
 func TransactionInsertHandler(s services.TransactionService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

@@ -66,7 +66,7 @@ func accountTransactionToDTO(tx []model.AccountTransaction) []AccountTransaction
 // @Produce json
 // @Param accountId path string true "Account ID"
 // @Success 200 {object} AccountDetailsDTO "Successful retrieval of account details"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId} [get]
 func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +95,7 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 // @Produce json
 // @Param accountId path string true "Account ID"
 // @Success 200 {object} []AccountTransactionDTO "Successful retrieval of account transactions"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId}/transactions [get]
 func AccountTransactionsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -125,8 +125,8 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 // @Produce json
 // @Param login body AccountLoginDTO true "Login payload"
 // @Success 200 {object} AccountDetailsDTO "Successful login"
-// @Failure 401 {string} string "Invalid credentials"
-// @Failure 500 {string} string "Internal server error"
+// @Failure 401 {object} utils.ErrorMessage "Invalid credentials"
+// @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/login [post]
 func AccountLoginHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
