@@ -23,5 +23,6 @@ type AccountTransaction struct {
 }
 
 var (
+	ErrNoMatchingUsername = errors.New("no matching username found for account")
 	ErrInvalidCredentials = errors.New("invalid username or password")
 )

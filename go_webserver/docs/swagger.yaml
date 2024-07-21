@@ -1,4 +1,4 @@
-basePath: /v1
+basePath: /
 definitions:
   handlers.AccountDetailsDTO:
     properties:
@@ -42,7 +42,7 @@ definitions:
       toAccount:
         type: string
     type: object
-host: localhost:8080
+host: backendAPI
 info:
   contact: {}
   description: This is a simple wallet API

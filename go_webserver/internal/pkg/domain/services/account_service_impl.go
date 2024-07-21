@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"log"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/repositories"
@@ -84,6 +85,9 @@ func (a *AccountServiceImpl) Login(
 	accountDetails, err := a.ar.GetAccountDetailsFromUsername(username, getCtx)
 	if err != nil {
 		log.Printf("Unable to login with error: %v", err)
+		if errors.Is(err, model.ErrNoMatchingUsername) {
+			return nil, errors.New("invalid username or password")
+		}
 		return nil, err
 	}
 	exists := accountDetails.Password == password

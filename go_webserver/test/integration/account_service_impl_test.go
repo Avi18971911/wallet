@@ -134,6 +134,13 @@ func TestLogins(t *testing.T) {
 		assert.EqualError(t, err, "invalid username or password")
 	})
 
+	t.Run("Does not allow the login of a user with the incorrect username", func(t *testing.T) {
+		service := setupAccountService(mongoClient, tranCollection, accCollection)
+		_, err := service.Login("wrongusername", passwords[0], ctx)
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "invalid username or password")
+	})
+
 }
 
 func makeTransactionsInput(

@@ -6,8 +6,8 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
-    "basePath": "/v1",
+    "host": "backendAPI",
+    "basePath": "/",
     "paths": {
         "/accounts/login": {
             "post": {
