@@ -31,3 +31,15 @@ func (m *MockAccountRepository) DeductBalance(accountID string, amount float64, 
 	args := m.Called(accountID, amount, ctx)
 	return args.Error(0)
 }
+
+func (m *MockAccountRepository) GetAccountDetailsFromUsername(
+	username string,
+	ctx context.Context,
+) (*model.AccountDetails, error) {
+	args := m.Called(username, ctx)
+	var accountDetails *model.AccountDetails
+	if args.Get(0) != nil {
+		accountDetails = args.Get(0).(*model.AccountDetails)
+	}
+	return accountDetails, args.Error(1)
+}
