@@ -11,6 +11,7 @@ import (
 	"time"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/services"
+	"webserver/internal/pkg/utils"
 )
 
 type AccountDetailsDTO struct {
@@ -72,13 +73,14 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 		accountID := mux.Vars(r)["accountId"]
 		accountDetails, err := s.GetAccountDetails(accountID, ctx)
 		if err != nil {
-			http.Error(w, "Failed to get Account Details", http.StatusInternalServerError)
+			utils.HttpError(w, "Failed to get Account Details", http.StatusInternalServerError)
 			return
 		}
 		jsonAccountDetails := accountDetailsToDTO(accountDetails)
 		err = json.NewEncoder(w).Encode(jsonAccountDetails)
 		if err != nil {
-			http.Error(w, "Error encountered during response payload construction", http.StatusInternalServerError)
+			utils.HttpError(w, "Error encountered during response payload construction",
+				http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -100,14 +102,15 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 		accountID := mux.Vars(r)["accountId"]
 		accountTransactions, err := s.GetAccountTransactions(accountID, ctx)
 		if err != nil {
-			http.Error(w, "Failed to get Account Transactions", http.StatusInternalServerError)
+			utils.HttpError(w, "Failed to get Account Transactions", http.StatusInternalServerError)
 			return
 		}
 		jsonAccountTransactions := accountTransactionToDTO(accountTransactions)
 
 		err = json.NewEncoder(w).Encode(jsonAccountTransactions)
 		if err != nil {
-			http.Error(w, "Error encountered during response payload construction", http.StatusInternalServerError)
+			utils.HttpError(w, "Error encountered during response payload construction",
+				http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -130,7 +133,7 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 		var req AccountLoginDTO
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
 
@@ -144,16 +147,17 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 		accountDetails, err := s.Login(req.Username, req.Password, ctx)
 		if err != nil {
 			if errors.Is(err, model.ErrInvalidCredentials) {
-				http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+				utils.HttpError(w, "Invalid credentials", http.StatusUnauthorized)
 				return
 			}
-			http.Error(w, "Error encountered during login", http.StatusInternalServerError)
+			utils.HttpError(w, "Error encountered during login", http.StatusInternalServerError)
 			return
 		}
 
 		err = json.NewEncoder(w).Encode(accountDetails)
 		if err != nil {
-			http.Error(w, "Error encountered during JSON Encoding of Response", http.StatusInternalServerError)
+			utils.HttpError(w, "Error encountered during JSON Encoding of Response",
+				http.StatusInternalServerError)
 			return
 		}
 

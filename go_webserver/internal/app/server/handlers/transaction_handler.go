@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"webserver/internal/pkg/domain/services"
+	"webserver/internal/pkg/utils"
 )
 
 type TransactionRequest struct {
@@ -31,7 +32,7 @@ func TransactionInsertHandler(s services.TransactionService, ctx context.Context
 		var req TransactionRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
 
@@ -44,7 +45,7 @@ func TransactionInsertHandler(s services.TransactionService, ctx context.Context
 
 		err = s.AddTransaction(req.ToAccount, req.FromAccount, req.Amount, ctx)
 		if err != nil {
-			http.Error(w, "Failed to Add Transaction", http.StatusInternalServerError)
+			utils.HttpError(w, "Failed to Add Transaction", http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusAccepted)
