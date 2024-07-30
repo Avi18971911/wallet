@@ -154,7 +154,8 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 			return
 		}
 
-		err = json.NewEncoder(w).Encode(accountDetails)
+		jsonAccountDetails := accountDetailsToDTO(accountDetails)
+		err = json.NewEncoder(w).Encode(jsonAccountDetails)
 		if err != nil {
 			utils.HttpError(w, "Error encountered during JSON Encoding of Response",
 				http.StatusInternalServerError)
