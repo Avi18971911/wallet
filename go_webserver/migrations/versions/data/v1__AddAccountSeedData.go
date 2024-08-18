@@ -23,8 +23,9 @@ var accounts = []interface{}{
 			FirstName: "Olly",
 			LastName:  "OxenFree",
 		},
-		AccountType: "Checking",
-		CreatedAt:   utils.GetCurrentTimestamp(),
+		KnownAccounts: []mongodb.KnownAccount{},
+		AccountType:   "Checking",
+		CreatedAt:     utils.GetCurrentTimestamp(),
 	},
 	mongodb.MongoAccountDetails{
 		Id:               primitive.NewObjectID(),
@@ -82,7 +83,6 @@ var MigrationData1 = versions.Migration{
 		collectionName := "account"
 		coll := db.Collection(collectionName)
 
-		log.Printf("inserting account seed data %s", accounts)
 		_, err := coll.InsertMany(mongoCtx, accounts)
 		if err != nil {
 			return err
