@@ -9,7 +9,21 @@ type MongoAccountDetails struct {
 	AvailableBalance float64             `bson:"availableBalance"`
 	Username         string              `bson:"username"`
 	Password         string              `bson:"password"`
+	Person           Person              `bson:"person"`
+	AccountNumber    string              `bson:"accountNumber"`
+	KnownAccounts    []KnownAccount      `bson:"knownAccounts"`
 	CreatedAt        primitive.Timestamp `bson:"_createdAt"`
+}
+
+type Person struct {
+	FirstName string `bson:"firstName"`
+	LastName  string `bson:"lastName"`
+}
+
+type KnownAccount struct {
+	AccountNumber string `bson:"accountNumber"`
+	AccountHolder string `bson:"accountHolder"`
+	AccountType   string `bson:"accountType"`
 }
 
 type MongoAccountTransaction struct {

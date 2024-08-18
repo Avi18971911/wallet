@@ -20,7 +20,7 @@ var MigrationSchema1 = versions.Migration{
 		validator := bson.M{
 			"$jsonSchema": bson.M{
 				"bsonType": "object",
-				"required": []string{"availableBalance", "username", "password", "_createdAt"},
+				"required": []string{"availableBalance", "username", "password", "person", "_createdAt"},
 				"properties": bson.M{
 					"availableBalance": bson.M{
 						"bsonType":    "double",
@@ -34,6 +34,41 @@ var MigrationSchema1 = versions.Migration{
 					"username": bson.M{
 						"bsonType":    "string",
 						"description": "Username for the Account [required]",
+					},
+					"person": bson.M{
+						"bsonType": "object",
+						"required": []string{"firstName", "lastName"},
+						"properties": bson.M{
+							"firstName": bson.M{
+								"bsonType":    "string",
+								"description": "First Name of the Account Holder [required]",
+							},
+							"lastName": bson.M{
+								"bsonType":    "string",
+								"description": "Last Name of the Account Holder [required]",
+							},
+						},
+					},
+					"knownAccounts": bson.M{
+						"bsonType": "array",
+						"items": bson.M{
+							"bsonType": "object",
+							"required": []string{"accountId", "nickname", "accountType"},
+							"properties": bson.M{
+								"accountNumber": bson.M{
+									"bsonType":    "string",
+									"description": "Account Number of the Known Account [required]",
+								},
+								"accountHolder": bson.M{
+									"bsonType":    "string",
+									"description": "Account Holder (First Name + Last Name) of the Known Account [required]",
+								},
+								"accountType": bson.M{
+									"bsonType":    "string",
+									"description": "Type of the Known Account [required]",
+								},
+							},
+						},
 					},
 					"_createdAt": bson.M{
 						"bsonType":    "timestamp",
