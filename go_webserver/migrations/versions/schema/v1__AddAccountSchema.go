@@ -20,7 +20,9 @@ var MigrationSchema1 = versions.Migration{
 		validator := bson.M{
 			"$jsonSchema": bson.M{
 				"bsonType": "object",
-				"required": []string{"availableBalance", "username", "password", "person", "_createdAt"},
+				"required": []string{
+					"availableBalance", "username", "password", "person", "accountNumber", "accountType", "_createdAt",
+				},
 				"properties": bson.M{
 					"availableBalance": bson.M{
 						"bsonType":    "double",
@@ -34,6 +36,14 @@ var MigrationSchema1 = versions.Migration{
 					"username": bson.M{
 						"bsonType":    "string",
 						"description": "Username for the Account [required]",
+					},
+					"accountNumber": bson.M{
+						"bsonType":    "string",
+						"description": "Account Number for the Account [required]",
+					},
+					"accountType": bson.M{
+						"bsonType":    "string",
+						"description": "Account Type for the Account [required]",
 					},
 					"person": bson.M{
 						"bsonType": "object",
@@ -53,7 +63,7 @@ var MigrationSchema1 = versions.Migration{
 						"bsonType": "array",
 						"items": bson.M{
 							"bsonType": "object",
-							"required": []string{"accountId", "nickname", "accountType"},
+							"required": []string{"accountNumber", "accountHolder", "accountType"},
 							"properties": bson.M{
 								"accountNumber": bson.M{
 									"bsonType":    "string",

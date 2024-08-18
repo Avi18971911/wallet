@@ -11,6 +11,7 @@ type MongoAccountDetails struct {
 	Password         string              `bson:"password"`
 	Person           Person              `bson:"person"`
 	AccountNumber    string              `bson:"accountNumber"`
+	AccountType      string              `bson:"accountType"`
 	KnownAccounts    []KnownAccount      `bson:"knownAccounts"`
 	CreatedAt        primitive.Timestamp `bson:"_createdAt"`
 }

@@ -18,21 +18,58 @@ var accounts = []interface{}{
 		AvailableBalance: 123.32,
 		Username:         "Olly",
 		Password:         "password",
-		CreatedAt:        utils.GetCurrentTimestamp(),
+		AccountNumber:    "123-12345-0",
+		Person: mongodb.Person{
+			FirstName: "Olly",
+			LastName:  "OxenFree",
+		},
+		AccountType: "Checking",
+		CreatedAt:   utils.GetCurrentTimestamp(),
 	},
 	mongodb.MongoAccountDetails{
 		Id:               primitive.NewObjectID(),
 		AvailableBalance: 275.11,
 		Username:         "Bob",
 		Password:         "bob'spassword",
-		CreatedAt:        utils.GetCurrentTimestamp(),
+		AccountNumber:    "123-12345-1",
+		AccountType:      "Savings",
+		Person: mongodb.Person{
+			FirstName: "Bob",
+			LastName:  "Barker",
+		},
+		KnownAccounts: []mongodb.KnownAccount{
+			{
+				AccountNumber: "123-12345-0",
+				AccountHolder: "Olly OxenFree",
+				AccountType:   "Checking",
+			},
+			{
+				AccountNumber: "123-12345-2",
+				AccountHolder: "Hilda Hill",
+				AccountType:   "Savings",
+			},
+		},
+		CreatedAt: utils.GetCurrentTimestamp(),
 	},
 	mongodb.MongoAccountDetails{
 		Id:               primitive.NewObjectID(),
 		AvailableBalance: 1004.55,
 		Username:         "Hilda",
 		Password:         "Hilda",
-		CreatedAt:        utils.GetCurrentTimestamp(),
+		AccountNumber:    "123-12345-2",
+		AccountType:      "Savings",
+		Person: mongodb.Person{
+			FirstName: "Hilda",
+			LastName:  "Hill",
+		},
+		KnownAccounts: []mongodb.KnownAccount{
+			{
+				AccountNumber: "123-12345-0",
+				AccountHolder: "Olly OxenFree",
+				AccountType:   "Checking",
+			},
+		},
+		CreatedAt: utils.GetCurrentTimestamp(),
 	},
 }
 
@@ -45,6 +82,7 @@ var MigrationData1 = versions.Migration{
 		collectionName := "account"
 		coll := db.Collection(collectionName)
 
+		log.Printf("inserting account seed data %s", accounts)
 		_, err := coll.InsertMany(mongoCtx, accounts)
 		if err != nil {
 			return err
