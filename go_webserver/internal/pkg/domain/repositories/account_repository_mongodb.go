@@ -114,6 +114,31 @@ func (ar *AccountRepositoryMongodb) GetAccountDetailsFromUsername(
 	return fromMongoAccountDetails(&accountDetails)
 }
 
+func fromMongoAccountType(accountType string) int {
+	switch accountType {
+	case "savings":
+		return model.Savings
+	case "checking":
+		return model.Checking
+	case "investment":
+		return model.Investment
+	default:
+		return -1
+	}
+}
+
+func fromMongoKnownAccount(knownAccount []mongodb.KnownAccount) []model.KnownAccount {
+	var res = make([]model.KnownAccount, len(knownAccount))
+	for i, ka := range knownAccount {
+		res[i] = model.KnownAccount{
+			AccountNumber: ka.AccountNumber,
+			AccountHolder: ka.AccountHolder,
+			AccountType:   fromMongoAccountType(ka.AccountType),
+		}
+	}
+	return res
+}
+
 func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {
 	accountId, err := utils.ObjectIdToString(details.Id)
 	if err != nil {
@@ -126,6 +151,13 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.Accou
 		Username:         details.Username,
 		Password:         details.Password,
 		AvailableBalance: details.AvailableBalance,
-		CreatedAt:        utils.TimestampToTime(details.CreatedAt),
+		AccountNumber:    details.AccountNumber,
+		AccountType:      fromMongoAccountType(details.AccountType),
+		Person: model.Person{
+			FirstName: details.Person.FirstName,
+			LastName:  details.Person.LastName,
+		},
+		KnownAccounts: fromMongoKnownAccount(details.KnownAccounts),
+		CreatedAt:     utils.TimestampToTime(details.CreatedAt),
 	}, nil
 }

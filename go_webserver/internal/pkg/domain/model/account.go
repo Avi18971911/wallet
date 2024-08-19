@@ -11,6 +11,7 @@ type AccountDetails struct {
 	Password         string
 	AvailableBalance float64
 	AccountNumber    string
+	AccountType      int
 	Person           Person
 	KnownAccounts    []KnownAccount
 	CreatedAt        time.Time

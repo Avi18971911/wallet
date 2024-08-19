@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"regexp"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/repositories"
 	"webserver/internal/pkg/infrastructure/transactional"
@@ -24,6 +25,21 @@ func CreateNewAccountServiceImpl(
 	return &AccountServiceImpl{ar: ar, tr: tr, tran: tran}
 }
 
+func validateAccountDetails(accountDetails *model.AccountDetails) error {
+	const pattern = `^\d{3}-\d{5}-\d{1}$`
+	var accountNumberRegex, err = regexp.Compile(pattern)
+	if err != nil {
+		log.Printf("Unable to compile regex pattern for account number validation with error: %v", err)
+	} else if !accountNumberRegex.MatchString(accountDetails.AccountNumber) {
+		return errors.New("account number does not match expected pattern of XXX-XXXXX-X")
+	}
+	if accountDetails.AccountType > model.Investment || accountDetails.AccountType < model.Savings {
+		return errors.New("account type is not a valid type of account. " +
+			"Should be savings, checking, or investment")
+	}
+	return nil
+}
+
 func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) (*model.AccountDetails, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
@@ -31,6 +47,12 @@ func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Con
 	if err != nil {
 		log.Printf("Unable to get account details for Account %s with error: %v", accountId, err)
 		return nil, fmt.Errorf("unable to get account details with error: %w", err)
+	}
+	err = validateAccountDetails(accountDetails)
+	if err != nil {
+		log.Printf("Unable to successfully validate account details for Account %s with error: "+
+			"%v", accountId, err)
+		return nil, fmt.Errorf("unable to validate account details with error: %w", err)
 	}
 	return accountDetails, nil
 }
