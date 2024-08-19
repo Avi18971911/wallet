@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"testing"
 	"time"
 	"webserver/internal/pkg/domain/model"
@@ -27,12 +26,8 @@ func TestGetAccountDetails(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
-	if err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
 
-	t.Run("Allows the insertion of an account with the required details", func(t *testing.T) {
+	t.Run("Allows the retrieval of account details from an inserted account record", func(t *testing.T) {
 		tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 		if tomErr != nil {
 			t.Errorf("Error inserting Tom's record %v", tomErr)
@@ -57,10 +52,6 @@ func TestGetAccountTransactions(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
-	if err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
 	tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
 		t.Errorf("Error inserting Tom's record %v", tomErr)
@@ -87,7 +78,7 @@ func TestGetAccountTransactions(t *testing.T) {
 	t.Run(
 		"Allows the insertion of transactions and the retrieval of all transactions from an account",
 		func(t *testing.T) {
-			_, err = tranCollection.InsertMany(ctx, transactionsInput)
+			_, err := tranCollection.InsertMany(ctx, transactionsInput)
 			if err != nil {
 				t.Errorf("Error inserting transactions: %v", err)
 			}
@@ -115,10 +106,6 @@ func TestLogins(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
-	if err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
 
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {

@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"testing"
 	"time"
 	"webserver/internal/pkg/domain/model"
@@ -27,10 +26,6 @@ func TestAddTransaction(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
-	if err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
 	tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
 		t.Errorf("Error inserting Tom's record %v", tomErr)
@@ -50,7 +45,7 @@ func TestAddTransaction(t *testing.T) {
 		Amount:      transferAmount,
 	}
 
-	t.Run("Should be able to insert transactions with the required fields", func(t *testing.T) {
+	t.Run("Should be able to insert transactions", func(t *testing.T) {
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, input.Amount, ctx)
 		assert.Nil(t, err)
 		samFind, tomFind := mongodb.MongoAccountDetails{}, mongodb.MongoAccountDetails{}
