@@ -176,3 +176,4 @@ func CleanupDatabase(client *mongo.Client, ctx context.Context) error {
 }
 
 const TestDatabaseName = "wallet"
+const MongoURI = "mongodb://mongo:30001/?replicaSet=rs0"

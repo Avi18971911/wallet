@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"testing"
 	"time"
+	"webserver/internal/pkg/infrastructure/mongodb"
 	pkgutils "webserver/internal/pkg/utils"
 	"webserver/migrations"
 	"webserver/migrations/versions/schema"
@@ -80,17 +81,10 @@ func TestV1SchemaMigration(t *testing.T) {
 	collection := db.Collection("account")
 	migration := schema.MigrationSchema1
 
-	// TODO: Add further tests once the schema has been finalized
-	t.Run("Should be able to add accounts with balances, username, password and _createdAt", func(t *testing.T) {
+	t.Run("Should be able to add accounts with required fields", func(t *testing.T) {
 		err := migration.Up(mongoClient, ctx, utils.TestDatabaseName)
 		assert.Nil(t, err)
-		mongoTimestamp := pkgutils.GetCurrentTimestamp()
-		_, err = collection.InsertOne(ctx, bson.M{
-			"_createdAt":       mongoTimestamp,
-			"availableBalance": 1000.00,
-			"username":         "Paula",
-			"password":         "pass",
-		})
+		_, err = collection.InsertOne(ctx, sampleAccountDetails)
 		assert.Nil(t, err)
 		cleanupMigrations(collection, ctx)
 	})
@@ -106,18 +100,10 @@ func TestV2SchemaMigration(t *testing.T) {
 	collection := db.Collection("transaction")
 	migration := schema.MigrationSchema2
 
-	// TODO: Add further tests once the schema has been finalized
 	t.Run("Should be able to add transactions with required fields", func(t *testing.T) {
 		err := migration.Up(mongoClient, ctx, utils.TestDatabaseName)
 		assert.Nil(t, err)
-		mongoTimestamp := pkgutils.GetCurrentTimestamp()
-		accountId1, accountId2 := primitive.NewObjectID(), primitive.NewObjectID()
-		_, err = collection.InsertOne(ctx, bson.M{
-			"_createdAt":  mongoTimestamp,
-			"amount":      1000.00,
-			"fromAccount": accountId1,
-			"toAccount":   accountId2,
-		})
+		_, err = collection.InsertOne(ctx, sampleTransactionDetails)
 		assert.Nil(t, err)
 		cleanupMigrations(collection, ctx)
 	})
@@ -125,4 +111,25 @@ func TestV2SchemaMigration(t *testing.T) {
 
 func cleanupMigrations(collection *mongo.Collection, ctx context.Context) {
 	collection.Drop(ctx)
+}
+
+var sampleAccountDetails = mongodb.MongoAccountInput{
+	Username:        "Paula",
+	Password:        "pass",
+	AccountNumber:   "1234567890",
+	AccountType:     "savings",
+	StartingBalance: 1000.00,
+	Person: mongodb.Person{
+		FirstName: "Paula",
+		LastName:  "Smith",
+	},
+	KnownAccounts: []mongodb.KnownAccount{},
+	CreatedAt:     pkgutils.GetCurrentTimestamp(),
+}
+
+var sampleTransactionDetails = mongodb.MongoTransactionDetails{
+	FromAccount: primitive.NewObjectID(),
+	ToAccount:   primitive.NewObjectID(),
+	Amount:      1000.00,
+	CreatedAt:   pkgutils.GetCurrentTimestamp(),
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"testing"
 	"time"
 	"webserver/internal/pkg/domain/model"
@@ -26,21 +27,15 @@ func TestAddTransaction(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	tomRes, tomErr := accCollection.InsertOne(ctx, bson.M{
-		"availableBalance": 1000.0,
-		"username":         "Tom",
-		"password":         "pass",
-		"_createdAt":       pkgutils.GetCurrentTimestamp(),
-	})
+	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+	tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
 		t.Errorf("Error inserting Tom's record %v", tomErr)
 	}
-	samRes, samErr := accCollection.InsertOne(ctx, bson.M{
-		"availableBalance": 1000.0,
-		"username":         "Sam",
-		"password":         "word",
-		"_createdAt":       pkgutils.GetCurrentTimestamp(),
-	})
+	samRes, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
 	if samErr != nil {
 		t.Errorf("Error inserting Tom's record %v", samErr)
 	}

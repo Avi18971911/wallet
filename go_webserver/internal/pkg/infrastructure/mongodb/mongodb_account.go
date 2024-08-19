@@ -16,6 +16,17 @@ type MongoAccountDetails struct {
 	CreatedAt        primitive.Timestamp `bson:"_createdAt"`
 }
 
+type MongoAccountInput struct {
+	Username        string              `bson:"username"`
+	Password        string              `bson:"password"`
+	AccountNumber   string              `bson:"accountNumber"`
+	AccountType     string              `bson:"accountType"`
+	StartingBalance float64             `bson:"availableBalance"`
+	Person          Person              `bson:"person"`
+	KnownAccounts   []KnownAccount      `bson:"knownAccounts"`
+	CreatedAt       primitive.Timestamp `bson:"_createdAt"`
+}
+
 type Person struct {
 	FirstName string `bson:"firstName"`
 	LastName  string `bson:"lastName"`

@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"testing"
 	"time"
 	"webserver/internal/pkg/domain/model"
@@ -26,32 +27,28 @@ func TestGetAccountDetails(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	username := "user"
-	password := "pass"
-	ts := pkgutils.GetCurrentTimestamp()
+	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
 
 	t.Run("Allows the insertion of an account with the required details", func(t *testing.T) {
-		input := bson.M{
-			"availableBalance": 1000.0,
-			"username":         username,
-			"password":         password,
-			"_createdAt":       ts,
-		}
-		tomRes, tomErr := accCollection.InsertOne(ctx, input)
+		tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 		if tomErr != nil {
 			t.Errorf("Error inserting Tom's record %v", tomErr)
 		}
-		tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
+		tomAccountId, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
 		service := setupAccountService(mongoClient, tranCollection, accCollection)
 
-		accountDetails, err := service.GetAccountDetails(tomAccountName, ctx)
+		accountDetails, err := service.GetAccountDetails(tomAccountId, ctx)
 		if err != nil {
 			t.Errorf("Error getting Tom's accountDetails: %v", err)
 		}
 		assert.Equal(t, 1000.0, accountDetails.AvailableBalance)
-		assert.Equal(t, username, accountDetails.Username)
-		assert.Equal(t, pkgutils.TimestampToTime(ts), accountDetails.CreatedAt)
-		assert.Equal(t, tomAccountName, accountDetails.Id)
+		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
+		assert.Equal(t, pkgutils.TimestampToTime(utils.TomAccountDetails.CreatedAt), accountDetails.CreatedAt)
+		assert.Equal(t, utils.TomAccountDetails.Password, accountDetails.Password)
+		assert.Equal(t, tomAccountId, accountDetails.Id)
 	})
 }
 
@@ -60,14 +57,23 @@ func TestGetAccountTransactions(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	baseAmounts := []float64{1000.0, 1000.0}
-	users := []string{"Tom", "Sam"}
-	passwords := []string{"pass", "word"}
-	accountIds, err := createAccounts(accCollection, ctx, baseAmounts, users, passwords)
-	tomAccountId, samAccountId := accountIds[0], accountIds[1]
+	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+	tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
+	if tomErr != nil {
+		t.Errorf("Error inserting Tom's record %v", tomErr)
+	}
+	samRes, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
+	if samErr != nil {
+		t.Errorf("Error inserting Tom's record %v", samErr)
+	}
 
-	tomAccountName, err := pkgutils.ObjectIdToString(tomAccountId)
-	samAccountName, err := pkgutils.ObjectIdToString(samAccountId)
+	tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
+	samAccountName, _ := pkgutils.ObjectIdToString(samRes.InsertedID)
+	tomObjectId, _ := pkgutils.StringToObjectId(tomAccountName)
+	samObjectId, _ := pkgutils.StringToObjectId(samAccountName)
 
 	tranAmounts := []float64{50.32, 23.89, 10.88}
 	tranIds := make([]primitive.ObjectID, 3)
@@ -76,7 +82,7 @@ func TestGetAccountTransactions(t *testing.T) {
 		tranIds[i] = primitive.NewObjectID()
 		tranStrings[i], _ = pkgutils.ObjectIdToString(tranIds[i])
 	}
-	transactionsInput := makeTransactionsInput(tomAccountId, samAccountId, tranAmounts, tranIds)
+	transactionsInput := makeTransactionsInput(tomObjectId, samObjectId, tranAmounts, tranIds)
 
 	t.Run(
 		"Allows the insertion of transactions and the retrieval of all transactions from an account",
@@ -109,34 +115,40 @@ func TestLogins(t *testing.T) {
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	baseAmounts := []float64{1000.0, 1000.0}
-	users := []string{"Tom", "Sam"}
-	passwords := []string{"pass", "word"}
-	_, err := createAccounts(accCollection, ctx, baseAmounts, users, passwords)
+	err := utils.StartMigrationsContainer(ctx, utils.MongoURI)
 	if err != nil {
-		t.Fatalf("Error creating accounts: %v", err)
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
+	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
+	if tomErr != nil {
+		t.Errorf("Error inserting Tom's record %v", tomErr)
+	}
+	_, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
+	if samErr != nil {
+		t.Errorf("Error inserting Tom's record %v", samErr)
 	}
 
 	t.Run("Allows the login of a user with the correct password", func(t *testing.T) {
 		service := setupAccountService(mongoClient, tranCollection, accCollection)
-		accountDetails, err := service.Login(users[0], passwords[0], ctx)
+		accountDetails, err := service.Login(utils.TomAccountDetails.Username, utils.TomAccountDetails.Password, ctx)
 		if err != nil {
 			t.Fatalf("Error logging in: %v", err)
 		}
-		assert.Equal(t, users[0], accountDetails.Username)
-		assert.Equal(t, baseAmounts[0], accountDetails.AvailableBalance)
+		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
+		assert.Equal(t, utils.TomAccountDetails.StartingBalance, accountDetails.AvailableBalance)
 	})
 
 	t.Run("Does not allow the login of a user with the incorrect password", func(t *testing.T) {
 		service := setupAccountService(mongoClient, tranCollection, accCollection)
-		_, err := service.Login(users[0], "wrongpassword", ctx)
+		_, err := service.Login(utils.TomAccountDetails.Username, "wrongpassword", ctx)
 		assert.NotNil(t, err)
 		assert.EqualError(t, err, "invalid username or password")
 	})
 
 	t.Run("Does not allow the login of a user with the incorrect username", func(t *testing.T) {
 		service := setupAccountService(mongoClient, tranCollection, accCollection)
-		_, err := service.Login("wrongusername", passwords[0], ctx)
+		_, err := service.Login("wrongusername", utils.TomAccountDetails.Password, ctx)
 		assert.NotNil(t, err)
 		assert.EqualError(t, err, "invalid username or password")
 	})
@@ -194,42 +206,6 @@ func createExpectedAccountTranResult(
 		}
 	}
 	return expectedResults
-}
-
-func createAccounts(
-	accCollection *mongo.Collection,
-	ctx context.Context,
-	amounts []float64,
-	users []string,
-	passwords []string,
-) (accountIds []primitive.ObjectID, err error) {
-	res := make([]primitive.ObjectID, len(amounts))
-	for i, _ := range amounts {
-		currentAmount := amounts[i]
-		res[i] = primitive.NewObjectID()
-		_, err := insertAccount(accCollection, ctx, res[i], currentAmount, users[i], passwords[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func insertAccount(
-	accCollection *mongo.Collection,
-	ctx context.Context,
-	accountId primitive.ObjectID,
-	amount float64,
-	username string,
-	password string,
-) (*mongo.InsertOneResult, error) {
-	return accCollection.InsertOne(ctx, bson.M{
-		"availableBalance": amount,
-		"_id":              accountId,
-		"username":         username,
-		"password":         password,
-		"_createdAt":       pkgutils.GetCurrentTimestamp(),
-	})
 }
 
 func setupAccountService(

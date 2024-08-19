@@ -10,7 +10,27 @@ type AccountDetails struct {
 	Username         string
 	Password         string
 	AvailableBalance float64
+	AccountNumber    string
+	Person           Person
+	KnownAccounts    []KnownAccount
 	CreatedAt        time.Time
+}
+
+const (
+	Savings int = iota
+	Checking
+	Investment
+)
+
+type Person struct {
+	FirstName string
+	LastName  string
+}
+
+type KnownAccount struct {
+	AccountNumber string
+	AccountHolder string
+	AccountType   int
 }
 
 type AccountTransaction struct {
