@@ -24,7 +24,7 @@ var accounts = []interface{}{
 			LastName:  "OxenFree",
 		},
 		KnownAccounts: []mongodb.KnownAccount{},
-		AccountType:   "Checking",
+		AccountType:   "checking",
 		CreatedAt:     utils.GetCurrentTimestamp(),
 	},
 	mongodb.MongoAccountDetails{
@@ -33,7 +33,7 @@ var accounts = []interface{}{
 		Username:         "Bob",
 		Password:         "bob'spassword",
 		AccountNumber:    "123-12345-1",
-		AccountType:      "Savings",
+		AccountType:      "savings",
 		Person: mongodb.Person{
 			FirstName: "Bob",
 			LastName:  "Barker",
@@ -42,12 +42,12 @@ var accounts = []interface{}{
 			{
 				AccountNumber: "123-12345-0",
 				AccountHolder: "Olly OxenFree",
-				AccountType:   "Checking",
+				AccountType:   "checking",
 			},
 			{
 				AccountNumber: "123-12345-2",
 				AccountHolder: "Hilda Hill",
-				AccountType:   "Savings",
+				AccountType:   "savings",
 			},
 		},
 		CreatedAt: utils.GetCurrentTimestamp(),
@@ -58,7 +58,7 @@ var accounts = []interface{}{
 		Username:         "Hilda",
 		Password:         "Hilda",
 		AccountNumber:    "123-12345-2",
-		AccountType:      "Savings",
+		AccountType:      "savings",
 		Person: mongodb.Person{
 			FirstName: "Hilda",
 			LastName:  "Hill",
@@ -67,7 +67,7 @@ var accounts = []interface{}{
 			{
 				AccountNumber: "123-12345-0",
 				AccountHolder: "Olly OxenFree",
-				AccountType:   "Checking",
+				AccountType:   "checking",
 			},
 		},
 		CreatedAt: utils.GetCurrentTimestamp(),
