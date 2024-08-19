@@ -15,10 +15,13 @@ import (
 )
 
 type AccountDetailsDTO struct {
-	Id               string    `json:"id"`
-	Username         string    `json:"username"`
-	AvailableBalance float64   `json:"availableBalance"`
-	CreatedAt        time.Time `json:"createdAt"`
+	Id               string            `json:"id"`
+	Username         string            `json:"username"`
+	AvailableBalance float64           `json:"availableBalance"`
+	AccountNumber    string            `json:"accountNumber"`
+	Person           PersonDTO         `json:"person"`
+	KnownAccounts    []KnownAccountDTO `json:"knownAccounts"`
+	CreatedAt        time.Time         `json:"createdAt"`
 }
 
 type AccountTransactionDTO struct {
@@ -35,11 +38,41 @@ type AccountLoginDTO struct {
 	Password string `json:"password"`
 }
 
+type PersonDTO struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
+type KnownAccountDTO struct {
+	AccountNumber string `json:"accountNumber"`
+	AccountHolder string `json:"accountHolder"`
+	AccountType   int    `json:"accountType"`
+}
+
+func knownAccountToDTO(tx []model.KnownAccount) []KnownAccountDTO {
+	knownAccountDTOList := make([]KnownAccountDTO, len(tx))
+	for i, element := range tx {
+		knownAccountDTOList[i] = KnownAccountDTO{
+			AccountNumber: element.AccountNumber,
+			AccountHolder: element.AccountHolder,
+			AccountType:   element.AccountType,
+		}
+	}
+	return knownAccountDTOList
+}
+
 func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
 	return AccountDetailsDTO{
 		Id:               tx.Id,
 		AvailableBalance: tx.AvailableBalance,
 		Username:         tx.Username,
+		AccountNumber:    tx.AccountNumber,
+		Person: PersonDTO{
+			FirstName: tx.Person.FirstName,
+			LastName:  tx.Person.LastName,
+		},
+		KnownAccounts: knownAccountToDTO(tx.KnownAccounts),
+		CreatedAt:     tx.CreatedAt,
 	}
 }
 
