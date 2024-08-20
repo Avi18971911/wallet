@@ -19,6 +19,7 @@ type AccountDetailsDTO struct {
 	Username         string            `json:"username"`
 	AvailableBalance float64           `json:"availableBalance"`
 	AccountNumber    string            `json:"accountNumber"`
+	AccountType      string            `json:"accountType"`
 	Person           PersonDTO         `json:"person"`
 	KnownAccounts    []KnownAccountDTO `json:"knownAccounts"`
 	CreatedAt        time.Time         `json:"createdAt"`
@@ -46,27 +47,36 @@ type PersonDTO struct {
 type KnownAccountDTO struct {
 	AccountNumber string `json:"accountNumber"`
 	AccountHolder string `json:"accountHolder"`
-	AccountType   int    `json:"accountType"`
+	AccountType   string `json:"accountType"`
 }
 
 func knownAccountToDTO(tx []model.KnownAccount) []KnownAccountDTO {
 	knownAccountDTOList := make([]KnownAccountDTO, len(tx))
 	for i, element := range tx {
+		accountType, err := accountTypeEnumToString(element.AccountType)
+		if err != nil {
+			log.Printf("Failed to convert account type to string: %v", err)
+		}
 		knownAccountDTOList[i] = KnownAccountDTO{
 			AccountNumber: element.AccountNumber,
 			AccountHolder: element.AccountHolder,
-			AccountType:   element.AccountType,
+			AccountType:   accountType,
 		}
 	}
 	return knownAccountDTOList
 }
 
 func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
+	accountType, err := accountTypeEnumToString(tx.AccountType)
+	if err != nil {
+		log.Printf("Failed to convert account type to string: %v", err)
+	}
 	return AccountDetailsDTO{
 		Id:               tx.Id,
 		AvailableBalance: tx.AvailableBalance,
 		Username:         tx.Username,
 		AccountNumber:    tx.AccountNumber,
+		AccountType:      accountType,
 		Person: PersonDTO{
 			FirstName: tx.Person.FirstName,
 			LastName:  tx.Person.LastName,
@@ -89,6 +99,19 @@ func accountTransactionToDTO(tx []model.AccountTransaction) []AccountTransaction
 		}
 	}
 	return accountTransactionDTOList
+}
+
+func accountTypeEnumToString(tx int) (string, error) {
+	switch tx {
+	case model.Savings:
+		return "savings", nil
+	case model.Checking:
+		return "checking", nil
+	case model.Investment:
+		return "investment", nil
+	default:
+		return "unknown", errors.New("invalid account type")
+	}
 }
 
 // AccountDetailsHandler creates a handler for fetching account details.
