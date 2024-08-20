@@ -6,8 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "backendAPI",
-    "basePath": "/",
+    "basePath": "/backendAPI",
     "paths": {
         "/accounts/login": {
             "post": {
@@ -185,6 +184,12 @@
         "handlers.AccountDetailsDTO": {
             "type": "object",
             "properties": {
+                "accountNumber": {
+                    "type": "string"
+                },
+                "accountType": {
+                    "type": "string"
+                },
                 "availableBalance": {
                     "type": "number"
                 },
@@ -193,6 +198,15 @@
                 },
                 "id": {
                     "type": "string"
+                },
+                "knownAccounts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.KnownAccountDTO"
+                    }
+                },
+                "person": {
+                    "$ref": "#/definitions/handlers.PersonDTO"
                 },
                 "username": {
                     "type": "string"
@@ -229,6 +243,31 @@
                     "type": "string"
                 },
                 "transactionType": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.KnownAccountDTO": {
+            "type": "object",
+            "properties": {
+                "accountHolder": {
+                    "type": "string"
+                },
+                "accountNumber": {
+                    "type": "string"
+                },
+                "accountType": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.PersonDTO": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
                     "type": "string"
                 }
             }

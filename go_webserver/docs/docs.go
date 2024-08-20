@@ -191,6 +191,12 @@ const docTemplate = `{
         "handlers.AccountDetailsDTO": {
             "type": "object",
             "properties": {
+                "accountNumber": {
+                    "type": "string"
+                },
+                "accountType": {
+                    "type": "string"
+                },
                 "availableBalance": {
                     "type": "number"
                 },
@@ -199,6 +205,15 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "knownAccounts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.KnownAccountDTO"
+                    }
+                },
+                "person": {
+                    "$ref": "#/definitions/handlers.PersonDTO"
                 },
                 "username": {
                     "type": "string"
@@ -239,6 +254,31 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.KnownAccountDTO": {
+            "type": "object",
+            "properties": {
+                "accountHolder": {
+                    "type": "string"
+                },
+                "accountNumber": {
+                    "type": "string"
+                },
+                "accountType": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.PersonDTO": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.TransactionRequest": {
             "type": "object",
             "properties": {
@@ -267,8 +307,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "backendAPI",
-	BasePath:         "/",
+	Host:             "",
+	BasePath:         "/backendAPI",
 	Schemes:          []string{},
 	Title:            "Wallet API",
 	Description:      "This is a simple wallet API",

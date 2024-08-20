@@ -26,10 +26,7 @@ import (
 //   name: Apache 2.0
 //   url: http://www.apache.org/licenses/LICENSE-2.0.html
 
-// servers:
-// - url: /{host}/{basePath}
-// @host backendAPI
-// @BasePath /
+// @BasePath /backendAPI
 
 func main() {
 	mongoURL := os.Getenv("MONGO_URL")

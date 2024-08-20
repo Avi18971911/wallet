@@ -1,13 +1,23 @@
-basePath: /
+basePath: /backendAPI
 definitions:
   handlers.AccountDetailsDTO:
     properties:
+      accountNumber:
+        type: string
+      accountType:
+        type: string
       availableBalance:
         type: number
       createdAt:
         type: string
       id:
         type: string
+      knownAccounts:
+        items:
+          $ref: '#/definitions/handlers.KnownAccountDTO'
+        type: array
+      person:
+        $ref: '#/definitions/handlers.PersonDTO'
       username:
         type: string
     type: object
@@ -33,6 +43,22 @@ definitions:
       transactionType:
         type: string
     type: object
+  handlers.KnownAccountDTO:
+    properties:
+      accountHolder:
+        type: string
+      accountNumber:
+        type: string
+      accountType:
+        type: string
+    type: object
+  handlers.PersonDTO:
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+    type: object
   handlers.TransactionRequest:
     properties:
       amount:
@@ -47,7 +73,6 @@ definitions:
       message:
         type: string
     type: object
-host: backendAPI
 info:
   contact: {}
   description: This is a simple wallet API
