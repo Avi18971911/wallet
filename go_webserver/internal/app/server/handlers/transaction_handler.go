@@ -17,7 +17,7 @@ import (
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param transaction body TransactionRequest true "Transaction request"
+// @Param transaction body dto.TransactionRequest true "Transaction request"
 // @Success 202 {string} string "Accepted"
 // @Failure 400 {object} utils.ErrorMessage "Invalid request payload"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"

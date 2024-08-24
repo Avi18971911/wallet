@@ -6,86 +6,65 @@ import "time"
 // @swagger:model KnownAccountDTO
 type KnownAccountDTO struct {
 	// The account number of the known account
-	// Required: true
-	AccountNumber string `json:"accountNumber"`
+	AccountNumber string `json:"accountNumber" validate:"required"`
 	// The name of the account holder
-	// Required: true
-	AccountHolder string `json:"accountHolder"`
+	AccountHolder string `json:"accountHolder" validate:"required"`
 	// The type of the account (e.g., savings, checking)
-	// Required: true
-	AccountType string `json:"accountType"`
+	AccountType string `json:"accountType" validate:"required"`
 }
 
 // AccountDetailsDTO represents the confidential details of an account belonging to a customer
 // @swagger:model AccountDetailsDTO
 type AccountDetailsDTO struct {
 	// The unique identifier of the account
-	// Required: true
-	Id string `json:"id"`
+	Id string `json:"id" validate:"required"`
 	// The username associated with the account
-	// Required: true
-	Username string `json:"username"`
+	Username string `json:"username" validate:"required"`
 	// The available balance in the account
-	// Required: true
-	AvailableBalance float64 `json:"availableBalance"`
+	AvailableBalance float64 `json:"availableBalance" validate:"required"`
 	// The account number
-	// Required: true
-	AccountNumber string `json:"accountNumber"`
+	AccountNumber string `json:"accountNumber" validate:"required"`
 	// The type of the account
-	// Required: true
-	AccountType string `json:"accountType"`
+	AccountType string `json:"accountType " validate:"required"`
 	// The account holder associated with the account
-	// Required: true
-	Person PersonDTO `json:"person"`
+	Person PersonDTO `json:"person " validate:"required"`
 	// The list of accounts known to and recognized by the account holder
-	// Required: true
-	KnownAccounts []KnownAccountDTO `json:"knownAccounts"`
+	KnownAccounts []KnownAccountDTO `json:"knownAccounts " validate:"required"`
 	// The creation timestamp of the account
-	// Required: true
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt time.Time `json:"createdAt " validate:"required"`
 }
 
 // AccountTransactionDTO represents a transaction between the given account and another account
 // @swagger:model AccountTransactionDTO
 type AccountTransactionDTO struct {
 	// The unique identifier of the transaction
-	// Required: true
-	Id string `json:"id"`
+	Id string `json:"id " validate:"required"`
 	// The primary account ID associated with the transaction
-	// Required: true
-	AccountId string `json:"accountId"`
+	AccountId string `json:"accountId " validate:"required"`
 	// The other account ID involved in the transaction
-	// Required: true
-	OtherAccountId string `json:"otherAccountId"`
+	OtherAccountId string `json:"otherAccountId " validate:"required"`
 	// The type of the transaction (debit or credit)
-	// Required: true
-	TransactionType string `json:"transactionType"`
+	TransactionType string `json:"transactionType " validate:"required"`
 	// The amount involved in the transaction
-	// Required: true
-	Amount float64 `json:"amount"`
+	Amount float64 `json:"amount " validate:"required"`
 	// The timestamp of when the transaction was created
-	// Required: true
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt time.Time `json:"createdAt " validate:"required"`
 }
 
 // AccountLoginDTO represents the login credentials for an account
 // @swagger:model AccountLoginDTO
 type AccountLoginDTO struct {
 	// The username for the login
-	// Required: true
-	Username string `json:"username"`
+	Username string `json:"username " validate:"required"`
 	// The password for the login
-	// Required: true
-	Password string `json:"password"`
+	Password string `json:"password " validate:"required"`
 }
 
 // PersonDTO represents an account holder
 // @swagger:model PersonDTO
 type PersonDTO struct {
 	// The first name of the person
-	// Required: true
-	FirstName string `json:"firstName"`
+	FirstName string `json:"firstName " validate:"required"`
 	// The last name of the person
-	// Required: true
-	LastName string `json:"lastName"`
+	LastName string `json:"lastName " validate:"required"`
 }

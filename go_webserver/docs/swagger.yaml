@@ -1,72 +1,129 @@
 basePath: /backendAPI
 definitions:
-  handlers.AccountDetailsDTO:
+  dto.AccountDetailsDTO:
     properties:
       accountNumber:
+        description: The account number
         type: string
       accountType:
+        description: The type of the account
         type: string
       availableBalance:
+        description: The available balance in the account
         type: number
       createdAt:
+        description: The creation timestamp of the account
         type: string
       id:
+        description: The unique identifier of the account
         type: string
       knownAccounts:
+        description: The list of accounts known to and recognized by the account holder
         items:
-          $ref: '#/definitions/handlers.KnownAccountDTO'
+          $ref: '#/definitions/dto.KnownAccountDTO'
         type: array
       person:
-        $ref: '#/definitions/handlers.PersonDTO'
+        allOf:
+        - $ref: '#/definitions/dto.PersonDTO'
+        description: The account holder associated with the account
       username:
+        description: The username associated with the account
         type: string
+    required:
+    - accountNumber
+    - accountType
+    - availableBalance
+    - createdAt
+    - id
+    - knownAccounts
+    - person
+    - username
     type: object
-  handlers.AccountLoginDTO:
+  dto.AccountLoginDTO:
     properties:
       password:
+        description: The password for the login
         type: string
       username:
+        description: The username for the login
         type: string
+    required:
+    - password
+    - username
     type: object
-  handlers.AccountTransactionDTO:
+  dto.AccountTransactionDTO:
     properties:
       accountId:
+        description: The primary account ID associated with the transaction
         type: string
       amount:
+        description: The amount involved in the transaction
         type: number
       createdAt:
+        description: The timestamp of when the transaction was created
         type: string
       id:
+        description: The unique identifier of the transaction
         type: string
       otherAccountId:
+        description: The other account ID involved in the transaction
         type: string
       transactionType:
+        description: The type of the transaction (debit or credit)
         type: string
+    required:
+    - accountId
+    - amount
+    - createdAt
+    - id
+    - otherAccountId
+    - transactionType
     type: object
-  handlers.KnownAccountDTO:
+  dto.KnownAccountDTO:
     properties:
       accountHolder:
+        description: The name of the account holder
         type: string
       accountNumber:
+        description: The account number of the known account
         type: string
       accountType:
+        description: The type of the account (e.g., savings, checking)
         type: string
+    required:
+    - accountHolder
+    - accountNumber
+    - accountType
     type: object
-  handlers.PersonDTO:
+  dto.PersonDTO:
     properties:
       firstName:
+        description: The first name of the person
         type: string
       lastName:
+        description: The last name of the person
         type: string
+    required:
+    - firstName
+    - lastName
     type: object
-  handlers.TransactionRequest:
+  dto.TransactionRequest:
     properties:
       amount:
+        description: The amount to be transferred
         type: number
       fromAccount:
+        description: The account number of the account from which the amount is to
+          be transferred
         type: string
       toAccount:
+        description: The account number of the account to which the amount is to be
+          transferred
         type: string
+    required:
+    - amount
+    - fromAccount
+    - toAccount
     type: object
   utils.ErrorMessage:
     properties:
@@ -96,7 +153,7 @@ paths:
         "200":
           description: Successful retrieval of account details
           schema:
-            $ref: '#/definitions/handlers.AccountDetailsDTO'
+            $ref: '#/definitions/dto.AccountDetailsDTO'
         "500":
           description: Internal server error
           schema:
@@ -123,7 +180,7 @@ paths:
           description: Successful retrieval of account transactions
           schema:
             items:
-              $ref: '#/definitions/handlers.AccountTransactionDTO'
+              $ref: '#/definitions/dto.AccountTransactionDTO'
             type: array
         "500":
           description: Internal server error
@@ -143,14 +200,14 @@ paths:
         name: login
         required: true
         schema:
-          $ref: '#/definitions/handlers.AccountLoginDTO'
+          $ref: '#/definitions/dto.AccountLoginDTO'
       produces:
       - application/json
       responses:
         "200":
           description: Successful login
           schema:
-            $ref: '#/definitions/handlers.AccountDetailsDTO'
+            $ref: '#/definitions/dto.AccountDetailsDTO'
         "401":
           description: Invalid credentials
           schema:
@@ -173,7 +230,7 @@ paths:
         name: transaction
         required: true
         schema:
-          $ref: '#/definitions/handlers.TransactionRequest'
+          $ref: '#/definitions/dto.TransactionRequest'
       produces:
       - application/json
       responses:

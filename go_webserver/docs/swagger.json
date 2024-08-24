@@ -28,7 +28,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.AccountLoginDTO"
+                            "$ref": "#/definitions/dto.AccountLoginDTO"
                         }
                     }
                 ],
@@ -36,7 +36,7 @@
                     "200": {
                         "description": "Successful login",
                         "schema": {
-                            "$ref": "#/definitions/handlers.AccountDetailsDTO"
+                            "$ref": "#/definitions/dto.AccountDetailsDTO"
                         }
                     },
                     "401": {
@@ -80,7 +80,7 @@
                     "200": {
                         "description": "Successful retrieval of account details",
                         "schema": {
-                            "$ref": "#/definitions/handlers.AccountDetailsDTO"
+                            "$ref": "#/definitions/dto.AccountDetailsDTO"
                         }
                     },
                     "500": {
@@ -120,7 +120,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handlers.AccountTransactionDTO"
+                                "$ref": "#/definitions/dto.AccountTransactionDTO"
                             }
                         }
                     },
@@ -153,7 +153,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.TransactionRequest"
+                            "$ref": "#/definitions/dto.TransactionRequest"
                         }
                     }
                 ],
@@ -181,107 +181,171 @@
         }
     },
     "definitions": {
-        "handlers.AccountDetailsDTO": {
+        "dto.AccountDetailsDTO": {
             "type": "object",
+            "required": [
+                "accountNumber",
+                "accountType",
+                "availableBalance",
+                "createdAt",
+                "id",
+                "knownAccounts",
+                "person",
+                "username"
+            ],
             "properties": {
                 "accountNumber": {
+                    "description": "The account number",
                     "type": "string"
                 },
                 "accountType": {
+                    "description": "The type of the account",
                     "type": "string"
                 },
                 "availableBalance": {
+                    "description": "The available balance in the account",
                     "type": "number"
                 },
                 "createdAt": {
+                    "description": "The creation timestamp of the account",
                     "type": "string"
                 },
                 "id": {
+                    "description": "The unique identifier of the account",
                     "type": "string"
                 },
                 "knownAccounts": {
+                    "description": "The list of accounts known to and recognized by the account holder",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/handlers.KnownAccountDTO"
+                        "$ref": "#/definitions/dto.KnownAccountDTO"
                     }
                 },
                 "person": {
-                    "$ref": "#/definitions/handlers.PersonDTO"
+                    "description": "The account holder associated with the account",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.PersonDTO"
+                        }
+                    ]
                 },
                 "username": {
+                    "description": "The username associated with the account",
                     "type": "string"
                 }
             }
         },
-        "handlers.AccountLoginDTO": {
+        "dto.AccountLoginDTO": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
+                    "description": "The password for the login",
                     "type": "string"
                 },
                 "username": {
+                    "description": "The username for the login",
                     "type": "string"
                 }
             }
         },
-        "handlers.AccountTransactionDTO": {
+        "dto.AccountTransactionDTO": {
             "type": "object",
+            "required": [
+                "accountId",
+                "amount",
+                "createdAt",
+                "id",
+                "otherAccountId",
+                "transactionType"
+            ],
             "properties": {
                 "accountId": {
+                    "description": "The primary account ID associated with the transaction",
                     "type": "string"
                 },
                 "amount": {
+                    "description": "The amount involved in the transaction",
                     "type": "number"
                 },
                 "createdAt": {
+                    "description": "The timestamp of when the transaction was created",
                     "type": "string"
                 },
                 "id": {
+                    "description": "The unique identifier of the transaction",
                     "type": "string"
                 },
                 "otherAccountId": {
+                    "description": "The other account ID involved in the transaction",
                     "type": "string"
                 },
                 "transactionType": {
+                    "description": "The type of the transaction (debit or credit)",
                     "type": "string"
                 }
             }
         },
-        "handlers.KnownAccountDTO": {
+        "dto.KnownAccountDTO": {
             "type": "object",
+            "required": [
+                "accountHolder",
+                "accountNumber",
+                "accountType"
+            ],
             "properties": {
                 "accountHolder": {
+                    "description": "The name of the account holder",
                     "type": "string"
                 },
                 "accountNumber": {
+                    "description": "The account number of the known account",
                     "type": "string"
                 },
                 "accountType": {
+                    "description": "The type of the account (e.g., savings, checking)",
                     "type": "string"
                 }
             }
         },
-        "handlers.PersonDTO": {
+        "dto.PersonDTO": {
             "type": "object",
+            "required": [
+                "firstName",
+                "lastName"
+            ],
             "properties": {
                 "firstName": {
+                    "description": "The first name of the person",
                     "type": "string"
                 },
                 "lastName": {
+                    "description": "The last name of the person",
                     "type": "string"
                 }
             }
         },
-        "handlers.TransactionRequest": {
+        "dto.TransactionRequest": {
             "type": "object",
+            "required": [
+                "amount",
+                "fromAccount",
+                "toAccount"
+            ],
             "properties": {
                 "amount": {
+                    "description": "The amount to be transferred",
                     "type": "number"
                 },
                 "fromAccount": {
+                    "description": "The account number of the account from which the amount is to be transferred",
                     "type": "string"
                 },
                 "toAccount": {
+                    "description": "The account number of the account to which the amount is to be transferred",
                     "type": "string"
                 }
             }

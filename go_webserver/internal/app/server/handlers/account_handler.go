@@ -85,7 +85,7 @@ func accountTypeEnumToString(tx int) (string, error) {
 // @Accept json
 // @Produce json
 // @Param accountId path string true "Account ID"
-// @Success 200 {object} AccountDetailsDTO "Successful retrieval of account details"
+// @Success 200 {object} dto.AccountDetailsDTO "Successful retrieval of account details"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId} [get]
 func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
@@ -114,7 +114,7 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 // @Accept json
 // @Produce json
 // @Param accountId path string true "Account ID"
-// @Success 200 {object} []AccountTransactionDTO "Successful retrieval of account transactions"
+// @Success 200 {object} []dto.AccountTransactionDTO "Successful retrieval of account transactions"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId}/transactions [get]
 func AccountTransactionsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
@@ -143,8 +143,8 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 // @Tags accounts
 // @Accept json
 // @Produce json
-// @Param login body AccountLoginDTO true "Login payload"
-// @Success 200 {object} AccountDetailsDTO "Successful login"
+// @Param login body dto.AccountLoginDTO true "Login payload"
+// @Success 200 {object} dto.AccountDetailsDTO "Successful login"
 // @Failure 401 {object} utils.ErrorMessage "Invalid credentials"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/login [post]
