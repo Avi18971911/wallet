@@ -14,40 +14,92 @@ import (
 	"webserver/internal/pkg/utils"
 )
 
+// AccountDetailsDTO represents the confidential details of an account belonging to a customer
+// @swagger:model AccountDetailsDTO
 type AccountDetailsDTO struct {
-	Id               string            `json:"id"`
-	Username         string            `json:"username"`
-	AvailableBalance float64           `json:"availableBalance"`
-	AccountNumber    string            `json:"accountNumber"`
-	AccountType      string            `json:"accountType"`
-	Person           PersonDTO         `json:"person"`
-	KnownAccounts    []KnownAccountDTO `json:"knownAccounts"`
-	CreatedAt        time.Time         `json:"createdAt"`
-}
-
-type AccountTransactionDTO struct {
-	Id              string    `json:"id"`
-	AccountId       string    `json:"accountId"`
-	OtherAccountId  string    `json:"otherAccountId"`
-	TransactionType string    `json:"transactionType"`
-	Amount          float64   `json:"amount"`
-	CreatedAt       time.Time `json:"createdAt"`
-}
-
-type AccountLoginDTO struct {
+	// The unique identifier of the account
+	// Required: true
+	Id string `json:"id"`
+	// The username associated with the account
+	// Required: true
 	Username string `json:"username"`
+	// The available balance in the account
+	// Required: true
+	AvailableBalance float64 `json:"availableBalance"`
+	// The account number
+	// Required: true
+	AccountNumber string `json:"accountNumber"`
+	// The type of the account
+	// Required: true
+	AccountType string `json:"accountType"`
+	// The account holder associated with the account
+	// Required: true
+	Person PersonDTO `json:"person"`
+	// The list of accounts known to and recognized by the account holder
+	// Required: true
+	KnownAccounts []KnownAccountDTO `json:"knownAccounts"`
+	// The creation timestamp of the account
+	// Required: true
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+// AccountTransactionDTO represents a transaction between the given account and another account
+// @swagger:model AccountTransactionDTO
+type AccountTransactionDTO struct {
+	// The unique identifier of the transaction
+	// Required: true
+	Id string `json:"id"`
+	// The primary account ID associated with the transaction
+	// Required: true
+	AccountId string `json:"accountId"`
+	// The other account ID involved in the transaction
+	// Required: true
+	OtherAccountId string `json:"otherAccountId"`
+	// The type of the transaction (debit or credit)
+	// Required: true
+	TransactionType string `json:"transactionType"`
+	// The amount involved in the transaction
+	// Required: true
+	Amount float64 `json:"amount"`
+	// The timestamp of when the transaction was created
+	// Required: true
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+// AccountLoginDTO represents the login credentials for an account
+// @swagger:model AccountLoginDTO
+type AccountLoginDTO struct {
+	// The username for the login
+	// Required: true
+	Username string `json:"username"`
+	// The password for the login
+	// Required: true
 	Password string `json:"password"`
 }
 
+// PersonDTO represents an account holder
+// @swagger:model PersonDTO
 type PersonDTO struct {
+	// The first name of the person
+	// Required: true
 	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	// The last name of the person
+	// Required: true
+	LastName string `json:"lastName"`
 }
 
+// KnownAccountDTO represents an account known to and recognized by a particular account
+// @swagger:model KnownAccountDTO
 type KnownAccountDTO struct {
+	// The account number of the known account
+	// Required: true
 	AccountNumber string `json:"accountNumber"`
+	// The name of the account holder
+	// Required: true
 	AccountHolder string `json:"accountHolder"`
-	AccountType   string `json:"accountType"`
+	// The type of the account (e.g., savings, checking)
+	// Required: true
+	AccountType string `json:"accountType"`
 }
 
 func knownAccountToDTO(tx []model.KnownAccount) []KnownAccountDTO {
