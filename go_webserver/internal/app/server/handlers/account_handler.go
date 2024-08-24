@@ -8,108 +8,20 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
+	"webserver/internal/app/server/dto"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/services"
 	"webserver/internal/pkg/utils"
 )
 
-// AccountDetailsDTO represents the confidential details of an account belonging to a customer
-// @swagger:model AccountDetailsDTO
-type AccountDetailsDTO struct {
-	// The unique identifier of the account
-	// Required: true
-	Id string `json:"id"`
-	// The username associated with the account
-	// Required: true
-	Username string `json:"username"`
-	// The available balance in the account
-	// Required: true
-	AvailableBalance float64 `json:"availableBalance"`
-	// The account number
-	// Required: true
-	AccountNumber string `json:"accountNumber"`
-	// The type of the account
-	// Required: true
-	AccountType string `json:"accountType"`
-	// The account holder associated with the account
-	// Required: true
-	Person PersonDTO `json:"person"`
-	// The list of accounts known to and recognized by the account holder
-	// Required: true
-	KnownAccounts []KnownAccountDTO `json:"knownAccounts"`
-	// The creation timestamp of the account
-	// Required: true
-	CreatedAt time.Time `json:"createdAt"`
-}
-
-// AccountTransactionDTO represents a transaction between the given account and another account
-// @swagger:model AccountTransactionDTO
-type AccountTransactionDTO struct {
-	// The unique identifier of the transaction
-	// Required: true
-	Id string `json:"id"`
-	// The primary account ID associated with the transaction
-	// Required: true
-	AccountId string `json:"accountId"`
-	// The other account ID involved in the transaction
-	// Required: true
-	OtherAccountId string `json:"otherAccountId"`
-	// The type of the transaction (debit or credit)
-	// Required: true
-	TransactionType string `json:"transactionType"`
-	// The amount involved in the transaction
-	// Required: true
-	Amount float64 `json:"amount"`
-	// The timestamp of when the transaction was created
-	// Required: true
-	CreatedAt time.Time `json:"createdAt"`
-}
-
-// AccountLoginDTO represents the login credentials for an account
-// @swagger:model AccountLoginDTO
-type AccountLoginDTO struct {
-	// The username for the login
-	// Required: true
-	Username string `json:"username"`
-	// The password for the login
-	// Required: true
-	Password string `json:"password"`
-}
-
-// PersonDTO represents an account holder
-// @swagger:model PersonDTO
-type PersonDTO struct {
-	// The first name of the person
-	// Required: true
-	FirstName string `json:"firstName"`
-	// The last name of the person
-	// Required: true
-	LastName string `json:"lastName"`
-}
-
-// KnownAccountDTO represents an account known to and recognized by a particular account
-// @swagger:model KnownAccountDTO
-type KnownAccountDTO struct {
-	// The account number of the known account
-	// Required: true
-	AccountNumber string `json:"accountNumber"`
-	// The name of the account holder
-	// Required: true
-	AccountHolder string `json:"accountHolder"`
-	// The type of the account (e.g., savings, checking)
-	// Required: true
-	AccountType string `json:"accountType"`
-}
-
-func knownAccountToDTO(tx []model.KnownAccount) []KnownAccountDTO {
-	knownAccountDTOList := make([]KnownAccountDTO, len(tx))
+func knownAccountToDTO(tx []model.KnownAccount) []dto.KnownAccountDTO {
+	knownAccountDTOList := make([]dto.KnownAccountDTO, len(tx))
 	for i, element := range tx {
 		accountType, err := accountTypeEnumToString(element.AccountType)
 		if err != nil {
 			log.Printf("Failed to convert account type to string: %v", err)
 		}
-		knownAccountDTOList[i] = KnownAccountDTO{
+		knownAccountDTOList[i] = dto.KnownAccountDTO{
 			AccountNumber: element.AccountNumber,
 			AccountHolder: element.AccountHolder,
 			AccountType:   accountType,
@@ -118,18 +30,18 @@ func knownAccountToDTO(tx []model.KnownAccount) []KnownAccountDTO {
 	return knownAccountDTOList
 }
 
-func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
+func accountDetailsToDTO(tx *model.AccountDetails) dto.AccountDetailsDTO {
 	accountType, err := accountTypeEnumToString(tx.AccountType)
 	if err != nil {
 		log.Printf("Failed to convert account type to string: %v", err)
 	}
-	return AccountDetailsDTO{
+	return dto.AccountDetailsDTO{
 		Id:               tx.Id,
 		AvailableBalance: tx.AvailableBalance,
 		Username:         tx.Username,
 		AccountNumber:    tx.AccountNumber,
 		AccountType:      accountType,
-		Person: PersonDTO{
+		Person: dto.PersonDTO{
 			FirstName: tx.Person.FirstName,
 			LastName:  tx.Person.LastName,
 		},
@@ -138,10 +50,10 @@ func accountDetailsToDTO(tx *model.AccountDetails) AccountDetailsDTO {
 	}
 }
 
-func accountTransactionToDTO(tx []model.AccountTransaction) []AccountTransactionDTO {
-	accountTransactionDTOList := make([]AccountTransactionDTO, len(tx))
+func accountTransactionToDTO(tx []model.AccountTransaction) []dto.AccountTransactionDTO {
+	accountTransactionDTOList := make([]dto.AccountTransactionDTO, len(tx))
 	for i, element := range tx {
-		accountTransactionDTOList[i] = AccountTransactionDTO{
+		accountTransactionDTOList[i] = dto.AccountTransactionDTO{
 			Id:              element.Id,
 			AccountId:       element.AccountId,
 			OtherAccountId:  element.OtherAccountId,
@@ -238,7 +150,7 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 // @Router /accounts/login [post]
 func AccountLoginHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req AccountLoginDTO
+		var req dto.AccountLoginDTO
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)
