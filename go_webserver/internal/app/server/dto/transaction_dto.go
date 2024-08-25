@@ -4,9 +4,9 @@ package dto
 // @swagger:model TransactionRequest
 type TransactionRequest struct {
 	// The account number of the account to which the amount is to be transferred
-	ToAccount string `json:"toAccount " validate:"required"`
+	ToAccount string `json:"toAccount" validate:"required"`
 	// The account number of the account from which the amount is to be transferred
-	FromAccount string `json:"fromAccount " validate:"required"`
+	FromAccount string `json:"fromAccount" validate:"required"`
 	// The amount to be transferred
-	Amount float64 `json:"amount " validate:"required"`
+	Amount float64 `json:"amount" validate:"required"`
 }
