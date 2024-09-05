@@ -1,5 +1,3 @@
-//go:build test
-
 package integration
 
 import (
@@ -80,6 +78,7 @@ func TestV1SchemaMigration(t *testing.T) {
 	db := mongoClient.Database(utils.TestDatabaseName)
 	collection := db.Collection("account")
 	migration := schema.MigrationSchema1
+	cleanupMigrations(collection, ctx)
 
 	t.Run("Should be able to add accounts with required fields", func(t *testing.T) {
 		err := migration.Up(mongoClient, ctx, utils.TestDatabaseName)
@@ -99,6 +98,7 @@ func TestV2SchemaMigration(t *testing.T) {
 	db := mongoClient.Database(utils.TestDatabaseName)
 	collection := db.Collection("transaction")
 	migration := schema.MigrationSchema2
+	cleanupMigrations(collection, ctx)
 
 	t.Run("Should be able to add transactions with required fields", func(t *testing.T) {
 		err := migration.Up(mongoClient, ctx, utils.TestDatabaseName)

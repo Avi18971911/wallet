@@ -8,8 +8,8 @@ import (
 var TomAccountDetails = mongodb.MongoAccountInput{
 	Username:        "Tom",
 	Password:        "pass",
-	AccountNumber:   "1234567890",
-	AccountType:     "Savings",
+	AccountNumber:   "123-45678-9",
+	AccountType:     "savings",
 	StartingBalance: 1000,
 	Person: mongodb.Person{
 		FirstName: "Tom",
@@ -22,8 +22,8 @@ var TomAccountDetails = mongodb.MongoAccountInput{
 var SamAccountDetails = mongodb.MongoAccountInput{
 	Username:        "Sam",
 	Password:        "word",
-	AccountNumber:   "0987654321",
-	AccountType:     "Savings",
+	AccountNumber:   "098-76543-2",
+	AccountType:     "savings",
 	StartingBalance: 1000,
 	Person: mongodb.Person{
 		FirstName: "Sam",
