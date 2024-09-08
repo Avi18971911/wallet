@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	pkgutils "webserver/internal/pkg/utils"
 )
@@ -10,6 +11,7 @@ var TomAccountDetails = mongodb.MongoAccountInput{
 	Password: "pass",
 	Accounts: []mongodb.Account{
 		{
+			Id:               primitive.NewObjectID(),
 			AccountNumber:    "123-45678-9",
 			AccountType:      "savings",
 			AvailableBalance: 1000,
@@ -19,8 +21,15 @@ var TomAccountDetails = mongodb.MongoAccountInput{
 		FirstName: "Tom",
 		LastName:  "Smith",
 	},
-	KnownAccounts: []mongodb.KnownAccount{},
-	CreatedAt:     pkgutils.GetCurrentTimestamp(),
+	KnownAccounts: []mongodb.KnownAccount{
+		{
+			Id:            primitive.NewObjectID(),
+			AccountNumber: "987-65432-1",
+			AccountHolder: "Sam Jones",
+			AccountType:   "checking",
+		},
+	},
+	CreatedAt: pkgutils.GetCurrentTimestamp(),
 }
 
 var SamAccountDetails = mongodb.MongoAccountInput{
@@ -28,6 +37,7 @@ var SamAccountDetails = mongodb.MongoAccountInput{
 	Password: "word",
 	Accounts: []mongodb.Account{
 		{
+			Id:               primitive.NewObjectID(),
 			AccountNumber:    "987-65432-1",
 			AccountType:      "checking",
 			AvailableBalance: 500,

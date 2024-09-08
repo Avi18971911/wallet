@@ -30,21 +30,31 @@ func knownAccountToDTO(tx []model.KnownAccount) []dto.KnownAccountDTO {
 	return knownAccountDTOList
 }
 
-func accountDetailsToDTO(tx *model.AccountDetails) dto.AccountDetailsDTO {
-	accountType, err := accountTypeEnumToString(tx.AccountType)
-	if err != nil {
-		log.Printf("Failed to convert account type to string: %v", err)
+func accountsToDTO(tx []model.Account) []dto.AccountDTO {
+	accountDTOList := make([]dto.AccountDTO, len(tx))
+	for i, element := range tx {
+		accountType, err := accountTypeEnumToString(element.AccountType)
+		if err != nil {
+			log.Printf("Failed to convert account type to string: %v", err)
+		}
+		accountDTOList[i] = dto.AccountDTO{
+			AccountNumber:    element.AccountNumber,
+			AccountType:      accountType,
+			AvailableBalance: element.AvailableBalance,
+		}
 	}
+	return accountDTOList
+}
+
+func accountDetailsToDTO(tx *model.AccountDetails) dto.AccountDetailsDTO {
 	return dto.AccountDetailsDTO{
-		Id:               tx.Id,
-		AvailableBalance: tx.AvailableBalance,
-		Username:         tx.Username,
-		AccountNumber:    tx.AccountNumber,
-		AccountType:      accountType,
+		Id:       tx.Id,
+		Username: tx.Username,
 		Person: dto.PersonDTO{
 			FirstName: tx.Person.FirstName,
 			LastName:  tx.Person.LastName,
 		},
+		Accounts:      accountsToDTO(tx.Accounts),
 		KnownAccounts: knownAccountToDTO(tx.KnownAccounts),
 		CreatedAt:     tx.CreatedAt,
 	}

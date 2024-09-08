@@ -31,7 +31,7 @@ func (ar *AccountRepositoryMongodb) GetAccountDetails(
 	if err != nil {
 		return nil, fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
-	filter := bson.M{"_id": objectId}
+	filter := bson.M{"accounts._id": objectId}
 	err = ar.col.FindOne(ctx, filter).Decode(&accountDetails)
 	if err != nil {
 		return nil, fmt.Errorf("error when finding account by ID %s: %w", accountId, err)
@@ -53,8 +53,8 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 	if err != nil {
 		return fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
-	filter := bson.M{"_id": objectId}
-	update := bson.M{"$inc": bson.M{"availableBalance": amount}}
+	filter := bson.M{"accounts._id": objectId}
+	update := bson.M{"$inc": bson.M{"accounts.$.availableBalance": amount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf(
@@ -82,8 +82,8 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 		return fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
 	negativeAmount := amount * -1
-	filter := bson.M{"_id": objectId}
-	update := bson.M{"$inc": bson.M{"availableBalance": negativeAmount}}
+	filter := bson.M{"accounts._id": objectId}
+	update := bson.M{"$inc": bson.M{"accounts.$.availableBalance": negativeAmount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf("error when updating account balance for accountId %s: %w", accountId, err)

@@ -20,28 +20,42 @@ func fromMongoAccountType(accountType string) int {
 	}
 }
 
-func fromMongoKnownAccount(knownAccount []mongodb.KnownAccount) []model.KnownAccount {
+func fromMongoKnownAccount(knownAccount []mongodb.KnownAccount) ([]model.KnownAccount, error) {
 	var res = make([]model.KnownAccount, len(knownAccount))
 	for i, ka := range knownAccount {
+		stringId, err := utils.ObjectIdToString(ka.Id)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"error when converting object ID to string for known account %s: %v", ka.AccountNumber, err,
+			)
+		}
 		res[i] = model.KnownAccount{
+			Id:            stringId,
 			AccountNumber: ka.AccountNumber,
 			AccountHolder: ka.AccountHolder,
 			AccountType:   fromMongoAccountType(ka.AccountType),
 		}
 	}
-	return res
+	return res, nil
 }
 
-func fromMongoAccounts(accounts []mongodb.Account) []model.Account {
+func fromMongoAccounts(accounts []mongodb.Account) ([]model.Account, error) {
 	var res = make([]model.Account, len(accounts))
 	for i, a := range accounts {
+		stringId, err := utils.ObjectIdToString(a.Id)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"error when converting object ID to string for account number %s: %v", a.AccountNumber, err,
+			)
+		}
 		res[i] = model.Account{
+			Id:               stringId,
 			AccountNumber:    a.AccountNumber,
 			AccountType:      fromMongoAccountType(a.AccountType),
 			AvailableBalance: a.AvailableBalance,
 		}
 	}
-	return res
+	return res, nil
 }
 
 func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {
@@ -51,6 +65,15 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.Accou
 			"error when converting object ID to string for username %s : %w", details.Username, err,
 		)
 	}
+	mongoAccounts, err := fromMongoAccounts(details.Accounts)
+	if err != nil {
+		return nil, fmt.Errorf("error when converting mongo accounts to model accounts: %v", err)
+	}
+	knownAccounts, err := fromMongoKnownAccount(details.KnownAccounts)
+	if err != nil {
+		return nil, fmt.Errorf("error when converting mongo known accounts to model known accounts: %v", err)
+	}
+
 	return &model.AccountDetails{
 		Id:       accountId,
 		Username: details.Username,
@@ -59,8 +82,8 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.Accou
 			FirstName: details.Person.FirstName,
 			LastName:  details.Person.LastName,
 		},
-		Accounts:      fromMongoAccounts(details.Accounts),
-		KnownAccounts: fromMongoKnownAccount(details.KnownAccounts),
+		Accounts:      mongoAccounts,
+		KnownAccounts: knownAccounts,
 		CreatedAt:     utils.TimestampToTime(details.CreatedAt),
 	}, nil
 }

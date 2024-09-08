@@ -23,20 +23,22 @@ func TestAddTransaction(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	utils.CleanupMigrations(tranCollection, ctx)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
+	utils.CleanupMigrations(accCollection, ctx)
+	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
 		t.Errorf("Error inserting Tom's record %v", tomErr)
 	}
-	samRes, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
+	_, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
 	if samErr != nil {
 		t.Errorf("Error inserting Tom's record %v", samErr)
 	}
 
-	tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
-	samAccountName, _ := pkgutils.ObjectIdToString(samRes.InsertedID)
+	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
+	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
 	service := setupTransactionService(mongoClient, tranCollection, accCollection)
-	transferAmount, baseAmount := 50.42, 1000.0
+	transferAmount := 50.42
 	input := model.TransactionDetails{
 		ToAccount:   samAccountName,
 		FromAccount: tomAccountName,
@@ -47,19 +49,33 @@ func TestAddTransaction(t *testing.T) {
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, input.Amount, ctx)
 		assert.Nil(t, err)
 		samFind, tomFind := mongodb.MongoAccountDetails{}, mongodb.MongoAccountDetails{}
-		err = accCollection.FindOne(ctx, bson.M{"_id": samRes.InsertedID}).Decode(&samFind)
+		err = accCollection.FindOne(
+			ctx, bson.M{"accounts._id": utils.SamAccountDetails.Accounts[0].Id},
+		).Decode(&samFind)
 		if err != nil {
 			t.Errorf("Error in finding Sam's account details: %v", err)
 		}
-		err = accCollection.FindOne(ctx, bson.M{"_id": tomRes.InsertedID}).Decode(&tomFind)
+		err = accCollection.FindOne(
+			ctx, bson.M{"accounts._id": utils.TomAccountDetails.Accounts[0].Id},
+		).Decode(&tomFind)
 		if err != nil {
 			t.Errorf("Error in finding Tom's's account details: %v", err)
 		}
-		assert.Equal(t, baseAmount+transferAmount, samFind.Accounts[0].AvailableBalance)
-		assert.Equal(t, baseAmount-transferAmount, tomFind.Accounts[0].AvailableBalance)
+		assert.Equal(
+			t,
+			utils.SamAccountDetails.Accounts[0].AvailableBalance+transferAmount,
+			samFind.Accounts[0].AvailableBalance,
+		)
+		assert.Equal(
+			t,
+			utils.TomAccountDetails.Accounts[0].AvailableBalance-transferAmount,
+			tomFind.Accounts[0].AvailableBalance,
+		)
 
 		var tranRes = mongodb.MongoTransactionDetails{}
-		err = tranCollection.FindOne(ctx, bson.M{"fromAccount": tomRes.InsertedID}).Decode(&tranRes)
+		err = tranCollection.FindOne(
+			ctx, bson.M{"fromAccount": utils.TomAccountDetails.Accounts[0].Id},
+		).Decode(&tranRes)
 		if err != nil {
 			t.Errorf("Error in decoding transaction result into tranRes: %v", err)
 		}

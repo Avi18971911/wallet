@@ -23,14 +23,17 @@ func TestGetAccountDetails(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	utils.CleanupMigrations(tranCollection, ctx)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
+	utils.CleanupMigrations(accCollection, ctx)
 
 	t.Run("Allows the retrieval of account details from an inserted account record", func(t *testing.T) {
-		tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
+		_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 		if tomErr != nil {
 			t.Errorf("Error inserting Tom's record %v", tomErr)
 		}
-		tomAccountId, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
+		tomAccountId, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
+		knownAccountId, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.KnownAccounts[0].Id)
 		service := setupAccountService(mongoClient, tranCollection, accCollection)
 
 		accountDetails, err := service.GetAccountDetails(tomAccountId, ctx)
@@ -41,7 +44,8 @@ func TestGetAccountDetails(t *testing.T) {
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
 		assert.Equal(t, pkgutils.TimestampToTime(utils.TomAccountDetails.CreatedAt), accountDetails.CreatedAt)
 		assert.Equal(t, utils.TomAccountDetails.Password, accountDetails.Password)
-		assert.Equal(t, tomAccountId, accountDetails.Id)
+		assert.Equal(t, knownAccountId, accountDetails.KnownAccounts[0].Id)
+		assert.Equal(t, tomAccountId, accountDetails.Accounts[0].Id)
 	})
 }
 
@@ -49,18 +53,20 @@ func TestGetAccountTransactions(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	utils.CleanupMigrations(tranCollection, ctx)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
-	tomRes, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
+	utils.CleanupMigrations(accCollection, ctx)
+	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
 		t.Errorf("Error inserting Tom's record %v", tomErr)
 	}
-	samRes, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
+	_, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
 	if samErr != nil {
 		t.Errorf("Error inserting Tom's record %v", samErr)
 	}
 
-	tomAccountName, _ := pkgutils.ObjectIdToString(tomRes.InsertedID)
-	samAccountName, _ := pkgutils.ObjectIdToString(samRes.InsertedID)
+	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
+	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
 	tomObjectId, _ := pkgutils.StringToObjectId(tomAccountName)
 	samObjectId, _ := pkgutils.StringToObjectId(samAccountName)
 
@@ -103,7 +109,9 @@ func TestLogins(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	utils.CleanupMigrations(tranCollection, ctx)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
+	utils.CleanupMigrations(accCollection, ctx)
 
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
