@@ -26,16 +26,38 @@ func CreateNewAccountServiceImpl(
 }
 
 func validateAccountDetails(accountDetails *model.AccountDetails) error {
+	err := validateAccountNumbers(accountDetails.Accounts)
+	if err != nil {
+		return fmt.Errorf("unable to validate account numbers with error: %w", err)
+	}
+	err = validateAccountTypes(accountDetails.Accounts)
+	if err != nil {
+		return fmt.Errorf("unable to validate account types with error: %w", err)
+	}
+	return nil
+}
+
+func validateAccountNumbers(accounts []model.Account) error {
 	const pattern = `^\d{3}-\d{5}-\d{1}$`
 	var accountNumberRegex, err = regexp.Compile(pattern)
 	if err != nil {
 		log.Printf("Unable to compile regex pattern for account number validation with error: %v", err)
-	} else if !accountNumberRegex.MatchString(accountDetails.AccountNumber) {
-		return errors.New("account number does not match expected pattern of XXX-XXXXX-X")
+	} else {
+		for _, account := range accounts {
+			if !accountNumberRegex.MatchString(account.AccountNumber) {
+				return errors.New("account number does not match expected pattern of XXX-XXXXX-X")
+			}
+		}
 	}
-	if accountDetails.AccountType > model.Investment || accountDetails.AccountType < model.Savings {
-		return errors.New("account type is not a valid type of account. " +
-			"Should be savings, checking, or investment")
+	return nil
+}
+
+func validateAccountTypes(accounts []model.Account) error {
+	for _, account := range accounts {
+		if account.AccountType > model.Investment || account.AccountType < model.Savings {
+			return errors.New("account type is not a valid type of account. " +
+				"Should be savings, checking, or investment")
+		}
 	}
 	return nil
 }

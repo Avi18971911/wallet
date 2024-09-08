@@ -37,7 +37,7 @@ func TestGetAccountDetails(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error getting Tom's accountDetails: %v", err)
 		}
-		assert.Equal(t, 1000.0, accountDetails.AvailableBalance)
+		assert.Equal(t, 1000.0, accountDetails.Accounts[0].AvailableBalance)
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
 		assert.Equal(t, pkgutils.TimestampToTime(utils.TomAccountDetails.CreatedAt), accountDetails.CreatedAt)
 		assert.Equal(t, utils.TomAccountDetails.Password, accountDetails.Password)
@@ -121,7 +121,9 @@ func TestLogins(t *testing.T) {
 			t.Fatalf("Error logging in: %v", err)
 		}
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
-		assert.Equal(t, utils.TomAccountDetails.StartingBalance, accountDetails.AvailableBalance)
+		assert.Equal(
+			t, utils.TomAccountDetails.Accounts[0].AvailableBalance, accountDetails.Accounts[0].AvailableBalance,
+		)
 	})
 
 	t.Run("Does not allow the login of a user with the incorrect password", func(t *testing.T) {

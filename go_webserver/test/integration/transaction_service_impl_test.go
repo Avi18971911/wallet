@@ -55,8 +55,8 @@ func TestAddTransaction(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error in finding Tom's's account details: %v", err)
 		}
-		assert.Equal(t, baseAmount+transferAmount, samFind.AvailableBalance)
-		assert.Equal(t, baseAmount-transferAmount, tomFind.AvailableBalance)
+		assert.Equal(t, baseAmount+transferAmount, samFind.Accounts[0].AvailableBalance)
+		assert.Equal(t, baseAmount-transferAmount, tomFind.Accounts[0].AvailableBalance)
 
 		var tranRes = mongodb.MongoTransactionDetails{}
 		err = tranCollection.FindOne(ctx, bson.M{"fromAccount": tomRes.InsertedID}).Decode(&tranRes)

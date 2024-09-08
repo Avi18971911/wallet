@@ -14,29 +14,37 @@ import (
 
 var accounts = []interface{}{
 	mongodb.MongoAccountDetails{
-		Id:               primitive.NewObjectID(),
-		AvailableBalance: 123.32,
-		Username:         "Olly",
-		Password:         "password",
-		AccountNumber:    "123-12345-0",
+		Id:       primitive.NewObjectID(),
+		Username: "Olly",
+		Password: "password",
 		Person: mongodb.Person{
 			FirstName: "Olly",
 			LastName:  "OxenFree",
 		},
+		Accounts: []mongodb.Account{
+			{
+				AccountNumber:    "123-12345-0",
+				AccountType:      "checking",
+				AvailableBalance: 123.32,
+			},
+		},
 		KnownAccounts: []mongodb.KnownAccount{},
-		AccountType:   "checking",
 		CreatedAt:     utils.GetCurrentTimestamp(),
 	},
 	mongodb.MongoAccountDetails{
-		Id:               primitive.NewObjectID(),
-		AvailableBalance: 275.11,
-		Username:         "Bob",
-		Password:         "bob'spassword",
-		AccountNumber:    "123-12345-1",
-		AccountType:      "savings",
+		Id:       primitive.NewObjectID(),
+		Username: "Bob",
+		Password: "bob'spassword",
 		Person: mongodb.Person{
 			FirstName: "Bob",
 			LastName:  "Barker",
+		},
+		Accounts: []mongodb.Account{
+			{
+				AccountNumber:    "123-12345-1",
+				AccountType:      "savings",
+				AvailableBalance: 275.11,
+			},
 		},
 		KnownAccounts: []mongodb.KnownAccount{
 			{
@@ -53,15 +61,19 @@ var accounts = []interface{}{
 		CreatedAt: utils.GetCurrentTimestamp(),
 	},
 	mongodb.MongoAccountDetails{
-		Id:               primitive.NewObjectID(),
-		AvailableBalance: 1004.55,
-		Username:         "Hilda",
-		Password:         "Hilda",
-		AccountNumber:    "123-12345-2",
-		AccountType:      "savings",
+		Id:       primitive.NewObjectID(),
+		Username: "Hilda",
+		Password: "Hilda",
 		Person: mongodb.Person{
 			FirstName: "Hilda",
 			LastName:  "Hill",
+		},
+		Accounts: []mongodb.Account{
+			{
+				AccountNumber:    "123-12345-2",
+				AccountType:      "savings",
+				AvailableBalance: 1004.55,
+			},
 		},
 		KnownAccounts: []mongodb.KnownAccount{
 			{

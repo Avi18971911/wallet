@@ -113,19 +113,7 @@ func cleanupMigrations(collection *mongo.Collection, ctx context.Context) {
 	collection.Drop(ctx)
 }
 
-var sampleAccountDetails = mongodb.MongoAccountInput{
-	Username:        "Paula",
-	Password:        "pass",
-	AccountNumber:   "1234567890",
-	AccountType:     "savings",
-	StartingBalance: 1000.00,
-	Person: mongodb.Person{
-		FirstName: "Paula",
-		LastName:  "Smith",
-	},
-	KnownAccounts: []mongodb.KnownAccount{},
-	CreatedAt:     pkgutils.GetCurrentTimestamp(),
-}
+var sampleAccountDetails = utils.TomAccountDetails
 
 var sampleTransactionDetails = mongodb.MongoTransactionDetails{
 	FromAccount: primitive.NewObjectID(),
