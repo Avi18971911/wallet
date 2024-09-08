@@ -6,15 +6,13 @@ import (
 )
 
 type AccountDetails struct {
-	Id               string
-	Username         string
-	Password         string
-	AvailableBalance float64
-	AccountNumber    string
-	AccountType      int
-	Person           Person
-	KnownAccounts    []KnownAccount
-	CreatedAt        time.Time
+	Id            string
+	Username      string
+	Password      string
+	Person        Person
+	Accounts      []Account
+	KnownAccounts []KnownAccount
+	CreatedAt     time.Time
 }
 
 const (
@@ -28,7 +26,15 @@ type Person struct {
 	LastName  string
 }
 
+type Account struct {
+	Id               string
+	AccountNumber    string
+	AccountType      int
+	AvailableBalance float64
+}
+
 type KnownAccount struct {
+	Id            string
 	AccountNumber string
 	AccountHolder string
 	AccountType   int

@@ -5,26 +5,22 @@ import (
 )
 
 type MongoAccountDetails struct {
-	Id               primitive.ObjectID  `bson:"_id"`
-	AvailableBalance float64             `bson:"availableBalance"`
-	Username         string              `bson:"username"`
-	Password         string              `bson:"password"`
-	Person           Person              `bson:"person"`
-	AccountNumber    string              `bson:"accountNumber"`
-	AccountType      string              `bson:"accountType"`
-	KnownAccounts    []KnownAccount      `bson:"knownAccounts"`
-	CreatedAt        primitive.Timestamp `bson:"_createdAt"`
+	Id            primitive.ObjectID  `bson:"_id"`
+	Username      string              `bson:"username"`
+	Password      string              `bson:"password"`
+	Person        Person              `bson:"person"`
+	Accounts      []Account           `bson:"accounts"`
+	KnownAccounts []KnownAccount      `bson:"knownAccounts"`
+	CreatedAt     primitive.Timestamp `bson:"_createdAt"`
 }
 
 type MongoAccountInput struct {
-	Username        string              `bson:"username"`
-	Password        string              `bson:"password"`
-	AccountNumber   string              `bson:"accountNumber"`
-	AccountType     string              `bson:"accountType"`
-	StartingBalance float64             `bson:"availableBalance"`
-	Person          Person              `bson:"person"`
-	KnownAccounts   []KnownAccount      `bson:"knownAccounts"`
-	CreatedAt       primitive.Timestamp `bson:"_createdAt"`
+	Username      string              `bson:"username"`
+	Password      string              `bson:"password"`
+	Person        Person              `bson:"person"`
+	Accounts      []Account           `bson:"accounts"`
+	KnownAccounts []KnownAccount      `bson:"knownAccounts"`
+	CreatedAt     primitive.Timestamp `bson:"_createdAt"`
 }
 
 type Person struct {
@@ -32,10 +28,18 @@ type Person struct {
 	LastName  string `bson:"lastName"`
 }
 
+type Account struct {
+	Id               primitive.ObjectID `bson:"_id"`
+	AccountNumber    string             `bson:"accountNumber"`
+	AccountType      string             `bson:"accountType"`
+	AvailableBalance float64            `bson:"availableBalance"`
+}
+
 type KnownAccount struct {
-	AccountNumber string `bson:"accountNumber"`
-	AccountHolder string `bson:"accountHolder"`
-	AccountType   string `bson:"accountType"`
+	Id            primitive.ObjectID `bson:"_id"`
+	AccountNumber string             `bson:"accountNumber"`
+	AccountHolder string             `bson:"accountHolder"`
+	AccountType   string             `bson:"accountType"`
 }
 
 type MongoAccountTransaction struct {

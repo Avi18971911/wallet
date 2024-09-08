@@ -139,6 +139,18 @@ func fromMongoKnownAccount(knownAccount []mongodb.KnownAccount) []model.KnownAcc
 	return res
 }
 
+func fromMongoAccounts(accounts []mongodb.Account) []model.Account {
+	var res = make([]model.Account, len(accounts))
+	for i, a := range accounts {
+		res[i] = model.Account{
+			AccountNumber:    a.AccountNumber,
+			AccountType:      fromMongoAccountType(a.AccountType),
+			AvailableBalance: a.AvailableBalance,
+		}
+	}
+	return res
+}
+
 func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {
 	accountId, err := utils.ObjectIdToString(details.Id)
 	if err != nil {
@@ -147,16 +159,14 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.Accou
 		)
 	}
 	return &model.AccountDetails{
-		Id:               accountId,
-		Username:         details.Username,
-		Password:         details.Password,
-		AvailableBalance: details.AvailableBalance,
-		AccountNumber:    details.AccountNumber,
-		AccountType:      fromMongoAccountType(details.AccountType),
+		Id:       accountId,
+		Username: details.Username,
+		Password: details.Password,
 		Person: model.Person{
 			FirstName: details.Person.FirstName,
 			LastName:  details.Person.LastName,
 		},
+		Accounts:      fromMongoAccounts(details.Accounts),
 		KnownAccounts: fromMongoKnownAccount(details.KnownAccounts),
 		CreatedAt:     utils.TimestampToTime(details.CreatedAt),
 	}, nil

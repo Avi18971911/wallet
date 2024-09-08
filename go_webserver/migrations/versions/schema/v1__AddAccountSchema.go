@@ -21,29 +21,16 @@ var MigrationSchema1 = versions.Migration{
 			"$jsonSchema": bson.M{
 				"bsonType": "object",
 				"required": []string{
-					"availableBalance", "username", "password", "person", "accountNumber", "accountType", "_createdAt",
+					"username", "password", "person", "_createdAt",
 				},
 				"properties": bson.M{
-					"availableBalance": bson.M{
-						"bsonType":    "double",
-						"minimum":     0,
-						"description": "Available Balance for the Account [required]",
-					},
-					"password": bson.M{
-						"bsonType":    "string",
-						"description": "Password for the Account [required]",
-					},
 					"username": bson.M{
 						"bsonType":    "string",
 						"description": "Username for the Account [required]",
 					},
-					"accountNumber": bson.M{
+					"password": bson.M{
 						"bsonType":    "string",
-						"description": "Account Number for the Account [required]",
-					},
-					"accountType": bson.M{
-						"bsonType":    "string",
-						"description": "Account Type for the Account [required]",
+						"description": "Password for the Account [required]",
 					},
 					"person": bson.M{
 						"bsonType": "object",
@@ -59,6 +46,34 @@ var MigrationSchema1 = versions.Migration{
 							},
 						},
 					},
+					// Embedded Accounts (Main Accounts for the User)
+					"accounts": bson.M{
+						"bsonType": "array",
+						"items": bson.M{
+							"bsonType": "object",
+							"required": []string{"accountNumber", "accountType", "availableBalance"},
+							"properties": bson.M{
+								"accountNumber": bson.M{
+									"bsonType":    "string",
+									"description": "Account Number for the Account [required]",
+								},
+								"accountType": bson.M{
+									"bsonType":    "string",
+									"description": "Account Type [required]",
+								},
+								"availableBalance": bson.M{
+									"bsonType":    "double",
+									"minimum":     0,
+									"description": "Available Balance for the Account [required]",
+								},
+								"_id": bson.M{
+									"bsonType":    "objectId",
+									"description": "Unique ID for this Account [optional]",
+								},
+							},
+						},
+					},
+					// Known Accounts (External or Third-Party Accounts)
 					"knownAccounts": bson.M{
 						"bsonType": "array",
 						"items": bson.M{
@@ -71,11 +86,16 @@ var MigrationSchema1 = versions.Migration{
 								},
 								"accountHolder": bson.M{
 									"bsonType":    "string",
-									"description": "Account Holder (First Name + Last Name) of the Known Account [required]",
+									"description": "Account Holder Name of the Known Account [required]",
 								},
 								"accountType": bson.M{
 									"bsonType":    "string",
 									"description": "Type of the Known Account [required]",
+								},
+								// Optional: Include ID if necessary for future references
+								"_id": bson.M{
+									"bsonType":    "objectId",
+									"description": "Unique ID for this Known Account [optional]",
 								},
 							},
 						},
