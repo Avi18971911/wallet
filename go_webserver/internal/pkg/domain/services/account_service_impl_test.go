@@ -9,13 +9,14 @@ import (
 	"time"
 	"webserver/internal/pkg/domain/model"
 	"webserver/test/mocks"
+	"webserver/test/utils"
 )
 
 func TestGetAccountDetails(t *testing.T) {
 	t.Run("Doesn't return error if GetAccountDetails is successful", func(t *testing.T) {
 		_, mockAccRepo, _, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		stubDetails := &model.AccountDetails{Id: "accountId", AvailableBalance: 38.43}
+		stubDetails := &utils.TomAccountDetailsModel
 		mockAccRepo.On("GetAccountDetails", mock.Anything, mock.Anything).Return(stubDetails, nil)
 
 		res, err := service.GetAccountDetails("accountId", ctx)

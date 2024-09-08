@@ -2,6 +2,8 @@ package utils
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	pkgutils "webserver/internal/pkg/utils"
 )
@@ -49,4 +51,29 @@ var SamAccountDetails = mongodb.MongoAccountInput{
 	},
 	KnownAccounts: []mongodb.KnownAccount{},
 	CreatedAt:     pkgutils.GetCurrentTimestamp(),
+}
+
+var TomAccountDetailsModel = model.AccountDetails{
+	Username: "Tom",
+	Accounts: []model.Account{
+		{
+			Id:               "UUID",
+			AccountNumber:    "123-45678-9",
+			AvailableBalance: 1000,
+			AccountType:      1,
+		},
+	},
+	Person: model.Person{
+		FirstName: "Tom",
+		LastName:  "Smith",
+	},
+	KnownAccounts: []model.KnownAccount{
+		{
+			Id:            "UUID",
+			AccountNumber: "987-65432-1",
+			AccountHolder: "Sam Jones",
+			AccountType:   0,
+		},
+	},
+	CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
 }
