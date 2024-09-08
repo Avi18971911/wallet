@@ -188,12 +188,37 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.AccountDetailsDTO": {
+        "dto.AccountDTO": {
             "type": "object",
             "required": [
                 "accountNumber",
                 "accountType",
                 "availableBalance",
+                "id"
+            ],
+            "properties": {
+                "accountNumber": {
+                    "description": "The account number associated with the account",
+                    "type": "string"
+                },
+                "accountType": {
+                    "description": "The type of the account (e.g., savings, checking)",
+                    "type": "string"
+                },
+                "availableBalance": {
+                    "description": "The available balance of the account",
+                    "type": "number"
+                },
+                "id": {
+                    "description": "The unique identifier of the account",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AccountDetailsDTO": {
+            "type": "object",
+            "required": [
+                "accounts",
                 "createdAt",
                 "id",
                 "knownAccounts",
@@ -201,17 +226,12 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
-                "accountNumber": {
-                    "description": "The account number",
-                    "type": "string"
-                },
-                "accountType": {
-                    "description": "The type of the account",
-                    "type": "string"
-                },
-                "availableBalance": {
-                    "description": "The available balance in the account",
-                    "type": "number"
+                "accounts": {
+                    "description": "The list of accounts associated with the account holder",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AccountDTO"
+                    }
                 },
                 "createdAt": {
                     "description": "The creation timestamp of the account",
@@ -301,7 +321,8 @@ const docTemplate = `{
             "required": [
                 "accountHolder",
                 "accountNumber",
-                "accountType"
+                "accountType",
+                "id"
             ],
             "properties": {
                 "accountHolder": {
@@ -314,6 +335,10 @@ const docTemplate = `{
                 },
                 "accountType": {
                     "description": "The type of the account (e.g., savings, checking)",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "The account ID of the known account",
                     "type": "string"
                 }
             }

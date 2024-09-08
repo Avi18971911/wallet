@@ -1,16 +1,32 @@
 basePath: /backendAPI
 definitions:
-  dto.AccountDetailsDTO:
+  dto.AccountDTO:
     properties:
       accountNumber:
-        description: The account number
+        description: The account number associated with the account
         type: string
       accountType:
-        description: The type of the account
+        description: The type of the account (e.g., savings, checking)
         type: string
       availableBalance:
-        description: The available balance in the account
+        description: The available balance of the account
         type: number
+      id:
+        description: The unique identifier of the account
+        type: string
+    required:
+    - accountNumber
+    - accountType
+    - availableBalance
+    - id
+    type: object
+  dto.AccountDetailsDTO:
+    properties:
+      accounts:
+        description: The list of accounts associated with the account holder
+        items:
+          $ref: '#/definitions/dto.AccountDTO'
+        type: array
       createdAt:
         description: The creation timestamp of the account
         type: string
@@ -30,9 +46,7 @@ definitions:
         description: The username associated with the account
         type: string
     required:
-    - accountNumber
-    - accountType
-    - availableBalance
+    - accounts
     - createdAt
     - id
     - knownAccounts
@@ -90,10 +104,14 @@ definitions:
       accountType:
         description: The type of the account (e.g., savings, checking)
         type: string
+      id:
+        description: The account ID of the known account
+        type: string
     required:
     - accountHolder
     - accountNumber
     - accountType
+    - id
     type: object
   dto.PersonDTO:
     properties:
