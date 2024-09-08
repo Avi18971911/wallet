@@ -12,6 +12,12 @@ import (
 	"webserver/migrations/versions"
 )
 
+var accountIds = []primitive.ObjectID{
+	primitive.NewObjectID(),
+	primitive.NewObjectID(),
+	primitive.NewObjectID(),
+	primitive.NewObjectID(),
+}
 var accounts = []interface{}{
 	mongodb.MongoAccountDetails{
 		Id:       primitive.NewObjectID(),
@@ -23,7 +29,7 @@ var accounts = []interface{}{
 		},
 		Accounts: []mongodb.Account{
 			{
-				Id:               primitive.NewObjectID(),
+				Id:               accountIds[0],
 				AccountNumber:    "123-12345-0",
 				AccountType:      "checking",
 				AvailableBalance: 123.32,
@@ -42,7 +48,7 @@ var accounts = []interface{}{
 		},
 		Accounts: []mongodb.Account{
 			{
-				Id:               primitive.NewObjectID(),
+				Id:               accountIds[1],
 				AccountNumber:    "123-12345-1",
 				AccountType:      "savings",
 				AvailableBalance: 275.11,
@@ -50,13 +56,13 @@ var accounts = []interface{}{
 		},
 		KnownAccounts: []mongodb.KnownAccount{
 			{
-				Id:            primitive.NewObjectID(),
+				Id:            accountIds[0],
 				AccountNumber: "123-12345-0",
 				AccountHolder: "Olly OxenFree",
 				AccountType:   "checking",
 			},
 			{
-				Id:            primitive.NewObjectID(),
+				Id:            accountIds[2],
 				AccountNumber: "123-12345-2",
 				AccountHolder: "Hilda Hill",
 				AccountType:   "savings",
@@ -74,13 +80,13 @@ var accounts = []interface{}{
 		},
 		Accounts: []mongodb.Account{
 			{
-				Id:               primitive.NewObjectID(),
+				Id:               accountIds[2],
 				AccountNumber:    "123-12345-2",
 				AccountType:      "savings",
 				AvailableBalance: 1004.55,
 			},
 			{
-				Id:               primitive.NewObjectID(),
+				Id:               accountIds[3],
 				AccountNumber:    "123-12345-3",
 				AccountType:      "checking",
 				AvailableBalance: 100.00,
@@ -88,7 +94,7 @@ var accounts = []interface{}{
 		},
 		KnownAccounts: []mongodb.KnownAccount{
 			{
-				Id:            primitive.NewObjectID(),
+				Id:            accountIds[0],
 				AccountNumber: "123-12345-0",
 				AccountHolder: "Olly OxenFree",
 				AccountType:   "checking",
