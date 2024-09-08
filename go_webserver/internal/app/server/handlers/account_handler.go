@@ -22,6 +22,7 @@ func knownAccountToDTO(tx []model.KnownAccount) []dto.KnownAccountDTO {
 			log.Printf("Failed to convert account type to string: %v", err)
 		}
 		knownAccountDTOList[i] = dto.KnownAccountDTO{
+			Id:            element.Id,
 			AccountNumber: element.AccountNumber,
 			AccountHolder: element.AccountHolder,
 			AccountType:   accountType,
@@ -38,6 +39,7 @@ func accountsToDTO(tx []model.Account) []dto.AccountDTO {
 			log.Printf("Failed to convert account type to string: %v", err)
 		}
 		accountDTOList[i] = dto.AccountDTO{
+			Id:               element.Id,
 			AccountNumber:    element.AccountNumber,
 			AccountType:      accountType,
 			AvailableBalance: element.AvailableBalance,
@@ -113,7 +115,6 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 				http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -143,7 +144,6 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 				http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -192,6 +192,5 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
 	}
 }
