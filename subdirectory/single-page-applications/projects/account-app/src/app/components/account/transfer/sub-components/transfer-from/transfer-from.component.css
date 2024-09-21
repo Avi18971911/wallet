@@ -1,0 +1,48 @@
+h2 {
+  color: var(--primary-color);
+}
+
+.container {
+  width: var(--width-full);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.underscore {
+  border-bottom: 1px solid var(--secondary-color);
+  margin-bottom: 25px;
+  width: var(--width-full);
+}
+
+.descriptor {
+  margin-right: var(--margin-right);
+}
+
+mat-form-field {
+  width: var(--width-large);
+  margin-bottom: var(--margin-bottom);
+}
+
+.mat-form-field-outline {
+  border-radius: var(--border-radius);
+}
+
+.mat-select-placeholder {
+  color: var(--text-gray);
+  font-size: var(--font-size-small);
+}
+
+.mat-option-text {
+  font-size: var(--font-size-small);
+  color: black;
+}

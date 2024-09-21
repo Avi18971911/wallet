@@ -1,0 +1,16 @@
+<div class="container">
+  <h2>
+    Transfer Type
+  </h2>
+  <div class="underscore"></div>
+  <mat-radio-group class="column-radio-group" [formControl]="typeControl">
+    <mat-radio-button value="{{TransferType.IMMEDIATE}}">Immediate Transfer</mat-radio-button>
+    <mat-radio-button value="{{TransferType.SCHEDULED}}">Scheduled Transfer</mat-radio-button>
+    <!-- Error messages -->
+  </mat-radio-group>
+  <div class="error">
+    <mat-error *ngIf="hasSubmitted && typeControl.hasError('required')">
+      Transfer type is required.
+    </mat-error>
+  </div>
+</div>

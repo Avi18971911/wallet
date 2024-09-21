@@ -1,0 +1,21 @@
+<div class="container">
+  <div *ngIf="userFirstName && currentBalance; else loadingContent" class="content" >
+    <div class="slim-column">
+      <h2>Welcome Back</h2>
+      <h1>{{userFirstName}}</h1>
+    </div>
+    <div class="big-column">
+      <div class="upper-row">
+        <p>Your Financial Overview</p>
+        <p>{{currentMonthAndYear.month}} {{currentMonthAndYear.year}}</p>
+      </div>
+      <div class="lower-row">
+        <app-balance-chart [availableBalance]="currentBalance" />
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loadingContent>
+    <app-loading-spinner [useSpinner]="true" [message]="'Loading your account details...'" [diameter]="50"></app-loading-spinner>
+  </ng-template>
+</div>

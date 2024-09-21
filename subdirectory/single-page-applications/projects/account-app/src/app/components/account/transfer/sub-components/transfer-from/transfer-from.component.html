@@ -1,0 +1,27 @@
+<div class="container">
+  <h2>
+    From
+  </h2>
+  <div class="underscore"></div>
+  <div class="row">
+    <p class="descriptor"><b>My Account</b></p>
+    <mat-form-field appearance="outline">
+      <mat-select
+        placeholder="{{defaultFromAccount}}"
+        [formControl]="fromControl"
+      >
+        <mat-option *ngFor="let account of fromCandidateAccountDetails" [value]="account">
+          {{ account | formatAccountDetails }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>
+        Remaining Balance is {{fromControl.value?.availableBalance |
+          currency:'USD':'symbol':'1.2-2'}}
+      </mat-hint>
+      <!-- Error messages -->
+      <mat-error *ngIf="hasSubmitted && fromControl.hasError('required')">
+        From account is required.
+      </mat-error>
+    </mat-form-field>
+  </div>
+</div>

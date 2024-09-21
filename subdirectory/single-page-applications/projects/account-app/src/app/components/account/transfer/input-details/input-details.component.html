@@ -1,0 +1,36 @@
+<div class="container">
+  <div class="components">
+    <app-transfer-to
+      [toCandidateAccountDetails]="toAccountCandidates"
+      [toControl]="toAccountControl"
+      [hasSubmitted]="hasSubmitted"
+    > </app-transfer-to>
+
+    <app-transfer-from
+      [fromCandidateAccountDetails]="fromAccountCandidates"
+      [fromControl]="fromAccountControl"
+      [hasSubmitted]="hasSubmitted"
+    > </app-transfer-from>
+
+    <app-transfer-amount
+      [amountControl]="amountControl"
+      [hasSubmitted]="hasSubmitted"
+    ></app-transfer-amount>
+
+    <app-transfer-type
+      [typeControl]="transferTypeControl"
+      [hasSubmitted]="hasSubmitted"
+    ></app-transfer-type>
+  </div>
+
+  <div class="button-container">
+    <button mat-button class="button" (click)="validateAndProceed()">
+      Next
+    </button>
+
+    <button mat-button class="button" (click)="cancelTransfer()">
+      Cancel
+    </button>
+  </div>
+
+</div>

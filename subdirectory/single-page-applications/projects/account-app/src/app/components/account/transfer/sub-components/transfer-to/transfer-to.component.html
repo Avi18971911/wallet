@@ -1,0 +1,20 @@
+<div class="container">
+  <h2>
+    To
+  </h2>
+  <div class="underscore"></div>
+  <div class="row">
+    <p class="descriptor"><b>Recipient Account</b></p>
+    <mat-form-field appearance="outline">
+      <mat-select [formControl]="toControl" placeholder="Please select an account">
+        <mat-option *ngFor="let account of toCandidateAccountDetails" [value]="account">
+          {{ account | formatAccountDetails }}
+        </mat-option>
+      </mat-select>
+      <!-- Error messages -->
+      <mat-error *ngIf="hasSubmitted && toControl.hasError('required')">
+        Recipient account is required.
+      </mat-error>
+    </mat-form-field>
+  </div>
+</div>

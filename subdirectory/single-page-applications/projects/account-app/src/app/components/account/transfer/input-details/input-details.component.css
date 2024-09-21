@@ -1,0 +1,24 @@
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 40%;
+}
+
+.button {
+  margin-right: 10px;
+  flex: 1;
+  background-color: white;
+}
+
+.button:hover {
+  background-color: whitesmoke;
+  color: navy;
+}
+
+.components {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: 40%;
+}

@@ -1,0 +1,41 @@
+version: '3.8'  # Use Docker Compose file format version 3.8
+
+services:
+  banking-app:
+    image: banking-app  # Use the image built with your Dockerfile
+    build:
+      dockerfile: Dockerfile  # Name of the Dockerfile (default is 'Dockerfile')
+      args:
+        PROJECT_NAME: banking-app
+        NGINX_CONF: nginx-banking.conf
+    ports:
+      - "8080:80"  # Optional: Map ports for direct access (for testing purposes)
+    networks:
+      - app-network
+
+  account-app:
+    image: account-app
+    build:
+      dockerfile: Dockerfile
+      args:
+        PROJECT_NAME: account-app
+        NGINX_CONF: nginx-account.conf
+    ports:
+      - "8081:80"  # Optional: Map ports for direct access (for testing purposes)
+    networks:
+      - app-network
+
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"  # Map port 80 on the host to port 80 in the container
+    volumes:
+      - ./nginx/nginx-main.conf:/etc/nginx/nginx.conf:ro  # Mount the main Nginx configuration
+    depends_on:
+      - banking-app
+      - account-app
+    networks:
+      - app-network
+
+networks:
+  app-network:  # Define the network to be used by the services

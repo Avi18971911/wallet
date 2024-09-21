@@ -1,0 +1,14 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #555;
+}

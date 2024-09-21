@@ -1,0 +1,36 @@
+<header class="header">
+  <div class = "header-row first-row">
+    <div class="left-content">
+      <img src="assets/logo.webp" alt="Logo" class="logo">
+    </div>
+    <div class="right-content">
+      <a href="/account_details" class="toolbar-link">
+        <mat-icon class="account">people_alt</mat-icon>
+      </a>
+      <a href="/messages" class="toolbar-link">
+        <mat-icon class="mail">mail</mat-icon>
+      </a>
+      <a href="/search" class="toolbar-link">
+        <mat-icon class="search">search</mat-icon>
+      </a>
+      <a href="/login" class="logout-link">Logout</a>
+    </div>
+  </div>
+  <div class="header-row second-row">
+    <div class="middle-content">
+      <nav>
+        <ul>
+          <li>
+            <app-dropdown-menu [title]="accountMenuTitle" [menuItems]="accountMenuItems"> </app-dropdown-menu>
+          </li>
+          <li>
+            <app-dropdown-menu [title]="transferMenuTitle" [menuItems]="transferMenuItems"> </app-dropdown-menu>
+          </li>
+          <li routerLinkActive="active"><a routerLink="/pay">Pay</a></li>
+          <li routerLinkActive="active"><a routerLink="/cards">Cards</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+

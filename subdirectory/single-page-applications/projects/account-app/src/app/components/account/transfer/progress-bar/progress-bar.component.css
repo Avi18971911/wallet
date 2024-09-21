@@ -1,0 +1,46 @@
+.progress-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.step-title {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.step.active .step-title {
+  color: #f0ad4e;
+  font-weight: bold;
+}
+
+.step-bar {
+  height: 4px;
+  background-color: #e5e5e5;
+  position: relative;
+  width: 100%;
+  top: 20px;
+  left: 0;
+}
+
+.step.active .step-bar {
+  background-color: #f0ad4e;
+}
+
+.step:not(:last-child) .step-bar::after {
+  content: '\00a0';
+  width: 2px;
+  height: 5px;
+  background-color: ghostwhite;
+  position: absolute;
+  top: 0;
+  right: 0;
+}

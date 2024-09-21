@@ -1,0 +1,28 @@
+.datetime {
+  color: darkgrey;
+}
+
+.header, .datetime {
+  margin: 5px 0px;
+}
+
+.container {
+  position: relative;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  width: 80%;
+  flex-direction: column;
+}
+
+:host {
+  --primary-color: #414141;
+  --secondary-color: darkgrey;
+  --text-gray: gray;
+  --font-size-small: 14px;
+  --margin-bottom: 16px;
+  --margin-right: 50px;
+  --border-radius: 4px;
+  --width-full: 100%;
+  --width-large: 60%;
+}

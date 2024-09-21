@@ -1,0 +1,270 @@
+basePath: /backendAPI
+definitions:
+  dto.AccountDTO:
+    properties:
+      accountNumber:
+        description: The account number associated with the account
+        type: string
+      accountType:
+        description: The type of the account (e.g., savings, checking)
+        type: string
+      availableBalance:
+        description: The available balance of the account
+        type: number
+      id:
+        description: The unique identifier of the account
+        type: string
+    required:
+    - accountNumber
+    - accountType
+    - availableBalance
+    - id
+    type: object
+  dto.AccountDetailsDTO:
+    properties:
+      accounts:
+        description: The list of accounts associated with the account holder
+        items:
+          $ref: '#/definitions/dto.AccountDTO'
+        type: array
+      createdAt:
+        description: The creation timestamp of the account
+        type: string
+      id:
+        description: The unique identifier of the account
+        type: string
+      knownAccounts:
+        description: The list of accounts known to and recognized by the account holder
+        items:
+          $ref: '#/definitions/dto.KnownAccountDTO'
+        type: array
+      person:
+        allOf:
+        - $ref: '#/definitions/dto.PersonDTO'
+        description: The account holder associated with the account
+      username:
+        description: The username associated with the account
+        type: string
+    required:
+    - accounts
+    - createdAt
+    - id
+    - knownAccounts
+    - person
+    - username
+    type: object
+  dto.AccountLoginDTO:
+    properties:
+      password:
+        description: The password for the login
+        type: string
+      username:
+        description: The username for the login
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.AccountTransactionDTO:
+    properties:
+      accountId:
+        description: The primary account ID associated with the transaction
+        type: string
+      amount:
+        description: The amount involved in the transaction
+        type: number
+      createdAt:
+        description: The timestamp of when the transaction was created
+        type: string
+      id:
+        description: The unique identifier of the transaction
+        type: string
+      otherAccountId:
+        description: The other account ID involved in the transaction
+        type: string
+      transactionType:
+        description: The type of the transaction (debit or credit)
+        type: string
+    required:
+    - accountId
+    - amount
+    - createdAt
+    - id
+    - otherAccountId
+    - transactionType
+    type: object
+  dto.KnownAccountDTO:
+    properties:
+      accountHolder:
+        description: The name of the account holder
+        type: string
+      accountNumber:
+        description: The account number of the known account
+        type: string
+      accountType:
+        description: The type of the account (e.g., savings, checking)
+        type: string
+      id:
+        description: The account ID of the known account
+        type: string
+    required:
+    - accountHolder
+    - accountNumber
+    - accountType
+    - id
+    type: object
+  dto.PersonDTO:
+    properties:
+      firstName:
+        description: The first name of the person
+        type: string
+      lastName:
+        description: The last name of the person
+        type: string
+    required:
+    - firstName
+    - lastName
+    type: object
+  dto.TransactionRequest:
+    properties:
+      amount:
+        description: The amount to be transferred
+        type: number
+      fromAccount:
+        description: The account number of the account from which the amount is to
+          be transferred
+        type: string
+      toAccount:
+        description: The account number of the account to which the amount is to be
+          transferred
+        type: string
+    required:
+    - amount
+    - fromAccount
+    - toAccount
+    type: object
+  utils.ErrorMessage:
+    properties:
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a simple wallet API
+  title: Wallet API
+  version: "1.0"
+paths:
+  /accounts/{accountId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a specific account by its ID.
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of account details
+          schema:
+            $ref: '#/definitions/dto.AccountDetailsDTO'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+      summary: Get account details
+      tags:
+      - accounts
+  /accounts/{accountId}/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of transactions for a specific account by its
+        ID.
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of account transactions
+          schema:
+            items:
+              $ref: '#/definitions/dto.AccountTransactionDTO'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+      summary: Get account transactions
+      tags:
+      - transactions
+  /accounts/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user with the provided username and password.
+      parameters:
+      - description: Login payload
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AccountLoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login
+          schema:
+            $ref: '#/definitions/dto.AccountDetailsDTO'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+      summary: Login
+      tags:
+      - accounts
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new transaction to the system.
+      parameters:
+      - description: Transaction request
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+      summary: Add a new transaction
+      tags:
+      - transactions
+swagger: "2.0"

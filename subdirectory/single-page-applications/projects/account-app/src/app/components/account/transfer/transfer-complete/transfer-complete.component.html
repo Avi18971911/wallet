@@ -1,0 +1,21 @@
+<mat-card *ngIf="isSuccess" class="success-message">
+  <mat-card-header>
+    <mat-card-title>Transfer Submitted Successfully</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>
+      Your transfer request has been submitted successfully. Please note that your account balance will be updated within 1-2 business days.
+    </p>
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="!isSuccess" class="error-message">
+  <mat-card-header>
+    <mat-card-title>Transfer Request Failed</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>
+      We were unable to process your transfer request at this time. Please try again in a few minutes. If the issue persists, contact customer support for further assistance.
+    </p>
+  </mat-card-content>
+</mat-card>

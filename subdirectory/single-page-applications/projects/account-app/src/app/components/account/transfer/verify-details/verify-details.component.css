@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 50px;
+  width: 40%;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.underscore {
+  border-bottom: 1px solid var(--secondary-color);
+  margin-bottom: 25px;
+  width: var(--width-full);
+}
+
+.prefix {
+  margin-right: 10px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 40%;
+}
+
+.button {
+  margin-right: 10px;
+  flex: 1;
+  background-color: white;
+}
+
+.button:hover {
+  background-color: whitesmoke;
+  color: navy;
+}
+
+.details {
+  margin-bottom: 20px;
+}

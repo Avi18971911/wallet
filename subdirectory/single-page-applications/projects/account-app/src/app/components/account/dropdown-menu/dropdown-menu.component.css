@@ -1,0 +1,21 @@
+.hovered {
+  color: lightblue;
+}
+
+.button-span {
+  background-color: white;
+}
+
+.button-span:hover,
+.button-span.cdk-focused,
+.button-span.cdk-program-focused {
+  background: #00468B !important;
+  color: whitesmoke;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: inherit;
+  font-style: inherit;
+}
