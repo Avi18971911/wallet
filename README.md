@@ -19,13 +19,43 @@ app used to create the database schema and seed the database with some initial d
 webserver that serves the front-end and handles the API requests. To build the migrator app, you can run the following
 command 
 ```bash
+cd ./go_webserver
 go build -o ${DESIRED_OUTPUT_NAME} ./cmd/migrator/
 ```
 where ${DESIRED_OUTPUT_NAME} is the name of the output file. To build the webserver app, you can run the following
 command
 ```bash
+cd ./go_webserver
 go build -o ${DESIRED_OUTPUT_NAME} ./cmd/webserver/
 ```
 where ${DESIRED_OUTPUT_NAME} is the name of the output file. Once you have built the desired app, you can run it
 by executing the output file. Both the webserver and migrator apps require a MongoDB instance to be 
-running on the default port (27017).
+running on the default port (30001), or you can specify a different port by setting the MONGO_URL environment variable.
+If you wish to run the DB, the migrator, and the webserver in Docker, you can use the provided docker-compose file.
+To run the docker-compose file and build the required images, you can run the following command
+```bash
+cd ./go_webserver
+docker-compose up --build
+```
+Once this has been executed, you can peek into the database using the MongoDB CLI using the following command
+```bash
+mongosh "mongodb://mongo:30001/?replicaSet=rs0"
+```
+The database is named wallet and has two collections: accounts and transactions. The accounts collection contains
+the account information for each user, and the transactions collection contains the transaction history for each user.
+There will be no transactions in the transactions collection until you have made some transactions using the front-end.
+
+You can also send POST and GET requests to the API using endpoints detailed in go_webserver/docs/swagger.json.
+Note that docker-compose exposes the webserver on port 8080, so you can send requests to the API using the following
+URL: http://localhost:8080.
+
+#### Creating the Swagger JSON
+To generate the swagger.json and swagger.yaml files, you can run the following command
+```bash
+cd ./go_webserver
+swag init -g ./cmd/webserver/main.go
+```
+These will be consumed by the front-end to generate the API functions.
+
+### Front-end
+The front-end is written in Angular. To install the front-end, you will need to have Node.js and npm installed on your

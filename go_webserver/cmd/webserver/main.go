@@ -29,7 +29,10 @@ import (
 // @BasePath /backendAPI
 
 func main() {
-	mongoURL := os.Getenv("MONGO_URL")
+	mongoURL, urlPresent := os.LookupEnv("MONGO_URL")
+	if !urlPresent {
+		mongoURL = "mongodb://localhost:30001"
+	}
 	cli, cleanup, ctx := createDatabase(mongoURL)
 	accountCollection := cli.Database("wallet").Collection("account")
 	transactionCollection := cli.Database("wallet").Collection("transaction")
