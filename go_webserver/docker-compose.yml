@@ -2,14 +2,11 @@ version: '3.8'
 services:
   mongo:
     image: mongo:7.0.8
-    command: [--replSet, rs0, --bind_ip_all, --port, "30001"]
+    command: [--replSet, rs0, --bind_ip_all, --port, "30001", --quiet, --logpath, /dev/null]
     ports:
       - "30001:30001"
-    # volumes:
-    #   - ../mongodb/initiate_replica_set.js:/docker-entrypoint-initdb.d/initiate_replica_set.js:ro
     healthcheck:
       test: test $$(mongosh --port 30001 --quiet --eval "try {rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongo:30001\"}]})} catch(e) {rs.status().ok}") -eq 1
-      # test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       start_period: 30s
 
