@@ -11,28 +11,44 @@ the front-end, and Docker (and eventually Kubernetes) for deployment.
 ## Installation
 
 ### Back-end
-As previously mentioned, the back-end is written in Go. To install the back-end, you will need to have Go installed
-on your machine. You can download Go from the official website [here](https://go.dev/doc/install). Currently, the
-repository uses version 1.22.1. Once you have Go installed, you can clone the repository and navigate to the
-directory `./go_webserver`. From there you can either build the migrator app or the webserver app. The migrator
+
+#### Prerequisites
+Make sure the following are installed on your machine:
+- **Go**: Download from [Go website](https://go.dev/doc/install) (This repo uses `Go v1.22.1`)
+- **Docker**: Download from [Docker website](https://docs.docker.com/get-docker/) (This repo uses `Docker 25.0.3`)
+- **Docker Compose**: Download from [Docker Compose website](https://docs.docker.com/compose/install/) (This repo uses `Docker Compose v2.24.6-desktop.1`)
+
+Optional:
+- **MongoDB CLI**: Download from [MongoDB website](https://www.mongodb.com/try/download/shell) (This repo uses `MongoDB Shell 2.2.3`)
+
+#### Steps
+1. Install the dependencies. Note that all commands are run from the root of the repository.
+    ```bash
+    cd ./go_webserver
+    go mod tidy
+    ```
+2. Build either the migrator or webserver app (Optional).
+
+The migrator
 app used to create the database schema and seed the database with some initial data. The webserver app is the actual
 webserver that serves the front-end and handles the API requests. To build the migrator app, you can run the following
-command. Note that all commands are run from the root of the repository.
+command.
 ```bash
 cd ./go_webserver
 go build -o ${DESIRED_OUTPUT_NAME} ./cmd/migrator/
 ```
-where DESIRED_OUTPUT_NAME is the name of the output file. To build the webserver app, you can run the following
+where `DESIRED_OUTPUT_NAME` is the name of the output file. To build the webserver app, you can run the following
 command
 ```bash
 cd ./go_webserver
 go build -o ${DESIRED_OUTPUT_NAME} ./cmd/webserver/
 ```
-where DESIRED_OUTPUT_NAME is the name of the output file. Once you have built the desired app, you can run it
+Once you have built the desired app, you can run it
 by executing the output file. Both the webserver and migrator apps require a MongoDB instance to be 
 running on the default port (`30001`), or you can specify a different port by setting the `MONGO_URL` environment 
-variable. If you wish to run the DB, the migrator, and the webserver in Docker, you can use the provided docker-compose 
-file. To run the docker-compose file and build the required images, you can run the following command
+variable accordingly: `mongodb://localhost:${PORT}`, where `PORT` is the desired port. 
+
+3. Run the DB, webserver, and migrator using Docker Compose
 ```bash
 cd ./go_webserver
 docker-compose up --build
@@ -41,15 +57,19 @@ Once this has been executed, you can peek into the database using the MongoDB CL
 ```bash
 mongosh "mongodb://mongo:30001/?replicaSet=rs0"
 ```
-The database is named wallet and has two collections: accounts and transactions. The accounts collection contains
-the account information for each user, and the transactions collection contains the transaction history for each user.
-There will be no transactions in the transactions collection until you have made some transactions using the front-end.
+Note that `docker-compose` creates a MongoDB instance running on port `30001` and a webserver running on port `8080`.
+The database is named wallet and has two collections: `account` and `transaction`. The `account` collection contains
+the account information for each user, and the `transaction` collection contains the transaction history for each user.
+There will be no transactions in the `transaction` collection until you have made some transactions using the front-end.
+
+4. Interacting with the API (Optional)
 
 You can also send POST and GET requests to the API using endpoints detailed in `go_webserver/docs/swagger.json`.
 Note that docker-compose exposes the webserver on port `8080`, so you can send requests to the API using the following
-URL: http://localhost:8080.
+base URL: http://localhost:8080.
 
-#### Creating the Swagger JSON
+5. Creating the Swagger JSON (Optional)
+
 To generate the swagger.json and swagger.yaml files, you can run the following command
 ```bash
 cd ./go_webserver
@@ -58,36 +78,42 @@ swag init -g ./cmd/webserver/main.go
 These will be consumed by the front-end to generate the API functions.
 
 ### Front-end
-The front-end is written in Angular. To install the front-end, you will need to have Node.js, npm, and Angular
-installed on your machine. You can download Node.js and npm from the official website 
-[here](https://nodejs.org/en/download/). The repository uses `node version v20.13.1` and `npm version 10.5.2`. 
-To install Angular, you can run the following command
-```bash
-npm install -g @angular/cli
-```
-The repository uses `Angular version 18.1.1`. Once you have Angular installed, you can navigate to the 
-`./angular_frontend` directory and run the following command to install the required dependencies
-```bash
-cd ./angular_frontend
-npm install
-```
-Once the dependencies have been installed, you can introspect the API using the `swagger.json` file generated by the
-back-end. To download the OpenAPI CLI, you can run the following command
-```bash
-npm install @openapitools/openapi-generator-cli -g
-```
 
-To generate the API functions, you can now run the following command
-```bash
-cd ./
-openapi-generator-cli generate -i go_webserver/docs/swagger.json -g typescript-angular -o angular_frontend/projects/account-app/src/app/backend-api
-```
-This will generate the API functions in the `angular_frontend/projects/account-app/src/app/backend-api` directory. Once
-that has been accomplished, you can run the following command to start the Angular development server
-```bash
-cd ./angular_frontend
-ng serve
-```
-This will start the Angular development server on port `4200`. You can navigate to http://localhost:4200 to view the
-front-end. The front-end will be able to communicate with the back-end running on port `8080`. Note that this is
-hardcoded in the `proxy.conf.json` file in the angular_frontend directory.
+#### Prequisites
+Make sure the following are installed on your machine:
+- **Node.js**: Download from [Node.js website](https://nodejs.org/en/download/) (This repo uses `Node v20.13.1`)
+- **npm**: Comes with Node.js (This repo uses `npm v10.5.2`)
+- **Angular CLI**: Install globally with npm
+  ```bash
+  npm install -g @angular/cli
+- **OpenAPI Generator CLI**: Install globally with npm
+  ```bash
+  npm install -g @openapitools/openapi-generator-cli
+  ```
+
+#### Steps
+
+1. Install the dependencies
+    ```bash
+    cd ./angular_frontend
+    npm install
+    ```
+2. Generate the API functions
+
+    ```bash
+    cd ./
+    openapi-generator-cli generate -i go_webserver/docs/swagger.json -g typescript-angular -o angular_frontend/projects/account-app/src/app/backend-api
+    ```
+   
+    This will generate the API functions in the `angular_frontend/projects/account-app/src/app/backend-api` directory.
+
+
+3. Start the Angular development server
+    ```bash
+    cd ./angular_frontend
+    ng serve
+    ```
+    This will start the Angular development server on port `4200`. You can navigate to http://localhost:4200 to view the
+    front-end. The front-end will be able to communicate with the back-end running on port `8080`. Note that this is
+    hardcoded in the `proxy.conf.json` file in the `angular_frontend` directory. You can login using the credentials
+    `username: Hilda`, `password: Hilda`, or you can probe the DB to find other users.
