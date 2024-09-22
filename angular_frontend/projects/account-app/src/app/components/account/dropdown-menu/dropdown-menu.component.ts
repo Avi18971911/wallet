@@ -21,7 +21,7 @@ import {RouterLink} from "@angular/router";
   styleUrl: './dropdown-menu.component.css'
 })
 export class DropdownMenuComponent {
-  protected timedOutCloser: NodeJS.Timeout | undefined;
+  protected timedOutCloser: number | undefined;
   protected isHovered = false;
   @Input({required: true}) title: string = "";
   @Input({required: true}) menuItems: MenuItem[] = [];
@@ -29,21 +29,26 @@ export class DropdownMenuComponent {
 
   onMouseEnter(trigger: MatMenuTrigger) {
     if (this.timedOutCloser) {
-      clearTimeout(this.timedOutCloser);
+      window.clearTimeout(this.timedOutCloser);
     }
     this.isHovered = true;
     trigger.openMenu();
   }
 
   onMouseLeave(trigger: MatMenuTrigger) {
-    this.timedOutCloser = setTimeout(() => {
+    this.timedOutCloser = window.setTimeout(() => {
       trigger.closeMenu();
       this.isHovered = false;
-    }, 50);
+    }, 150);
   }
 
   focusMenuItem(menuItemButton: MatMenuItem): void {
     this.renderer.selectRootElement(menuItemButton).focus();
+  }
+
+  navigationCallback(): void {
+    this.isHovered = false;
+    this.removeFocus();
   }
 
   removeFocus(): void {

@@ -8,6 +8,7 @@
     <a class="button-span" mat-menu-item *ngFor="let menuItem of menuItems" [routerLink]="['./'].concat(menuItem.link)"
             #menuItemButton
             (mouseenter)="focusMenuItem(menuItemButton)"
+            (click)="navigationCallback()"
             (mouseleave)="removeFocus()">
       <span> {{menuItem.label}} </span>
     </a>
