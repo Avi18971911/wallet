@@ -44,3 +44,12 @@
 app-balance-chart {
   flex: 1;
 }
+
+.financial-overview {
+  display: flex;
+}
+
+.icon-custom {
+  font-size: 24px;
+  color: midnightblue;
+}

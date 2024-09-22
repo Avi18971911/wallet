@@ -1,11 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {DtoAccountDetailsDTO} from "../../../backend-api";
 import {CommonModule} from "@angular/common";
 import {BalanceChartComponent} from "./balance-chart/balance-chart.component";
 import {DateFormatService} from "../../../services/util/date-format.service";
 import {AccountService} from "../../../services/account/account.service";
 import {LoadingSpinnerComponent} from "../../loading-spinner/loading-spinner.component";
 import {Subject, takeUntil} from "rxjs";
+import {MatIcon} from "@angular/material/icon";
+import {MatTooltip} from "@angular/material/tooltip";
 
 interface CurrentMonthAndYear {
   month: string;
@@ -15,7 +16,14 @@ interface CurrentMonthAndYear {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, BalanceChartComponent, LoadingSpinnerComponent],
+  imports: [
+    CommonModule,
+    BalanceChartComponent,
+    LoadingSpinnerComponent,
+    MatIcon,
+    MatTooltip,
+
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

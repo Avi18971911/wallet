@@ -6,7 +6,12 @@
     </div>
     <div class="big-column">
       <div class="upper-row">
-        <p>Your Financial Overview</p>
+          <div class="financial-overview">
+              <p><b>Your Financial Overview</b></p>
+              <div matTooltip="This is an expanding tooltip!" class="expanding-tooltip">
+                 <mat-icon class="icon-custom">info</mat-icon>
+              </div>
+          </div>
         <p>{{currentMonthAndYear.month}} {{currentMonthAndYear.year}}</p>
       </div>
       <div class="lower-row">
