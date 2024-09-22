@@ -20,7 +20,7 @@ interface CurrentMonthAndYear {
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  protected userFirstName: string | undefined;
+  protected userFirstAndLastName: string | undefined;
   protected currentBalance: number | undefined;
   private ngUnsubscribe = new Subject<void>();
   constructor(
@@ -29,9 +29,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.accountService.getFirstName$()
+    this.accountService.getFirstAndLastName$()
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((firstName) => { this.userFirstName = firstName })
+      .subscribe((firstAndLastName) => {
+        this.userFirstAndLastName = firstAndLastName?.firstName + " " + firstAndLastName?.lastName
+      });
     this.accountService.getCurrentBalance$()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((currentBalance) => this.currentBalance = currentBalance)
