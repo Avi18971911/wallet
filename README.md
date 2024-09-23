@@ -117,3 +117,6 @@ Make sure the following are installed on your machine:
     front-end. The front-end will be able to communicate with the back-end running on port `8080`. Note that this is
     hardcoded in the `proxy.conf.json` file in the `angular_frontend` directory. You can login using the credentials
     `username: Hilda`, `password: Hilda`, or you can probe the DB to find other users.
+
+Note that the front-end only has three working components: the login page, the dashboard (landing page after login)
+and the transfer to other walletbank accounts page. The transaction history page is not yet implemented.
