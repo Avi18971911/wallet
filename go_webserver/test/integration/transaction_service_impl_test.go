@@ -62,10 +62,14 @@ func TestAddTransaction(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error in finding Tom's's account details: %v", err)
 		}
-		samBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(samFind.Accounts[0].AvailableBalance)
+		samBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(
+			utils.SamAccountDetails.Accounts[0].AvailableBalance,
+		)
 		samBalance = samBalance.Add(transferAmount)
 		samBalanceDecimal128, _ := pkgutils.FromDecimalToPrimitiveDecimal128(samBalance)
-		tomBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(tomFind.Accounts[0].AvailableBalance)
+		tomBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(
+			utils.TomAccountDetails.Accounts[0].AvailableBalance,
+		)
 		tomBalance = tomBalance.Sub(transferAmount)
 		tomBalanceDecimal128, _ := pkgutils.FromDecimalToPrimitiveDecimal128(tomBalance)
 		assert.Equal(
@@ -86,7 +90,7 @@ func TestAddTransaction(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error in decoding transaction result into tranRes: %v", err)
 		}
-		assert.Equal(t, transferAmount, tranRes.Amount)
+		assert.Equal(t, transferAmount.String(), tranRes.Amount.String())
 	})
 }
 
