@@ -32,7 +32,11 @@ export class BalanceChartComponent implements OnChanges {
 
   private updateChartData(): void {
     this.barChartData = [
-      {data: [this.availableBalance, 0.00, 0.00, 0.00, 0.00], label: 'Current'},
+      {
+        data: [this.availableBalance, 0.00, 0.00, 0.00, 0.00],
+        label: 'Current',
+        backgroundColor: 'rgb(7,12,225)',
+      },
     ];
   }
 }
