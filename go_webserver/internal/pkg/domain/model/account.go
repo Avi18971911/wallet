@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"github.com/shopspring/decimal"
 	"time"
 )
 
@@ -30,7 +31,7 @@ type Account struct {
 	Id               string
 	AccountNumber    string
 	AccountType      int
-	AvailableBalance float64
+	AvailableBalance decimal.Decimal
 }
 
 type KnownAccount struct {
@@ -45,7 +46,7 @@ type AccountTransaction struct {
 	AccountId       string
 	OtherAccountId  string
 	TransactionType string
-	Amount          float64
+	Amount          decimal.Decimal
 	CreatedAt       time.Time
 }
 

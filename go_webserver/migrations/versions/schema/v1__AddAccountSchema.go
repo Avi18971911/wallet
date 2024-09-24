@@ -62,7 +62,7 @@ var MigrationSchema1 = versions.Migration{
 									"description": "Account Type [required]",
 								},
 								"availableBalance": bson.M{
-									"bsonType":    "double",
+									"bsonType":    "decimal",
 									"minimum":     0,
 									"description": "Available Balance for the Account [required]",
 								},

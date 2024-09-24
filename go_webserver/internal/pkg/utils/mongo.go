@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
@@ -31,3 +32,12 @@ func TimeToTimestamp(tm time.Time) primitive.Timestamp {
 }
 
 func TimestampToTime(ts primitive.Timestamp) time.Time { return time.Unix(int64(ts.T), 0) }
+
+func FromDecimalToPrimitiveDecimal128(amount decimal.Decimal) (primitive.Decimal128, error) {
+	return primitive.ParseDecimal128(amount.String())
+}
+
+func FromPrimitiveDecimal128ToDecimal(decimal128 primitive.Decimal128) (decimal.Decimal, error) {
+	decimalStr := decimal128.String()
+	return decimal.NewFromString(decimalStr)
+}

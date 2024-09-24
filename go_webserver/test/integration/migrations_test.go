@@ -113,6 +113,6 @@ var sampleAccountDetails = utils.TomAccountDetails
 var sampleTransactionDetails = mongodb.MongoTransactionDetails{
 	FromAccount: primitive.NewObjectID(),
 	ToAccount:   primitive.NewObjectID(),
-	Amount:      1000.00,
+	Amount:      primitive.NewDecimal128(1000, 0),
 	CreatedAt:   pkgutils.GetCurrentTimestamp(),
 }

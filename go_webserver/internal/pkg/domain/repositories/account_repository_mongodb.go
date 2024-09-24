@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -46,15 +47,19 @@ func (ar *AccountRepositoryMongodb) GetAccountDetails(
 
 func (ar *AccountRepositoryMongodb) AddBalance(
 	accountId string,
-	amount float64,
+	amount decimal.Decimal,
 	ctx context.Context,
 ) error {
 	objectId, err := utils.StringToObjectId(accountId)
 	if err != nil {
 		return fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
+	decimal128Amount, err := utils.FromDecimalToPrimitiveDecimal128(amount)
+	if err != nil {
+		return fmt.Errorf("error when converting amount to Decimal128 for accountId %s: %w", accountId, err)
+	}
 	filter := bson.M{"accounts._id": objectId}
-	update := bson.M{"$inc": bson.M{"accounts.$.availableBalance": amount}}
+	update := bson.M{"$inc": bson.M{"accounts.$.availableBalance": decimal128Amount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf(
@@ -74,16 +79,20 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 
 func (ar *AccountRepositoryMongodb) DeductBalance(
 	accountId string,
-	amount float64,
+	amount decimal.Decimal,
 	ctx context.Context,
 ) error {
 	objectId, err := utils.StringToObjectId(accountId)
 	if err != nil {
 		return fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
-	negativeAmount := amount * -1
+	negativeAmount := amount.Neg()
+	decimal128Amount, err := utils.FromDecimalToPrimitiveDecimal128(negativeAmount)
+	if err != nil {
+		return fmt.Errorf("error when converting amount to Decimal128 for accountId %s: %w", accountId, err)
+	}
 	filter := bson.M{"accounts._id": objectId}
-	update := bson.M{"$inc": bson.M{"accounts.$.availableBalance": negativeAmount}}
+	update := bson.M{"$inc": bson.M{"accounts.$.availableBalance": decimal128Amount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf("error when updating account balance for accountId %s: %w", accountId, err)

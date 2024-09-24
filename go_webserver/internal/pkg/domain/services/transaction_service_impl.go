@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"log"
 	"webserver/internal/pkg/domain/model"
 	repositories2 "webserver/internal/pkg/domain/repositories"
@@ -26,7 +27,7 @@ func CreateNewTransactionServiceImpl(
 func (t *TransactionServiceImpl) AddTransaction(
 	toAccount string,
 	fromAccount string,
-	amount float64,
+	amount decimal.Decimal,
 	ctx context.Context,
 ) error {
 	addCtx, cancel := context.WithTimeout(ctx, addTimeout)

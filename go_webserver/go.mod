@@ -4,6 +4,7 @@ go 1.22.1
 
 require (
 	github.com/gorilla/mux v1.8.1
+	github.com/shopspring/decimal v1.4.0
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
 	github.com/testcontainers/testcontainers-go v0.30.0

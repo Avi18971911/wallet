@@ -24,7 +24,7 @@ var MigrationSchema2 = versions.Migration{
 				"required": []string{"amount", "_createdAt", "fromAccount", "toAccount"},
 				"properties": bson.M{
 					"amount": bson.M{
-						"bsonType":    "double",
+						"bsonType":    "decimal",
 						"minimum":     0,
 						"description": "the amount transferred",
 					},

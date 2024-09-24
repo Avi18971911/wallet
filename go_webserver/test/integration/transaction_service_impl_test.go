@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -38,7 +39,7 @@ func TestAddTransaction(t *testing.T) {
 	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
 	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
 	service := setupTransactionService(mongoClient, tranCollection, accCollection)
-	transferAmount := 50.42
+	transferAmount := decimal.NewFromFloatWithExponent(1000.0, -2)
 	input := model.TransactionDetails{
 		ToAccount:   samAccountName,
 		FromAccount: tomAccountName,
@@ -61,15 +62,21 @@ func TestAddTransaction(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error in finding Tom's's account details: %v", err)
 		}
+		samBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(samFind.Accounts[0].AvailableBalance)
+		samBalance = samBalance.Add(transferAmount)
+		samBalanceDecimal128, _ := pkgutils.FromDecimalToPrimitiveDecimal128(samBalance)
+		tomBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(tomFind.Accounts[0].AvailableBalance)
+		tomBalance = tomBalance.Sub(transferAmount)
+		tomBalanceDecimal128, _ := pkgutils.FromDecimalToPrimitiveDecimal128(tomBalance)
 		assert.Equal(
 			t,
-			utils.SamAccountDetails.Accounts[0].AvailableBalance+transferAmount,
-			samFind.Accounts[0].AvailableBalance,
+			samBalanceDecimal128.String(),
+			samFind.Accounts[0].AvailableBalance.String(),
 		)
 		assert.Equal(
 			t,
-			utils.TomAccountDetails.Accounts[0].AvailableBalance-transferAmount,
-			tomFind.Accounts[0].AvailableBalance,
+			tomBalanceDecimal128.String(),
+			tomFind.Accounts[0].AvailableBalance.String(),
 		)
 
 		var tranRes = mongodb.MongoTransactionDetails{}

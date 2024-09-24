@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -40,7 +41,11 @@ func TestGetAccountDetails(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error getting Tom's accountDetails: %v", err)
 		}
-		assert.Equal(t, 1000.0, accountDetails.Accounts[0].AvailableBalance)
+		assert.Equal(
+			t,
+			utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
+			accountDetails.Accounts[0].AvailableBalance.String(),
+		)
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
 		assert.Equal(t, pkgutils.TimestampToTime(utils.TomAccountDetails.CreatedAt), accountDetails.CreatedAt)
 		assert.Equal(t, utils.TomAccountDetails.Password, accountDetails.Password)
@@ -70,14 +75,24 @@ func TestGetAccountTransactions(t *testing.T) {
 	tomObjectId, _ := pkgutils.StringToObjectId(tomAccountName)
 	samObjectId, _ := pkgutils.StringToObjectId(samAccountName)
 
-	tranAmounts := []float64{50.32, 23.89, 10.88}
+	tranAmounts := []decimal.Decimal{
+		decimal.NewFromFloat(100.0),
+		decimal.NewFromFloat(200.0),
+		decimal.NewFromFloat(300.0),
+	}
+
+	tranAmountsDecimal128 := make([]primitive.Decimal128, 3)
+	for i, _ := range tranAmounts {
+		tranAmountsDecimal128[i], _ = pkgutils.FromDecimalToPrimitiveDecimal128(tranAmounts[i])
+	}
+
 	tranIds := make([]primitive.ObjectID, 3)
 	tranStrings := make([]string, 3)
 	for i, _ := range tranIds {
 		tranIds[i] = primitive.NewObjectID()
 		tranStrings[i], _ = pkgutils.ObjectIdToString(tranIds[i])
 	}
-	transactionsInput := makeTransactionsInput(tomObjectId, samObjectId, tranAmounts, tranIds)
+	transactionsInput := makeTransactionsInput(tomObjectId, samObjectId, tranAmountsDecimal128, tranIds)
 
 	t.Run(
 		"Allows the insertion of transactions and the retrieval of all transactions from an account",
@@ -130,7 +145,8 @@ func TestLogins(t *testing.T) {
 		}
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
 		assert.Equal(
-			t, utils.TomAccountDetails.Accounts[0].AvailableBalance, accountDetails.Accounts[0].AvailableBalance,
+			t, utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
+			accountDetails.Accounts[0].AvailableBalance.String(),
 		)
 	})
 
@@ -153,7 +169,7 @@ func TestLogins(t *testing.T) {
 func makeTransactionsInput(
 	tomAccountId primitive.ObjectID,
 	samAccountId primitive.ObjectID,
-	tranAmounts []float64,
+	tranAmounts []primitive.Decimal128,
 	tranIds []primitive.ObjectID,
 ) bson.A {
 	return bson.A{
@@ -186,7 +202,7 @@ func createExpectedAccountTranResult(
 	otherAccountId string,
 	expectedCreatedAt time.Time,
 	tranStrings []string,
-	tranAmounts []float64,
+	tranAmounts []decimal.Decimal,
 	transactionTypes []string,
 ) []model.AccountTransaction {
 	expectedResults := make([]model.AccountTransaction, len(tranAmounts))

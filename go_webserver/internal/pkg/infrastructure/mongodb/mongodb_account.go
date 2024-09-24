@@ -29,10 +29,10 @@ type Person struct {
 }
 
 type Account struct {
-	Id               primitive.ObjectID `bson:"_id"`
-	AccountNumber    string             `bson:"accountNumber"`
-	AccountType      string             `bson:"accountType"`
-	AvailableBalance float64            `bson:"availableBalance"`
+	Id               primitive.ObjectID   `bson:"_id"`
+	AccountNumber    string               `bson:"accountNumber"`
+	AccountType      string               `bson:"accountType"`
+	AvailableBalance primitive.Decimal128 `bson:"availableBalance"`
 }
 
 type KnownAccount struct {
@@ -43,10 +43,10 @@ type KnownAccount struct {
 }
 
 type MongoAccountTransaction struct {
-	Id              primitive.ObjectID  `bson:"_id"`
-	AccountId       primitive.ObjectID  `bson:"accountId"`
-	OtherAccountId  primitive.ObjectID  `bson:"otherAccountId"`
-	TransactionType string              `bson:"transactionType"`
-	Amount          float64             `bson:"amount"`
-	CreatedAt       primitive.Timestamp `bson:"_createdAt"`
+	Id              primitive.ObjectID   `bson:"_id"`
+	AccountId       primitive.ObjectID   `bson:"accountId"`
+	OtherAccountId  primitive.ObjectID   `bson:"otherAccountId"`
+	TransactionType string               `bson:"transactionType"`
+	Amount          primitive.Decimal128 `bson:"amount"`
+	CreatedAt       primitive.Timestamp  `bson:"_createdAt"`
 }

@@ -18,6 +18,12 @@ var accountIds = []primitive.ObjectID{
 	primitive.NewObjectID(),
 	primitive.NewObjectID(),
 }
+
+var ollyAmount, _ = primitive.ParseDecimal128("123.23")
+var bobAmount, _ = primitive.ParseDecimal128("275.11")
+var hildaAmount1, _ = primitive.ParseDecimal128("1004.55")
+var hildaAmount2, _ = primitive.ParseDecimal128("100.00")
+
 var accounts = []interface{}{
 	mongodb.MongoAccountDetails{
 		Id:       primitive.NewObjectID(),
@@ -32,7 +38,7 @@ var accounts = []interface{}{
 				Id:               accountIds[0],
 				AccountNumber:    "123-12345-0",
 				AccountType:      "checking",
-				AvailableBalance: 123.32,
+				AvailableBalance: ollyAmount,
 			},
 		},
 		KnownAccounts: []mongodb.KnownAccount{},
@@ -51,7 +57,7 @@ var accounts = []interface{}{
 				Id:               accountIds[1],
 				AccountNumber:    "123-12345-1",
 				AccountType:      "savings",
-				AvailableBalance: 275.11,
+				AvailableBalance: bobAmount,
 			},
 		},
 		KnownAccounts: []mongodb.KnownAccount{
@@ -83,13 +89,13 @@ var accounts = []interface{}{
 				Id:               accountIds[2],
 				AccountNumber:    "123-12345-2",
 				AccountType:      "savings",
-				AvailableBalance: 1004.55,
+				AvailableBalance: hildaAmount1,
 			},
 			{
 				Id:               accountIds[3],
 				AccountNumber:    "123-12345-3",
 				AccountType:      "checking",
-				AvailableBalance: 100.00,
+				AvailableBalance: hildaAmount2,
 			},
 		},
 		KnownAccounts: []mongodb.KnownAccount{

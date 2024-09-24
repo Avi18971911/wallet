@@ -48,11 +48,17 @@ func fromMongoAccounts(accounts []mongodb.Account) ([]model.Account, error) {
 				"error when converting object ID to string for account number %s: %v", a.AccountNumber, err,
 			)
 		}
+		availableBalanceDecimal, err := utils.FromPrimitiveDecimal128ToDecimal(a.AvailableBalance)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"error when converting available balance to decimal for account number %s: %v", a.AccountNumber, err,
+			)
+		}
 		res[i] = model.Account{
 			Id:               stringId,
 			AccountNumber:    a.AccountNumber,
 			AccountType:      fromMongoAccountType(a.AccountType),
-			AvailableBalance: a.AvailableBalance,
+			AvailableBalance: availableBalanceDecimal,
 		}
 	}
 	return res, nil

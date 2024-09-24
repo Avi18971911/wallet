@@ -1,6 +1,9 @@
 package dto
 
-import "time"
+import (
+	"github.com/shopspring/decimal"
+	"time"
+)
 
 // KnownAccountDTO represents an account known to and recognized by a particular account
 // @swagger:model KnownAccountDTO
@@ -68,7 +71,7 @@ type AccountDTO struct {
 	// The type of the account (e.g., savings, checking)
 	AccountType string `json:"accountType" validate:"required"`
 	// The available balance of the account
-	AvailableBalance float64 `json:"availableBalance" validate:"required"`
+	AvailableBalance decimal.Decimal `json:"availableBalance" validate:"required"`
 }
 
 // PersonDTO represents an account holder
