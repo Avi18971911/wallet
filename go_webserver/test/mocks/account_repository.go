@@ -2,6 +2,7 @@ package mocks
 
 import (
 	"context"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/mock"
 	"webserver/internal/pkg/domain/model"
 )
@@ -22,12 +23,12 @@ func (m *MockAccountRepository) GetAccountDetails(
 	return accountDetails, args.Error(1)
 }
 
-func (m *MockAccountRepository) AddBalance(accountID string, amount float64, ctx context.Context) error {
+func (m *MockAccountRepository) AddBalance(accountID string, amount decimal.Decimal, ctx context.Context) error {
 	args := m.Called(accountID, amount, ctx)
 	return args.Error(0)
 }
 
-func (m *MockAccountRepository) DeductBalance(accountID string, amount float64, ctx context.Context) error {
+func (m *MockAccountRepository) DeductBalance(accountID string, amount decimal.Decimal, ctx context.Context) error {
 	args := m.Called(accountID, amount, ctx)
 	return args.Error(0)
 }

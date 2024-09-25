@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"testing"
@@ -12,6 +11,7 @@ import (
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/domain/repositories"
 	"webserver/internal/pkg/domain/services"
+	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/infrastructure/transactional"
 	pkgutils "webserver/internal/pkg/utils"
 	"webserver/test/utils"
@@ -115,7 +115,7 @@ func TestGetAccountTransactions(t *testing.T) {
 				tranAmounts,
 				expectedTransactionTypes,
 			)
-			assert.ElementsMatch(t, expectedResults, res)
+			assertExpectedMatchesResult(t, expectedResults, res)
 		},
 	)
 }
@@ -171,28 +171,28 @@ func makeTransactionsInput(
 	samAccountId primitive.ObjectID,
 	tranAmounts []primitive.Decimal128,
 	tranIds []primitive.ObjectID,
-) bson.A {
-	return bson.A{
-		bson.M{
-			"fromAccount": tomAccountId,
-			"toAccount":   samAccountId,
-			"amount":      tranAmounts[0],
-			"_id":         tranIds[0],
-			"_createdAt":  pkgutils.GetCurrentTimestamp(),
+) []interface{} {
+	return []interface{}{
+		mongodb.MongoTransactionDetails{
+			FromAccount: tomAccountId,
+			ToAccount:   samAccountId,
+			Amount:      tranAmounts[0],
+			Id:          tranIds[0],
+			CreatedAt:   pkgutils.GetCurrentTimestamp(),
 		},
-		bson.M{
-			"fromAccount": samAccountId,
-			"toAccount":   tomAccountId,
-			"amount":      tranAmounts[1],
-			"_id":         tranIds[1],
-			"_createdAt":  pkgutils.GetCurrentTimestamp(),
+		mongodb.MongoTransactionDetails{
+			FromAccount: samAccountId,
+			ToAccount:   tomAccountId,
+			Amount:      tranAmounts[1],
+			Id:          tranIds[1],
+			CreatedAt:   pkgutils.GetCurrentTimestamp(),
 		},
-		bson.M{
-			"fromAccount": tomAccountId,
-			"toAccount":   samAccountId,
-			"amount":      tranAmounts[2],
-			"_id":         tranIds[2],
-			"_createdAt":  pkgutils.GetCurrentTimestamp(),
+		mongodb.MongoTransactionDetails{
+			FromAccount: tomAccountId,
+			ToAccount:   samAccountId,
+			Amount:      tranAmounts[2],
+			Id:          tranIds[2],
+			CreatedAt:   pkgutils.GetCurrentTimestamp(),
 		},
 	}
 }
@@ -217,6 +217,21 @@ func createExpectedAccountTranResult(
 		}
 	}
 	return expectedResults
+}
+
+func assertExpectedMatchesResult(
+	t *testing.T,
+	expectedResults []model.AccountTransaction,
+	res []model.AccountTransaction,
+) {
+	for i, _ := range expectedResults {
+		assert.Equal(t, expectedResults[i].Id, res[i].Id)
+		assert.Equal(t, expectedResults[i].AccountId, res[i].AccountId)
+		assert.Equal(t, expectedResults[i].TransactionType, res[i].TransactionType)
+		assert.Equal(t, expectedResults[i].OtherAccountId, res[i].OtherAccountId)
+		assert.Equal(t, expectedResults[i].Amount.String(), res[i].Amount.String())
+		assert.Equal(t, expectedResults[i].CreatedAt, res[i].CreatedAt)
+	}
 }
 
 func setupAccountService(

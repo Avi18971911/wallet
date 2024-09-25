@@ -66,20 +66,18 @@ func TestAddTransaction(t *testing.T) {
 			utils.SamAccountDetails.Accounts[0].AvailableBalance,
 		)
 		samBalance = samBalance.Add(transferAmount)
-		samBalanceDecimal128, _ := pkgutils.FromDecimalToPrimitiveDecimal128(samBalance)
 		tomBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(
 			utils.TomAccountDetails.Accounts[0].AvailableBalance,
 		)
 		tomBalance = tomBalance.Sub(transferAmount)
-		tomBalanceDecimal128, _ := pkgutils.FromDecimalToPrimitiveDecimal128(tomBalance)
 		assert.Equal(
 			t,
-			samBalanceDecimal128.String(),
+			samBalance.String(),
 			samFind.Accounts[0].AvailableBalance.String(),
 		)
 		assert.Equal(
 			t,
-			tomBalanceDecimal128.String(),
+			tomBalance.String(),
 			tomFind.Accounts[0].AvailableBalance.String(),
 		)
 

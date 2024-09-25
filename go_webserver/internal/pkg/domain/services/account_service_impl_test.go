@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -42,7 +43,7 @@ func TestGetAccountTransaction(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
 		stubTransactions := []model.AccountTransaction{
-			{Id: "transactionId", AccountId: "accountId", Amount: 123.12, CreatedAt: time.Now()},
+			{Id: "transactionId", AccountId: "accountId", Amount: decimal.NewFromFloat(123.13), CreatedAt: time.Now()},
 		}
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
