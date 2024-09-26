@@ -103,7 +103,7 @@ export class InputDetailsComponent implements OnInit, OnDestroy {
   protected validateAndProceed() {
     this.hasSubmitted = true;
     if (this.transferForm.valid) {
-      const amount = this.amountControl.value!;
+      const amount = parseFloat(this.amountControl.value!).toFixed(2);
       const fromAccount = this.fromAccountControl.value!;
       const toAccount = this.toAccountControl.value!;
       const transferType = this.transferTypeControl.value!;
