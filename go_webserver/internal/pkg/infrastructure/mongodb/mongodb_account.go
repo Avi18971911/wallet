@@ -4,7 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type MongoAccountDetails struct {
+type MongoAccountOutput struct {
 	Id            primitive.ObjectID  `bson:"_id"`
 	Username      string              `bson:"username"`
 	Password      string              `bson:"password"`
@@ -29,14 +29,14 @@ type Person struct {
 }
 
 type Account struct {
-	Id               primitive.ObjectID   `bson:"_id"`
+	Id               primitive.ObjectID   `bson:"_id,omitempty"`
 	AccountNumber    string               `bson:"accountNumber"`
 	AccountType      string               `bson:"accountType"`
 	AvailableBalance primitive.Decimal128 `bson:"availableBalance"`
 }
 
 type KnownAccount struct {
-	Id            primitive.ObjectID `bson:"_id"`
+	Id            primitive.ObjectID `bson:"_id,omitempty"`
 	AccountNumber string             `bson:"accountNumber"`
 	AccountHolder string             `bson:"accountHolder"`
 	AccountType   string             `bson:"accountType"`

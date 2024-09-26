@@ -173,21 +173,21 @@ func makeTransactionsInput(
 	tranIds []primitive.ObjectID,
 ) []interface{} {
 	return []interface{}{
-		mongodb.MongoTransactionDetails{
+		mongodb.MongoTransactionInput{
 			FromAccount: tomAccountId,
 			ToAccount:   samAccountId,
 			Amount:      tranAmounts[0],
 			Id:          tranIds[0],
 			CreatedAt:   pkgutils.GetCurrentTimestamp(),
 		},
-		mongodb.MongoTransactionDetails{
+		mongodb.MongoTransactionInput{
 			FromAccount: samAccountId,
 			ToAccount:   tomAccountId,
 			Amount:      tranAmounts[1],
 			Id:          tranIds[1],
 			CreatedAt:   pkgutils.GetCurrentTimestamp(),
 		},
-		mongodb.MongoTransactionDetails{
+		mongodb.MongoTransactionInput{
 			FromAccount: tomAccountId,
 			ToAccount:   samAccountId,
 			Amount:      tranAmounts[2],

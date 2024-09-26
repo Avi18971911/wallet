@@ -25,7 +25,7 @@ var hildaAmount1, _ = primitive.ParseDecimal128("1004.55")
 var hildaAmount2, _ = primitive.ParseDecimal128("100.00")
 
 var accounts = []interface{}{
-	mongodb.MongoAccountDetails{
+	mongodb.MongoAccountOutput{
 		Id:       primitive.NewObjectID(),
 		Username: "Olly",
 		Password: "password",
@@ -44,7 +44,7 @@ var accounts = []interface{}{
 		KnownAccounts: []mongodb.KnownAccount{},
 		CreatedAt:     utils.GetCurrentTimestamp(),
 	},
-	mongodb.MongoAccountDetails{
+	mongodb.MongoAccountOutput{
 		Id:       primitive.NewObjectID(),
 		Username: "Bob",
 		Password: "bob'spassword",
@@ -76,7 +76,7 @@ var accounts = []interface{}{
 		},
 		CreatedAt: utils.GetCurrentTimestamp(),
 	},
-	mongodb.MongoAccountDetails{
+	mongodb.MongoAccountOutput{
 		Id:       primitive.NewObjectID(),
 		Username: "Hilda",
 		Password: "Hilda",
@@ -136,7 +136,7 @@ var MigrationData1 = versions.Migration{
 
 		var ids = make([]primitive.ObjectID, len(accounts))
 		for i, elem := range accounts {
-			if mongoDetails, idOk := elem.(mongodb.MongoAccountDetails); idOk {
+			if mongoDetails, idOk := elem.(mongodb.MongoAccountOutput); idOk {
 				ids[i] = mongoDetails.Id
 			}
 		}

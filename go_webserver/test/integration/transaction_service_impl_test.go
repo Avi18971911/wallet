@@ -49,7 +49,7 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Should be able to insert transactions", func(t *testing.T) {
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, input.Amount, ctx)
 		assert.Nil(t, err)
-		samFind, tomFind := mongodb.MongoAccountDetails{}, mongodb.MongoAccountDetails{}
+		samFind, tomFind := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 		err = accCollection.FindOne(
 			ctx, bson.M{"accounts._id": utils.SamAccountDetails.Accounts[0].Id},
 		).Decode(&samFind)
@@ -81,7 +81,7 @@ func TestAddTransaction(t *testing.T) {
 			tomFind.Accounts[0].AvailableBalance.String(),
 		)
 
-		var tranRes = mongodb.MongoTransactionDetails{}
+		var tranRes = mongodb.MongoTransactionInput{}
 		err = tranCollection.FindOne(
 			ctx, bson.M{"fromAccount": utils.TomAccountDetails.Accounts[0].Id},
 		).Decode(&tranRes)

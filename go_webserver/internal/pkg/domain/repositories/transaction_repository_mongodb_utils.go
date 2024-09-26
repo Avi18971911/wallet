@@ -8,7 +8,7 @@ import (
 	"webserver/internal/pkg/utils"
 )
 
-func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.MongoTransactionDetails, error) {
+func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.MongoTransactionInput, error) {
 	var fromAccount, toAccount primitive.ObjectID
 	var err error
 	fromAccount, err = utils.StringToObjectId(details.FromAccount)
@@ -23,7 +23,7 @@ func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.M
 	if err != nil {
 		return nil, fmt.Errorf("error when converting amount %s to Decimal128: %w", details.Amount, err)
 	}
-	return &mongodb.MongoTransactionDetails{
+	return &mongodb.MongoTransactionInput{
 		FromAccount: fromAccount,
 		ToAccount:   toAccount,
 		Amount:      decimal128Amount,

@@ -64,7 +64,7 @@ func fromMongoAccounts(accounts []mongodb.Account) ([]model.Account, error) {
 	return res, nil
 }
 
-func fromMongoAccountDetails(details *mongodb.MongoAccountDetails) (*model.AccountDetails, error) {
+func fromMongoAccountDetails(details *mongodb.MongoAccountOutput) (*model.AccountDetails, error) {
 	accountId, err := utils.ObjectIdToString(details.Id)
 	if err != nil {
 		return nil, fmt.Errorf(

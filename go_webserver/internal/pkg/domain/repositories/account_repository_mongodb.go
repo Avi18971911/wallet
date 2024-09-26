@@ -26,7 +26,7 @@ func (ar *AccountRepositoryMongodb) GetAccountDetails(
 	accountId string,
 	ctx context.Context,
 ) (*model.AccountDetails, error) {
-	var accountDetails mongodb.MongoAccountDetails
+	var accountDetails mongodb.MongoAccountOutput
 	var res *model.AccountDetails
 	objectId, err := utils.StringToObjectId(accountId)
 	if err != nil {
@@ -111,7 +111,7 @@ func (ar *AccountRepositoryMongodb) GetAccountDetailsFromUsername(
 	username string,
 	ctx context.Context,
 ) (*model.AccountDetails, error) {
-	var accountDetails mongodb.MongoAccountDetails
+	var accountDetails mongodb.MongoAccountOutput
 	filter := bson.M{"username": username}
 	err := ar.col.FindOne(ctx, filter).Decode(&accountDetails)
 	if err != nil {
