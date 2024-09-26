@@ -206,8 +206,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "availableBalance": {
-                    "description": "The available balance of the account",
-                    "type": "number"
+                    "description": "The available balance of the account. Valid to two decimal places.",
+                    "type": "string"
                 },
                 "id": {
                     "description": "The unique identifier of the account",
@@ -295,8 +295,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "amount": {
-                    "description": "The amount involved in the transaction",
-                    "type": "number"
+                    "description": "The amount involved in the transaction. Valid to two decimal places.",
+                    "type": "string"
                 },
                 "createdAt": {
                     "description": "The timestamp of when the transaction was created",
@@ -369,8 +369,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "description": "The amount to be transferred",
-                    "type": "number"
+                    "description": "The amount to be transferred. Valid to two decimal places.",
+                    "type": "string"
                 },
                 "fromAccount": {
                     "description": "The account number of the account from which the amount is to be transferred",
