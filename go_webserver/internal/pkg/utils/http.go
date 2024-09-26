@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"github.com/shopspring/decimal"
 	"log"
 	"net/http"
 )
@@ -17,4 +18,12 @@ func HttpError(w http.ResponseWriter, message string, statusCode int) {
 	if err != nil {
 		log.Printf("Failed to encode error message: %v", err)
 	}
+}
+
+func FromStringToDecimal(amount string) (decimal.Decimal, error) {
+	decimalAmount, err := decimal.NewFromString(amount)
+	if err != nil {
+		return decimal.Decimal{}, err
+	}
+	return decimalAmount, nil
 }

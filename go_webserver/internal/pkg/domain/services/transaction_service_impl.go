@@ -27,7 +27,7 @@ func CreateNewTransactionServiceImpl(
 func (t *TransactionServiceImpl) AddTransaction(
 	toAccount string,
 	fromAccount string,
-	amount decimal.Decimal,
+	amount string,
 	ctx context.Context,
 ) error {
 	addCtx, cancel := context.WithTimeout(ctx, addTimeout)
@@ -49,10 +49,16 @@ func (t *TransactionServiceImpl) AddTransaction(
 		}
 	}()
 
+	amountDecimal, err := convertStringToDecimal(amount)
+	if err != nil {
+		log.Printf("Error converting string to decimal: %v", err)
+		return fmt.Errorf("error when converting string to decimal: %w", err)
+	}
+
 	transactionDetails := model.TransactionDetails{
 		FromAccount: fromAccount,
 		ToAccount:   toAccount,
-		Amount:      amount,
+		Amount:      amountDecimal,
 	}
 	if err = t.tr.AddTransaction(&transactionDetails, txnCtx); err != nil {
 		log.Printf("Error adding transaction to the database from Account %s to "+
@@ -60,12 +66,12 @@ func (t *TransactionServiceImpl) AddTransaction(
 		return fmt.Errorf("error when adding transaction to the database: %w", err)
 	}
 
-	if err = t.ar.AddBalance(toAccount, amount, txnCtx); err != nil {
+	if err = t.ar.AddBalance(toAccount, amountDecimal, txnCtx); err != nil {
 		log.Printf("Error adding balance to Account %s: %v", toAccount, err)
 		return fmt.Errorf("error when adding balance to Account %s: %w", toAccount, err)
 	}
 
-	if err = t.ar.DeductBalance(fromAccount, amount, txnCtx); err != nil {
+	if err = t.ar.DeductBalance(fromAccount, amountDecimal, txnCtx); err != nil {
 		log.Printf("Error deducting balance from Account %s: %v", fromAccount, err)
 		return fmt.Errorf("error when deducting balance from Account %s: %w", fromAccount, err)
 	}
@@ -76,4 +82,12 @@ func (t *TransactionServiceImpl) AddTransaction(
 	}
 
 	return nil
+}
+
+func convertStringToDecimal(amount string) (decimal.Decimal, error) {
+	amountDecimal, err := decimal.NewFromString(amount)
+	if err != nil {
+		return decimal.Decimal{}, fmt.Errorf("error converting string to decimal: %w", err)
+	}
+	return amountDecimal, nil
 }

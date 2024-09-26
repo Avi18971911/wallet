@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
 )
 
@@ -46,8 +45,8 @@ type AccountTransactionDTO struct {
 	OtherAccountId string `json:"otherAccountId" validate:"required"`
 	// The type of the transaction (debit or credit)
 	TransactionType string `json:"transactionType" validate:"required"`
-	// The amount involved in the transaction
-	Amount float64 `json:"amount" validate:"required"`
+	// The amount involved in the transaction. Valid to two decimal places.
+	Amount string `json:"amount" validate:"required"`
 	// The timestamp of when the transaction was created
 	CreatedAt time.Time `json:"createdAt" validate:"required"`
 }
@@ -70,8 +69,8 @@ type AccountDTO struct {
 	AccountNumber string `json:"accountNumber" validate:"required"`
 	// The type of the account (e.g., savings, checking)
 	AccountType string `json:"accountType" validate:"required"`
-	// The available balance of the account
-	AvailableBalance decimal.Decimal `json:"availableBalance" validate:"required"`
+	// The available balance of the account. Valid to two decimal places.
+	AvailableBalance string `json:"availableBalance" validate:"required"`
 }
 
 // PersonDTO represents an account holder
