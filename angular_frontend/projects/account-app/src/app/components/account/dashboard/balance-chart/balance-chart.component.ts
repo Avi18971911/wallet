@@ -13,7 +13,7 @@ import {isPlatformBrowser, NgIf} from "@angular/common";
   styleUrl: './balance-chart.component.css'
 })
 export class BalanceChartComponent implements OnChanges {
-  @Input({required: true, transform: transformAvailableBalance}) availableBalance: number = 10000;
+  @Input({required: true, transform: transformAvailableBalance}) availableBalance: string = "10000";
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   public barChartOptions = {
@@ -41,7 +41,7 @@ export class BalanceChartComponent implements OnChanges {
   }
 }
 
-function transformAvailableBalance(availableBalance: number | undefined): number {
-  return availableBalance ?? 0;
+function transformAvailableBalance(availableBalance: string | undefined): string {
+  return availableBalance ?? "0.00";
 }
 

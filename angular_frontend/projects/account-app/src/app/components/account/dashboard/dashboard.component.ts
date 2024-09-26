@@ -29,7 +29,7 @@ interface CurrentMonthAndYear {
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   protected userFirstAndLastName: string | undefined;
-  protected currentBalance: number | undefined;
+  protected currentBalance: string | undefined;
   private ngUnsubscribe = new Subject<void>();
   constructor(
     private accountService: AccountService,

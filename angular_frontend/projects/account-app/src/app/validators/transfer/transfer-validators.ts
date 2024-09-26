@@ -1,10 +1,10 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-export var errorMessage = "amountExceedsBalance";
-export function amountLessThanOrEqualToBalance(balance: number): ValidatorFn {
+export var exceedBalanceErrorMessage = "amountExceedsBalance";
+export function amountLessThanOrEqualToBalance(balance: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const amount = control.value;
-    if (amount !== null && amount !== undefined && amount > balance) {
+    if (amount !== null && amount !== undefined && parseFloat(amount) > parseFloat(balance)) {
       return { amountExceedsBalance: true };
     }
     return null;

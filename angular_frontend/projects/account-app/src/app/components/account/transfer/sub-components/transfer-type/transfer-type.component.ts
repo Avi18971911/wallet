@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {TransferState, TransferType} from "../../../../../models/transfer-state";
+import {Component, Input} from '@angular/core';
+import {TransferType} from "../../../../../models/transfer-state";
 import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MatError} from "@angular/material/form-field";

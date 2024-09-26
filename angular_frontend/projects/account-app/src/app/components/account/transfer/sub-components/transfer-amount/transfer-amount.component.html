@@ -13,7 +13,7 @@
       <mat-error *ngIf="hasSubmitted && amountControl.hasError('min')">
         Amount must be greater than or equal to $0.01.
       </mat-error>
-      <mat-error *ngIf="hasSubmitted && amountControl.hasError(errorMessage)">
+      <mat-error *ngIf="hasSubmitted && amountControl.hasError(exceedBalanceErrorMessage)">
         Amount must be less than or equal to the remaining balance.
       </mat-error>
     </mat-form-field>

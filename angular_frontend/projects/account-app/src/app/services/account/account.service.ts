@@ -14,7 +14,7 @@ export interface Account {
   accountNumber: string;
   accountHolder: string;
   accountType: string;
-  availableBalance: number;
+  availableBalance: string;
 }
 
 export interface AccountDetails {
@@ -48,7 +48,7 @@ export class AccountService {
     if (!this.userDataSubject.value) {
       return;
     }
-    this.backendAccountService.accountsAccountIdGet(this.userDataSubject.value?.accounts[0].id)
+    this.backendAccountService.accountsAccountIdGet(this.userDataSubject.value?.accounts[0].id!)
       .subscribe((data) => {
         this.setUserData(data);
       });
@@ -73,13 +73,17 @@ export class AccountService {
     );
   }
 
-  getCurrentBalance$(): Observable<number | undefined> {
+  getCurrentBalance$(): Observable<string | undefined> {
     return this.userData$.pipe(
-      map((userData) =>
-        userData?.accounts.reduce(
-          (acc, account) => acc + account.availableBalance, 0
-        )
-      )
+      map((userData) => {
+        const accounts = userData?.accounts
+        if (!accounts) {
+          return undefined
+        }
+        return accounts.reduce(
+          (acc, account) => acc + parseFloat(account.availableBalance), 0
+        ).toFixed(2)
+      })
     );
   }
 
@@ -120,7 +124,7 @@ export class AccountService {
       accountNumber: dtoAccountDTO.accountNumber,
       accountHolder: dtoPersonDTO.firstName + ' ' + dtoPersonDTO.lastName,
       accountType: dtoAccountDTO.accountType,
-      availableBalance: dtoAccountDTO.availableBalance,
+      availableBalance: parseFloat(dtoAccountDTO.availableBalance).toFixed(2),
     }
   }
 }

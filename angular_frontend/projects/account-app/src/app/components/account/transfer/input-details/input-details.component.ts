@@ -1,12 +1,7 @@
 import {
   Component,
-  EventEmitter,
-  OnChanges,
   OnDestroy,
   OnInit,
-  Optional,
-  Output,
-  SimpleChanges,
   SkipSelf
 } from "@angular/core";
 import {
@@ -25,7 +20,7 @@ import {TransferTypeComponent} from "../sub-components/transfer-type/transfer-ty
 import {Subject, takeUntil} from "rxjs";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {FormatAccountDetailsPipe} from "../../../../pipes/format-account-details.pipe";
-import {amountLessThanOrEqualToBalance} from "../../../../validators/transfer/amountLessThanOrEqualToBalance";
+import {amountLessThanOrEqualToBalance} from "../../../../validators/transfer/transfer-validators";
 import {CancelWarningDialogComponent} from "../sub-components/transfer-cancel-warning/cancel-warning-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 @Component({
@@ -54,7 +49,7 @@ export class InputDetailsComponent implements OnInit, OnDestroy {
   protected transferTypeControl!: FormControl<TransferType | undefined>;
   protected fromAccountControl!: FormControl<TransferFromWalletAccountDetails | undefined>;
   protected toAccountControl!: FormControl<TransferToWalletAccountDetails | undefined>;
-  protected amountControl!: FormControl<number | undefined>;
+  protected amountControl!: FormControl<string | undefined>;
 
   constructor(
     private accountService: AccountService,
@@ -138,12 +133,12 @@ export class InputDetailsComponent implements OnInit, OnDestroy {
       undefined, {nonNullable: true, validators: [Validators.required]}
     );
 
-    this.amountControl = new FormControl<number | undefined>(
+    this.amountControl = new FormControl<string | undefined>(
       undefined, {
         nonNullable: true,
         validators: [
           ...this.amountValidatorList,
-          amountLessThanOrEqualToBalance(this.fromAccountControl.value?.availableBalance || 0)
+          amountLessThanOrEqualToBalance(this.fromAccountControl.value?.availableBalance || "0.00")
         ]
       }
     );
@@ -151,7 +146,7 @@ export class InputDetailsComponent implements OnInit, OnDestroy {
     this.fromAccountControl.valueChanges
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((fromAccount) => {
-        this.updateBalanceForSelectedAccount(fromAccount?.availableBalance || 0, this.amountControl)
+        this.updateBalanceForSelectedAccount(fromAccount?.availableBalance || "0.00", this.amountControl)
       });
 
     this.transferForm = new FormGroup({
@@ -168,7 +163,7 @@ export class InputDetailsComponent implements OnInit, OnDestroy {
     Validators.min(0.01),
   ]
 
-  private updateBalanceForSelectedAccount(newBalance: number, amountControl: FormControl<number | undefined>): void {
+  private updateBalanceForSelectedAccount(newBalance: string, amountControl: FormControl<string | undefined>): void {
       amountControl.clearValidators();
       amountControl.setValidators([
         ...this.amountValidatorList,

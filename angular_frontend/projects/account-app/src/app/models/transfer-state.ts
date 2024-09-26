@@ -8,7 +8,7 @@ export interface TransferState {
   toAccountId: string | undefined;
   fromAccountNumber: string | undefined;
   fromAccountId: string | undefined;
-  amount: number | undefined;
+  amount: string | undefined;
   transferType: TransferType | undefined;
   recipientName: string | undefined;
 }

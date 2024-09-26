@@ -4,7 +4,7 @@ import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {NgIf} from "@angular/common";
 import {MatError} from "@angular/material/select";
-import {errorMessage} from "../../../../../validators/transfer/amountLessThanOrEqualToBalance";
+import {exceedBalanceErrorMessage} from "../../../../../validators/transfer/transfer-validators";
 
 @Component({
   selector: 'app-transfer-amount',
@@ -22,7 +22,7 @@ import {errorMessage} from "../../../../../validators/transfer/amountLessThanOrE
 })
 export class TransferAmountComponent implements OnChanges {
   @Input() hasSubmitted: boolean = false;
-  @Input() amountControl!: FormControl<number | undefined>;
+  @Input() amountControl!: FormControl<string | undefined>;
 
   ngOnChanges() {
     if (this.hasSubmitted) {
@@ -30,5 +30,5 @@ export class TransferAmountComponent implements OnChanges {
     }
   }
 
-  protected readonly errorMessage = errorMessage;
+  protected readonly exceedBalanceErrorMessage = exceedBalanceErrorMessage;
 }

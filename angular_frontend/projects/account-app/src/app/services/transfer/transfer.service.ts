@@ -8,7 +8,7 @@ export interface TransferData {
   toAccountId: string;
   fromAccountNumber: string;
   fromAccountId: string;
-  amount: number;
+  amount: string;
   recipientName: string;
 }
 
