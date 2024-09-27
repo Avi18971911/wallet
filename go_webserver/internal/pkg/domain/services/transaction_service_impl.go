@@ -67,9 +67,7 @@ func (t *TransactionServiceImpl) AddTransaction(
 		return fmt.Errorf("error when deducting balance from Account %s: %w", fromAccount, err)
 	}
 
-	stringer := newBalance.String()
-	s, _ := decimal.NewFromString(stringer)
-	if s.IsNegative() {
+	if newBalance.IsNegative() {
 		log.Printf("Insufficient balance in Account %s", fromAccount)
 		return fmt.Errorf("insufficient balance in Account %s", fromAccount)
 	}

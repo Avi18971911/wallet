@@ -40,7 +40,7 @@ func TestAddTransaction(t *testing.T) {
 	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
 	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
 	service := setupTransactionService(mongoClient, tranCollection, accCollection)
-	transferAmount := decimal.NewFromFloatWithExponent(1000.0, -2)
+	transferAmount, _ := decimal.NewFromString("100.00")
 	input := model.TransactionDetails{
 		ToAccount:   samAccountName,
 		FromAccount: tomAccountName,
