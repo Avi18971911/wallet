@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/infrastructure/mongodb"
@@ -81,30 +83,67 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 	accountId string,
 	amount decimal.Decimal,
 	ctx context.Context,
-) error {
+) (decimal.Decimal, error) {
 	objectId, err := utils.StringToObjectId(accountId)
+	defaultDecimal := decimal.NewFromInt(0)
 	if err != nil {
-		return fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
+		return defaultDecimal,
+			fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
 	negativeAmount := amount.Neg()
 	decimal128Amount, err := utils.FromDecimalToPrimitiveDecimal128(negativeAmount)
 	if err != nil {
-		return fmt.Errorf("error when converting amount to Decimal128 for accountId %s: %w", accountId, err)
+		return defaultDecimal,
+			fmt.Errorf("error when converting amount to Decimal128 for accountId %s: %w", accountId, err)
 	}
 	filter := bson.M{"accounts._id": objectId}
 	update := bson.M{"$inc": bson.M{"accounts.$.availableBalance": decimal128Amount}}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
-		return fmt.Errorf("error when updating account balance for accountId %s: %w", accountId, err)
+		return defaultDecimal,
+			fmt.Errorf("error when updating account balance for accountId %s: %w", accountId, err)
 	}
 	if result.MatchedCount == 0 {
-		return fmt.Errorf("no matching account found for accountId %s", accountId)
+		return defaultDecimal,
+			fmt.Errorf("no matching account found for accountId %s", accountId)
 	} else if result.ModifiedCount == 0 {
-		return fmt.Errorf("update failed to the account balance for accountId %s", accountId)
+		return defaultDecimal,
+			fmt.Errorf("update failed to the account balance for accountId %s", accountId)
 	} else {
-		log.Printf("Successfully updated balance for account %s\n", accountId)
-		return nil
+		updatedBalance, err := ar.GetAccountBalance(accountId, ctx)
+		if err != nil {
+			return defaultDecimal,
+				fmt.Errorf("error when getting updated balance for account %s: %w", accountId, err)
+		}
+		return updatedBalance, nil
 	}
+}
+
+type AccountBalance struct {
+	AvailableBalance primitive.Decimal128 `bson:"accounts.availableBalance"`
+}
+
+func (ar *AccountRepositoryMongodb) GetAccountBalance(accountId string, ctx context.Context) (decimal.Decimal, error) {
+	objectId, err := utils.StringToObjectId(accountId)
+	defaultDecimal := decimal.NewFromInt(0)
+	if err != nil {
+		return defaultDecimal,
+			fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
+	}
+	filter := bson.M{"accounts._id": objectId}
+	projection := bson.M{"accounts.$.availableBalance": 1}
+	var accountBalance AccountBalance
+	err = ar.col.FindOne(ctx, filter, options.FindOne().SetProjection(projection)).Decode(&accountBalance)
+	if err != nil {
+		return defaultDecimal,
+			fmt.Errorf("error when finding account by ID %s: %w", accountId, err)
+	}
+	balanceDecimal, err := utils.FromPrimitiveDecimal128ToDecimal(accountBalance.AvailableBalance)
+	if err != nil {
+		return defaultDecimal,
+			fmt.Errorf("error when converting available balance to decimal for accountId %s: %w", accountId, err)
+	}
+	return balanceDecimal, nil
 }
 
 func (ar *AccountRepositoryMongodb) GetAccountDetailsFromUsername(

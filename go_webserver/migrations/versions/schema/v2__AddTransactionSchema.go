@@ -25,7 +25,6 @@ var MigrationSchema2 = versions.Migration{
 				"properties": bson.M{
 					"amount": bson.M{
 						"bsonType":    "decimal",
-						"minimum":     0,
 						"description": "the amount transferred",
 					},
 					"_createdAt": bson.M{
