@@ -6,15 +6,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
+	"strconv"
 	"webserver/migrations/service"
 	"webserver/migrations/versions"
 	"webserver/migrations/versions/data"
 	"webserver/migrations/versions/schema"
 )
 
-var migrationsToRun = []versions.Migration{
+var schemaMigrations = []versions.Migration{
 	schema.MigrationSchema1,
 	schema.MigrationSchema2,
+}
+
+var dataMigrations = []versions.Migration{
 	data.MigrationData1,
 }
 
@@ -35,8 +39,18 @@ func main() {
 		}
 	}(client, ctx)
 
+	schemaStartVer := parseEnvAsInt("SCHEMA_START_VER", 1)
+	schemaEndVer := parseEnvAsInt("SCHEMA_END_VER", 2)
+
+	dataStartVer := parseEnvAsInt("DATA_START_VER", 1)
+	dataEndVer := parseEnvAsInt("DATA_END_VER", 1)
+
 	ms := service.NewMigrationService(client, ctx, migrationDatabaseName)
-	applyMigrations(ms, mainDatabaseName, migrationsToRun)
+
+	log.Printf("Applying schema migrations to database %s", mainDatabaseName)
+	applyMigrations(ms, mainDatabaseName, schemaMigrations, schemaStartVer, schemaEndVer)
+	log.Printf("Applying data migrations to database %s", mainDatabaseName)
+	applyMigrations(ms, mainDatabaseName, dataMigrations, dataStartVer, dataEndVer)
 	log.Println("Migrations completed successfully")
 }
 
@@ -44,7 +58,10 @@ func applyMigrations(
 	ms *service.MigrationServiceImpl,
 	mainDatabaseName string,
 	migrationsToRun []versions.Migration,
+	startVer int,
+	endVer int,
 ) {
+	migrationsToRun = migrationsToRun[startVer-1 : endVer]
 	for _, elem := range migrationsToRun {
 		err, hasBeenApplied := ms.ApplyMigration(mainDatabaseName, elem)
 		if err != nil {
@@ -56,4 +73,16 @@ func applyMigrations(
 			log.Printf("Migration %s has not been applied", elem.Version)
 		}
 	}
+}
+
+func parseEnvAsInt(envVar string, defaultValue int) int {
+	val := os.Getenv(envVar)
+	if val == "" {
+		return defaultValue
+	}
+	ret, err := strconv.Atoi(val)
+	if err != nil {
+		log.Fatalf("Error when parsing %s as int: %v", envVar, err)
+	}
+	return ret
 }
