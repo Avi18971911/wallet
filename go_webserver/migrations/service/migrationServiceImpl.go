@@ -27,7 +27,8 @@ func NewMigrationService(client *mongo.Client, ctx context.Context, migrationDat
 	}
 }
 
-func (ms *MigrationServiceImpl) checkIfApplied(version string) (bool, error) {
+// CheckIfApplied TODO: Set this function to private after finding out a way to test them
+func (ms *MigrationServiceImpl) CheckIfApplied(version string) (bool, error) {
 	db := ms.client.Database(ms.migrationDatabaseName)
 	collection := db.Collection(collectionName)
 	mongoCtx, cancel := context.WithTimeout(ms.ctx, MigrationTimeout)
@@ -43,7 +44,8 @@ func (ms *MigrationServiceImpl) checkIfApplied(version string) (bool, error) {
 	return true, nil
 }
 
-func (ms *MigrationServiceImpl) markAsApplied(version string) error {
+// MarkAsApplied TODO: Set this function to private after finding out a way to test them
+func (ms *MigrationServiceImpl) MarkAsApplied(version string) error {
 	db := ms.client.Database(ms.migrationDatabaseName)
 	collection := db.Collection(collectionName)
 	mongoCtx, cancel := context.WithTimeout(ms.ctx, MigrationTimeout)
@@ -56,7 +58,7 @@ func (ms *MigrationServiceImpl) markAsApplied(version string) error {
 }
 
 func (ms *MigrationServiceImpl) ApplyMigration(databaseName string, migration versions.Migration) (error, bool) {
-	hasBeenApplied, err := ms.checkIfApplied(migration.Version)
+	hasBeenApplied, err := ms.CheckIfApplied(migration.Version)
 	if err != nil {
 		log.Printf("Error when checking if migration %s has been applied: %v", migration.Version, err)
 		return err, false
@@ -70,7 +72,7 @@ func (ms *MigrationServiceImpl) ApplyMigration(databaseName string, migration ve
 		log.Printf("Error when applying migration %s: %v", migration.Version, err)
 		return err, false
 	}
-	err = ms.markAsApplied(migration.Version)
+	err = ms.MarkAsApplied(migration.Version)
 	if err != nil {
 		log.Printf("Error when marking migration %s as applied: %v", migration.Version, err)
 		return err, true

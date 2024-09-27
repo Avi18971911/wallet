@@ -9,7 +9,7 @@ import (
 	"time"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	pkgutils "webserver/internal/pkg/utils"
-	"webserver/migrations"
+	"webserver/migrations/service"
 	"webserver/migrations/versions/schema"
 	"webserver/test/utils"
 )
@@ -22,11 +22,12 @@ func TestMigrationService(t *testing.T) {
 	defer cancel()
 	db := mongoClient.Database(utils.TestDatabaseName)
 	collection := db.Collection("migrations")
+	ms := service.NewMigrationService(mongoClient, ctx, utils.TestDatabaseName)
 
 	t.Run("checkIfApplied should return true if a migration has already been applied", func(t *testing.T) {
 		version := "1"
 		_, err := collection.InsertOne(ctx, bson.M{"version": version})
-		res, err := migrations.CheckIfApplied(mongoClient, ctx, utils.TestDatabaseName, version)
+		res, err := ms.CheckIfApplied(version)
 		assert.Equal(t, true, res)
 		assert.Nil(t, err)
 		utils.CleanupMigrations(collection, ctx)
@@ -34,7 +35,7 @@ func TestMigrationService(t *testing.T) {
 
 	t.Run("checkIfApplied should return false if a migration hasn't been applied", func(t *testing.T) {
 		version := "1"
-		res, err := migrations.CheckIfApplied(mongoClient, ctx, utils.TestDatabaseName, version)
+		res, err := ms.CheckIfApplied(version)
 		assert.Equal(t, false, res)
 		assert.Nil(t, err)
 		utils.CleanupMigrations(collection, ctx)
@@ -42,7 +43,7 @@ func TestMigrationService(t *testing.T) {
 
 	t.Run("checkIfApplied should return false if a migration hasn't been applied", func(t *testing.T) {
 		version := "1"
-		res, err := migrations.CheckIfApplied(mongoClient, ctx, utils.TestDatabaseName, version)
+		res, err := ms.CheckIfApplied(version)
 		assert.Equal(t, false, res)
 		assert.Nil(t, err)
 		utils.CleanupMigrations(collection, ctx)
@@ -50,7 +51,7 @@ func TestMigrationService(t *testing.T) {
 
 	t.Run("markAsApplied should insert the migrated version into the database", func(t *testing.T) {
 		version := "20"
-		err := migrations.MarkAsApplied(mongoClient, ctx, utils.TestDatabaseName, version)
+		err := ms.MarkAsApplied(version)
 		assert.Nil(t, err)
 		err = collection.FindOne(ctx, bson.M{"version": version}).Err()
 		assert.Nil(t, err)
@@ -59,9 +60,9 @@ func TestMigrationService(t *testing.T) {
 
 	t.Run("checkIfApplied should return false after calling markAsApplied", func(t *testing.T) {
 		version := "20"
-		err := migrations.MarkAsApplied(mongoClient, ctx, utils.TestDatabaseName, version)
+		err := ms.MarkAsApplied(version)
 		assert.Nil(t, err)
-		res, err := migrations.CheckIfApplied(mongoClient, ctx, utils.TestDatabaseName, version)
+		res, err := ms.CheckIfApplied(version)
 		assert.Equal(t, true, res)
 		assert.Nil(t, err)
 		utils.CleanupMigrations(collection, ctx)
