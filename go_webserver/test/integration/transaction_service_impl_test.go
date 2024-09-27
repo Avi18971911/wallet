@@ -47,7 +47,7 @@ func TestAddTransaction(t *testing.T) {
 	}
 
 	t.Run("Should be able to insert transactions", func(t *testing.T) {
-		err := service.AddTransaction(input.ToAccount, input.FromAccount, input.Amount, ctx)
+		err := service.AddTransaction(input.ToAccount, input.FromAccount, input.Amount.String(), ctx)
 		assert.Nil(t, err)
 		samFind, tomFind := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 		err = accCollection.FindOne(
@@ -89,6 +89,13 @@ func TestAddTransaction(t *testing.T) {
 			t.Errorf("Error in decoding transaction result into tranRes: %v", err)
 		}
 		assert.Equal(t, transferAmount.String(), tranRes.Amount.String())
+	})
+
+	t.Run("Should not be able to insert transactions with insufficient balance", func(t *testing.T) {
+		reallyHighAmount := "99999999.99"
+		err := service.AddTransaction(input.ToAccount, input.FromAccount, reallyHighAmount, ctx)
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "insufficient balance")
 	})
 }
 
