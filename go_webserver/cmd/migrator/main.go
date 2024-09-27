@@ -13,15 +13,6 @@ import (
 	"webserver/migrations/versions/schema"
 )
 
-var schemaMigrations = []versions.Migration{
-	schema.MigrationSchema1,
-	schema.MigrationSchema2,
-}
-
-var dataMigrations = []versions.Migration{
-	data.MigrationData1,
-}
-
 func main() {
 	mainDatabaseName, migrationDatabaseName := "wallet", "migrations"
 	mongoURL := os.Getenv("MONGO_URL")
@@ -48,9 +39,9 @@ func main() {
 	ms := service.NewMigrationService(client, ctx, migrationDatabaseName)
 
 	log.Printf("Applying schema migrations to database %s", mainDatabaseName)
-	applyMigrations(ms, mainDatabaseName, schemaMigrations, schemaStartVer, schemaEndVer)
+	applyMigrations(ms, mainDatabaseName, schema.SchemaMigrations, schemaStartVer, schemaEndVer)
 	log.Printf("Applying data migrations to database %s", mainDatabaseName)
-	applyMigrations(ms, mainDatabaseName, dataMigrations, dataStartVer, dataEndVer)
+	applyMigrations(ms, mainDatabaseName, data.DataMigrations, dataStartVer, dataEndVer)
 	log.Println("Migrations completed successfully")
 }
 

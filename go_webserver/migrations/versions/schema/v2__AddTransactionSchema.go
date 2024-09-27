@@ -10,7 +10,7 @@ import (
 	"webserver/migrations/versions"
 )
 
-const collection = "transaction"
+const TransactionCollectionName = "transaction"
 
 var MigrationSchema2 = versions.Migration{
 	Version: "2__Schema",
@@ -46,19 +46,19 @@ var MigrationSchema2 = versions.Migration{
 
 		opts := options.CreateCollection().SetValidator(validation).SetValidationLevel("strict")
 
-		err := db.CreateCollection(mongoCtx, collection, opts)
+		err := db.CreateCollection(mongoCtx, TransactionCollectionName, opts)
 		if err != nil {
 			return err
 		}
 
-		log.Printf("Collection %s created with validation rules", collection)
+		log.Printf("Collection %s created with validation rules", TransactionCollectionName)
 		return nil
 	},
 	Down: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, service.MigrationTimeout)
 		defer cancel()
-		err := db.Collection(collection).Drop(mongoCtx)
+		err := db.Collection(TransactionCollectionName).Drop(mongoCtx)
 		if err != nil {
 			return err
 		}

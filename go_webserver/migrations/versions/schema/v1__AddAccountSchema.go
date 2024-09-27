@@ -10,13 +10,15 @@ import (
 	"webserver/migrations/versions"
 )
 
+const AccountCollectionName = "account"
+
 var MigrationSchema1 = versions.Migration{
 	Version: "1__Schema",
 	Up: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, service.MigrationTimeout)
 		defer cancel()
-		collection := "account"
+		collection := AccountCollectionName
 		validator := bson.M{
 			"$jsonSchema": bson.M{
 				"bsonType": "object",

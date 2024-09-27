@@ -14,6 +14,7 @@ import (
 	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/infrastructure/transactional"
 	pkgutils "webserver/internal/pkg/utils"
+	"webserver/migrations/versions/schema"
 	"webserver/test/utils"
 )
 
@@ -23,9 +24,9 @@ func TestGetAccountDetails(t *testing.T) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
-	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
 	utils.CleanupMigrations(tranCollection, ctx)
-	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
+	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
 	utils.CleanupMigrations(accCollection, ctx)
 
 	t.Run("Allows the retrieval of account details from an inserted account record", func(t *testing.T) {
@@ -57,9 +58,9 @@ func TestGetAccountDetails(t *testing.T) {
 func TestGetAccountTransactions(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
-	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
 	utils.CleanupMigrations(tranCollection, ctx)
-	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
+	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
 	utils.CleanupMigrations(accCollection, ctx)
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
@@ -123,9 +124,9 @@ func TestGetAccountTransactions(t *testing.T) {
 func TestLogins(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
-	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection("transaction")
+	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
 	utils.CleanupMigrations(tranCollection, ctx)
-	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection("account")
+	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
 	utils.CleanupMigrations(accCollection, ctx)
 
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
