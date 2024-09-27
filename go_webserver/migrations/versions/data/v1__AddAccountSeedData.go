@@ -8,7 +8,7 @@ import (
 	"log"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/utils"
-	"webserver/migrations"
+	"webserver/migrations/service"
 	"webserver/migrations/versions"
 )
 
@@ -114,7 +114,7 @@ var MigrationData1 = versions.Migration{
 	Version: "1__Data",
 	Up: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
-		mongoCtx, cancel := context.WithTimeout(ctx, migrations.MigrationTimeout)
+		mongoCtx, cancel := context.WithTimeout(ctx, service.MigrationTimeout)
 		defer cancel()
 		collectionName := "account"
 		coll := db.Collection(collectionName)
@@ -129,7 +129,7 @@ var MigrationData1 = versions.Migration{
 	},
 	Down: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
-		mongoCtx, cancel := context.WithTimeout(ctx, migrations.MigrationTimeout)
+		mongoCtx, cancel := context.WithTimeout(ctx, service.MigrationTimeout)
 		defer cancel()
 		collectionName := "account"
 		coll := db.Collection(collectionName)

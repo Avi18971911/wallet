@@ -6,13 +6,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
-	"webserver/migrations"
+	"webserver/migrations/service"
 	"webserver/migrations/versions"
 	"webserver/migrations/versions/data"
 	"webserver/migrations/versions/schema"
 )
 
-// TODO: Change these to a file trawler
 var migrationsToRun = []versions.Migration{
 	schema.MigrationSchema1,
 	schema.MigrationSchema2,
@@ -36,31 +35,25 @@ func main() {
 		}
 	}(client, ctx)
 
-	applyMigrations(client, ctx, mainDatabaseName, migrationDatabaseName, migrationsToRun)
+	ms := service.NewMigrationService(client, ctx, migrationDatabaseName)
+	applyMigrations(ms, mainDatabaseName, migrationsToRun)
 	log.Println("Migrations completed successfully")
 }
 
 func applyMigrations(
-	client *mongo.Client,
-	ctx context.Context,
+	ms *service.MigrationServiceImpl,
 	mainDatabaseName string,
-	migrationDatabaseName string,
 	migrationsToRun []versions.Migration,
 ) {
 	for _, elem := range migrationsToRun {
-		hasBeenApplied, err := migrations.CheckIfApplied(client, ctx, migrationDatabaseName, elem.Version)
+		err, hasBeenApplied := ms.ApplyMigration(mainDatabaseName, elem)
 		if err != nil {
-			log.Fatalf("Error when checking if migration has been applied: %v", err)
+			log.Fatalf("Error when applying migration %s: %v", elem.Version, err)
 		}
-		if !hasBeenApplied {
-			err = elem.Up(client, ctx, mainDatabaseName)
-			if err != nil {
-				log.Fatalf("Error when applying migration %s: %v", elem.Version, err)
-			}
-			err = migrations.MarkAsApplied(client, ctx, migrationDatabaseName, elem.Version)
-			if err != nil {
-				log.Printf("Error when marking migration %s as applied", elem.Version)
-			}
+		if hasBeenApplied {
+			log.Printf("Migration %s has been applied", elem.Version)
+		} else {
+			log.Printf("Migration %s has not been applied", elem.Version)
 		}
 	}
 }

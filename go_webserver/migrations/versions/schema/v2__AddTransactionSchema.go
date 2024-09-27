@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
-	"webserver/migrations"
+	"webserver/migrations/service"
 	"webserver/migrations/versions"
 )
 
@@ -16,7 +16,7 @@ var MigrationSchema2 = versions.Migration{
 	Version: "2__Schema",
 	Up: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
-		mongoCtx, cancel := context.WithTimeout(ctx, migrations.MigrationTimeout)
+		mongoCtx, cancel := context.WithTimeout(ctx, service.MigrationTimeout)
 		defer cancel()
 		validation := bson.M{
 			"$jsonSchema": bson.M{
@@ -56,7 +56,7 @@ var MigrationSchema2 = versions.Migration{
 	},
 	Down: func(client *mongo.Client, ctx context.Context, databaseName string) error {
 		db := client.Database(databaseName)
-		mongoCtx, cancel := context.WithTimeout(ctx, migrations.MigrationTimeout)
+		mongoCtx, cancel := context.WithTimeout(ctx, service.MigrationTimeout)
 		defer cancel()
 		err := db.Collection(collection).Drop(mongoCtx)
 		if err != nil {
