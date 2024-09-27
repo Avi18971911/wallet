@@ -96,7 +96,7 @@ func TestAddTransaction(t *testing.T) {
 		reallyHighAmount := "99999999.99"
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, reallyHighAmount, ctx)
 		assert.NotNil(t, err)
-		assert.EqualError(t, err, "insufficient balance")
+		assert.EqualError(t, err, "insufficient balance in Account "+tomAccountName)
 	})
 }
 

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -119,10 +118,6 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 	}
 }
 
-type AccountBalance struct {
-	AvailableBalance primitive.Decimal128 `bson:"accounts.availableBalance"`
-}
-
 func (ar *AccountRepositoryMongodb) GetAccountBalance(accountId string, ctx context.Context) (decimal.Decimal, error) {
 	objectId, err := utils.StringToObjectId(accountId)
 	defaultDecimal := decimal.NewFromInt(0)
@@ -131,14 +126,14 @@ func (ar *AccountRepositoryMongodb) GetAccountBalance(accountId string, ctx cont
 			fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
 	}
 	filter := bson.M{"accounts._id": objectId}
-	projection := bson.M{"accounts.$.availableBalance": 1}
-	var accountBalance AccountBalance
-	err = ar.col.FindOne(ctx, filter, options.FindOne().SetProjection(projection)).Decode(&accountBalance)
+	projection := bson.M{"accounts.$": 1}
+	var account mongodb.MongoAccountInput
+	err = ar.col.FindOne(ctx, filter, options.FindOne().SetProjection(projection)).Decode(&account)
 	if err != nil {
 		return defaultDecimal,
 			fmt.Errorf("error when finding account by ID %s: %w", accountId, err)
 	}
-	balanceDecimal, err := utils.FromPrimitiveDecimal128ToDecimal(accountBalance.AvailableBalance)
+	balanceDecimal, err := utils.FromPrimitiveDecimal128ToDecimal(account.Accounts[0].AvailableBalance)
 	if err != nil {
 		return defaultDecimal,
 			fmt.Errorf("error when converting available balance to decimal for accountId %s: %w", accountId, err)
