@@ -116,8 +116,16 @@ func TestAddTransaction(t *testing.T) {
 			t.Errorf("Error in finding Tom's's account details: %v", err)
 		}
 
-		assert.Equal(t, utils.SamAccountDetails.Accounts[0].AvailableBalance.String(), samDetails.Accounts[0].AvailableBalance.String())
-		assert.Equal(t, utils.TomAccountDetails.Accounts[0].AvailableBalance.String(), tomDetails.Accounts[0].AvailableBalance.String())
+		assert.Equal(
+			t,
+			utils.SamAccountDetails.Accounts[0].AvailableBalance.String(),
+			samDetails.Accounts[0].AvailableBalance.String(),
+		)
+		assert.Equal(
+			t,
+			utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
+			tomDetails.Accounts[0].AvailableBalance.String(),
+		)
 	})
 }
 
