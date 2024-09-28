@@ -128,8 +128,8 @@ func setupAddTransactionTestCase(
 	t *testing.T,
 ) {
 	log.Printf("Cleaning up the database")
-	utils.CleanupMigrations(tranCollection, ctx)
-	utils.CleanupMigrations(accCollection, ctx)
+	utils.CleanupCollection(tranCollection, ctx)
+	utils.CleanupCollection(accCollection, ctx)
 
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {

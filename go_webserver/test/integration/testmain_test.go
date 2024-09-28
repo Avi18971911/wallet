@@ -27,10 +27,11 @@ func TestMain(m *testing.M) {
 	}
 
 	mainDatabaseName, migrationDatabaseName := utils.TestDatabaseName, "migrations"
+	migrationCollectionName := "migrations"
 	if mongoClient == nil {
 		log.Fatalf("mongoClient is uninitialized or otherwise nil")
 	}
-	ms := service.NewMigrationService(mongoClient, ctx, migrationDatabaseName)
+	ms := service.NewMigrationService(mongoClient, ctx, migrationDatabaseName, migrationCollectionName)
 	migrations := schema.SchemaMigrations
 	for _, elem := range migrations {
 		_, hasBeenApplied := ms.ApplyMigration(mainDatabaseName, elem)

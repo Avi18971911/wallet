@@ -59,8 +59,8 @@ func setupGetAccountDetailsTestCase(
 	tranCollection *mongo.Collection,
 	ctx context.Context,
 ) {
-	utils.CleanupMigrations(tranCollection, ctx)
-	utils.CleanupMigrations(accCollection, ctx)
+	utils.CleanupCollection(tranCollection, ctx)
+	utils.CleanupCollection(accCollection, ctx)
 }
 
 func TestGetAccountTransactions(t *testing.T) {
@@ -126,8 +126,8 @@ func setupGetAccountTransactionsTestCase(
 	ctx context.Context,
 	t *testing.T,
 ) {
-	utils.CleanupMigrations(tranCollection, ctx)
-	utils.CleanupMigrations(accCollection, ctx)
+	utils.CleanupCollection(tranCollection, ctx)
+	utils.CleanupCollection(accCollection, ctx)
 
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {
@@ -249,8 +249,8 @@ func setupLoginTestCase(
 	ctx context.Context,
 	t *testing.T,
 ) {
-	utils.CleanupMigrations(tranCollection, ctx)
-	utils.CleanupMigrations(accCollection, ctx)
+	utils.CleanupCollection(tranCollection, ctx)
+	utils.CleanupCollection(accCollection, ctx)
 
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 	if tomErr != nil {

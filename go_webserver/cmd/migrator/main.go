@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	mainDatabaseName, migrationDatabaseName := "wallet", "migrations"
+	mainDatabaseName, migrationDatabaseName, migrationCollectionName := "wallet", "migrations", "migrations"
 	mongoURL := os.Getenv("MONGO_URL")
 	log.Printf("Attempting to connect to Mongo URL %s", mongoURL)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -36,7 +36,7 @@ func main() {
 	dataStartVer := parseEnvAsInt("DATA_START_VER", 1)
 	dataEndVer := parseEnvAsInt("DATA_END_VER", 1)
 
-	ms := service.NewMigrationService(client, ctx, migrationDatabaseName)
+	ms := service.NewMigrationService(client, ctx, migrationDatabaseName, migrationCollectionName)
 
 	log.Printf("Applying schema migrations to database %s", mainDatabaseName)
 	applyMigrations(ms, mainDatabaseName, schema.SchemaMigrations, schemaStartVer, schemaEndVer)

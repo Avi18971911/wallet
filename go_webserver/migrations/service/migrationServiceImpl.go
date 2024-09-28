@@ -11,30 +11,32 @@ import (
 )
 
 const MigrationTimeout = time.Minute * 1
-const migrationCollectionName = "migrations"
 
 type MigrationServiceImpl struct {
-	client                *mongo.Client
-	ctx                   context.Context
-	migrationDatabaseName string
+	client                  *mongo.Client
+	ctx                     context.Context
+	migrationDatabaseName   string
+	migrationCollectionName string
 }
 
 func NewMigrationService(
 	client *mongo.Client,
 	ctx context.Context,
 	migrationDatabaseName string,
+	migrationCollectionName string,
 ) *MigrationServiceImpl {
 	return &MigrationServiceImpl{
-		client:                client,
-		ctx:                   ctx,
-		migrationDatabaseName: migrationDatabaseName,
+		client:                  client,
+		ctx:                     ctx,
+		migrationDatabaseName:   migrationDatabaseName,
+		migrationCollectionName: migrationCollectionName,
 	}
 }
 
 // CheckIfApplied TODO: Set this function to private after finding out a way to test them
 func (ms *MigrationServiceImpl) CheckIfApplied(version string) (bool, error) {
 	db := ms.client.Database(ms.migrationDatabaseName)
-	collection := db.Collection(migrationCollectionName)
+	collection := db.Collection(ms.migrationCollectionName)
 	mongoCtx, cancel := context.WithTimeout(ms.ctx, MigrationTimeout)
 	defer cancel()
 	filter := bson.M{"version": version}
@@ -51,7 +53,7 @@ func (ms *MigrationServiceImpl) CheckIfApplied(version string) (bool, error) {
 // MarkAsApplied TODO: Set this function to private after finding out a way to test them
 func (ms *MigrationServiceImpl) MarkAsApplied(version string) error {
 	db := ms.client.Database(ms.migrationDatabaseName)
-	collection := db.Collection(migrationCollectionName)
+	collection := db.Collection(ms.migrationCollectionName)
 	mongoCtx, cancel := context.WithTimeout(ms.ctx, MigrationTimeout)
 	defer cancel()
 	_, err := collection.InsertOne(mongoCtx, bson.M{"version": version})

@@ -178,6 +178,6 @@ func CleanupDatabase(client *mongo.Client, ctx context.Context) error {
 const TestDatabaseName = "wallet"
 const MongoURI = "mongodb://mongo:30001/?replicaSet=rs0"
 
-func CleanupMigrations(collection *mongo.Collection, ctx context.Context) {
-	collection.Drop(ctx)
+func CleanupCollection(collection *mongo.Collection, ctx context.Context) {
+	collection.DeleteMany(ctx, bson.D{})
 }
