@@ -25,11 +25,10 @@ func TestGetAccountDetails(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
-	utils.CleanupMigrations(tranCollection, ctx)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
-	utils.CleanupMigrations(accCollection, ctx)
 
 	t.Run("Allows the retrieval of account details from an inserted account record", func(t *testing.T) {
+		setupGetAccountDetailsTestCase(accCollection, tranCollection, ctx)
 		_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
 		if tomErr != nil {
 			t.Errorf("Error inserting Tom's record %v", tomErr)
@@ -55,21 +54,20 @@ func TestGetAccountDetails(t *testing.T) {
 	})
 }
 
+func setupGetAccountDetailsTestCase(
+	accCollection *mongo.Collection,
+	tranCollection *mongo.Collection,
+	ctx context.Context,
+) {
+	utils.CleanupMigrations(tranCollection, ctx)
+	utils.CleanupMigrations(accCollection, ctx)
+}
+
 func TestGetAccountTransactions(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
-	utils.CleanupMigrations(tranCollection, ctx)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
-	utils.CleanupMigrations(accCollection, ctx)
-	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
-	if tomErr != nil {
-		t.Errorf("Error inserting Tom's record %v", tomErr)
-	}
-	_, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
-	if samErr != nil {
-		t.Errorf("Error inserting Tom's record %v", samErr)
-	}
 
 	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
 	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
@@ -98,6 +96,7 @@ func TestGetAccountTransactions(t *testing.T) {
 	t.Run(
 		"Allows the insertion of transactions and the retrieval of all transactions from an account",
 		func(t *testing.T) {
+			setupGetAccountTransactionsTestCase(accCollection, tranCollection, ctx, t)
 			_, err := tranCollection.InsertMany(ctx, transactionsInput)
 			if err != nil {
 				t.Errorf("Error inserting transactions: %v", err)
@@ -121,12 +120,13 @@ func TestGetAccountTransactions(t *testing.T) {
 	)
 }
 
-func TestLogins(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
-	defer cancel()
-	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
+func setupGetAccountTransactionsTestCase(
+	accCollection *mongo.Collection,
+	tranCollection *mongo.Collection,
+	ctx context.Context,
+	t *testing.T,
+) {
 	utils.CleanupMigrations(tranCollection, ctx)
-	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
 	utils.CleanupMigrations(accCollection, ctx)
 
 	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
@@ -137,34 +137,6 @@ func TestLogins(t *testing.T) {
 	if samErr != nil {
 		t.Errorf("Error inserting Tom's record %v", samErr)
 	}
-
-	t.Run("Allows the login of a user with the correct password", func(t *testing.T) {
-		service := setupAccountService(mongoClient, tranCollection, accCollection)
-		accountDetails, err := service.Login(utils.TomAccountDetails.Username, utils.TomAccountDetails.Password, ctx)
-		if err != nil {
-			t.Fatalf("Error logging in: %v", err)
-		}
-		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
-		assert.Equal(
-			t, utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
-			accountDetails.Accounts[0].AvailableBalance.String(),
-		)
-	})
-
-	t.Run("Does not allow the login of a user with the incorrect password", func(t *testing.T) {
-		service := setupAccountService(mongoClient, tranCollection, accCollection)
-		_, err := service.Login(utils.TomAccountDetails.Username, "wrongpassword", ctx)
-		assert.NotNil(t, err)
-		assert.EqualError(t, err, "invalid username or password")
-	})
-
-	t.Run("Does not allow the login of a user with the incorrect username", func(t *testing.T) {
-		service := setupAccountService(mongoClient, tranCollection, accCollection)
-		_, err := service.Login("wrongusername", utils.TomAccountDetails.Password, ctx)
-		assert.NotNil(t, err)
-		assert.EqualError(t, err, "invalid username or password")
-	})
-
 }
 
 func makeTransactionsInput(
@@ -232,6 +204,61 @@ func assertExpectedMatchesResult(
 		assert.Equal(t, expectedResults[i].OtherAccountId, res[i].OtherAccountId)
 		assert.Equal(t, expectedResults[i].Amount.String(), res[i].Amount.String())
 		assert.Equal(t, expectedResults[i].CreatedAt, res[i].CreatedAt)
+	}
+}
+
+func TestLogins(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	defer cancel()
+	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
+	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
+
+	t.Run("Allows the login of a user with the correct password", func(t *testing.T) {
+		setupLoginTestCase(accCollection, tranCollection, ctx, t)
+		service := setupAccountService(mongoClient, tranCollection, accCollection)
+		accountDetails, err := service.Login(utils.TomAccountDetails.Username, utils.TomAccountDetails.Password, ctx)
+		if err != nil {
+			t.Fatalf("Error logging in: %v", err)
+		}
+		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
+		assert.Equal(
+			t, utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
+			accountDetails.Accounts[0].AvailableBalance.String(),
+		)
+	})
+
+	t.Run("Does not allow the login of a user with the incorrect password", func(t *testing.T) {
+		service := setupAccountService(mongoClient, tranCollection, accCollection)
+		_, err := service.Login(utils.TomAccountDetails.Username, "wrongpassword", ctx)
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "invalid username or password")
+	})
+
+	t.Run("Does not allow the login of a user with the incorrect username", func(t *testing.T) {
+		service := setupAccountService(mongoClient, tranCollection, accCollection)
+		_, err := service.Login("wrongusername", utils.TomAccountDetails.Password, ctx)
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "invalid username or password")
+	})
+
+}
+
+func setupLoginTestCase(
+	accCollection *mongo.Collection,
+	tranCollection *mongo.Collection,
+	ctx context.Context,
+	t *testing.T,
+) {
+	utils.CleanupMigrations(tranCollection, ctx)
+	utils.CleanupMigrations(accCollection, ctx)
+
+	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
+	if tomErr != nil {
+		t.Errorf("Error inserting Tom's record %v", tomErr)
+	}
+	_, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
+	if samErr != nil {
+		t.Errorf("Error inserting Tom's record %v", samErr)
 	}
 }
 

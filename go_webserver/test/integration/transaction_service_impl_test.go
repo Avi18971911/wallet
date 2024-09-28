@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"testing"
 	"time"
 	"webserver/internal/pkg/domain/model"
@@ -25,20 +26,11 @@ func TestAddTransaction(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
-	utils.CleanupMigrations(tranCollection, ctx)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
-	utils.CleanupMigrations(accCollection, ctx)
-	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
-	if tomErr != nil {
-		t.Errorf("Error inserting Tom's record %v", tomErr)
-	}
-	_, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
-	if samErr != nil {
-		t.Errorf("Error inserting Tom's record %v", samErr)
-	}
 
 	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
 	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
+
 	service := setupTransactionService(mongoClient, tranCollection, accCollection)
 	transferAmount, _ := decimal.NewFromString("100.00")
 	input := model.TransactionDetails{
@@ -48,6 +40,7 @@ func TestAddTransaction(t *testing.T) {
 	}
 
 	t.Run("Should be able to insert transactions", func(t *testing.T) {
+		setupAddTransactionTestCase(tranCollection, accCollection, ctx, t)
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, input.Amount.String(), ctx)
 		assert.Nil(t, err)
 		samFind, tomFind := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
@@ -93,6 +86,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 
 	t.Run("Should not be able to insert transactions with insufficient balance", func(t *testing.T) {
+		setupAddTransactionTestCase(tranCollection, accCollection, ctx, t)
 		reallyHighAmount := "99999999.99"
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, reallyHighAmount, ctx)
 		assert.NotNil(t, err)
@@ -100,6 +94,7 @@ func TestAddTransaction(t *testing.T) {
 	})
 
 	t.Run("Should not carry out transaction if there is an error", func(t *testing.T) {
+		setupAddTransactionTestCase(tranCollection, accCollection, ctx, t)
 		reallyHighAmount := "99999999.99"
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, reallyHighAmount, ctx)
 		assert.NotNil(t, err)
@@ -124,6 +119,26 @@ func TestAddTransaction(t *testing.T) {
 		assert.Equal(t, utils.SamAccountDetails.Accounts[0].AvailableBalance.String(), samDetails.Accounts[0].AvailableBalance.String())
 		assert.Equal(t, utils.TomAccountDetails.Accounts[0].AvailableBalance.String(), tomDetails.Accounts[0].AvailableBalance.String())
 	})
+}
+
+func setupAddTransactionTestCase(
+	tranCollection *mongo.Collection,
+	accCollection *mongo.Collection,
+	ctx context.Context,
+	t *testing.T,
+) {
+	log.Printf("Cleaning up the database")
+	utils.CleanupMigrations(tranCollection, ctx)
+	utils.CleanupMigrations(accCollection, ctx)
+
+	_, tomErr := accCollection.InsertOne(ctx, utils.TomAccountDetails)
+	if tomErr != nil {
+		t.Errorf("Error inserting Tom's record %v", tomErr)
+	}
+	_, samErr := accCollection.InsertOne(ctx, utils.SamAccountDetails)
+	if samErr != nil {
+		t.Errorf("Error inserting Tom's record %v", samErr)
+	}
 }
 
 func setupTransactionService(
