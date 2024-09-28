@@ -98,6 +98,32 @@ func TestAddTransaction(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.EqualError(t, err, "insufficient balance in Account "+tomAccountName)
 	})
+
+	t.Run("Should not carry out transaction if there is an error", func(t *testing.T) {
+		reallyHighAmount := "99999999.99"
+		err := service.AddTransaction(input.ToAccount, input.FromAccount, reallyHighAmount, ctx)
+		assert.NotNil(t, err)
+		samDetails, tomDetails := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
+
+		err = accCollection.FindOne(
+			ctx, bson.M{"accounts._id": utils.SamAccountDetails.Accounts[0].Id},
+		).Decode(&samDetails)
+
+		if err != nil {
+			t.Errorf("Error in finding Sam's account details: %v", err)
+		}
+
+		err = accCollection.FindOne(
+			ctx, bson.M{"accounts._id": utils.TomAccountDetails.Accounts[0].Id},
+		).Decode(&tomDetails)
+
+		if err != nil {
+			t.Errorf("Error in finding Tom's's account details: %v", err)
+		}
+
+		assert.Equal(t, utils.SamAccountDetails.Accounts[0].AvailableBalance.String(), samDetails.Accounts[0].AvailableBalance.String())
+		assert.Equal(t, utils.TomAccountDetails.Accounts[0].AvailableBalance.String(), tomDetails.Accounts[0].AvailableBalance.String())
+	})
 }
 
 func setupTransactionService(

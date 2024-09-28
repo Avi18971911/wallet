@@ -40,8 +40,10 @@ func (t *TransactionServiceImpl) AddTransaction(
 		return fmt.Errorf("error when starting Add Transaction database transaction: %w", err)
 	}
 
+	var shouldRollback = true
+
 	defer func() {
-		if err != nil {
+		if shouldRollback {
 			if rollErr := t.tran.Rollback(txnCtx); rollErr != nil {
 				log.Printf("Error rolling back transaction: %v", rollErr)
 			}
@@ -88,6 +90,7 @@ func (t *TransactionServiceImpl) AddTransaction(
 		return fmt.Errorf("error when committing Add Transaction database transaction: %w", commitErr)
 	}
 
+	shouldRollback = false
 	return nil
 }
 
