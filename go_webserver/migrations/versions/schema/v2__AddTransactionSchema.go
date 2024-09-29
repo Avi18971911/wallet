@@ -21,25 +21,60 @@ var MigrationSchema2 = versions.Migration{
 		validation := bson.M{
 			"$jsonSchema": bson.M{
 				"bsonType": "object",
-				"required": []string{"amount", "_createdAt", "fromAccount", "toAccount"},
+				"required": []string{"amount", "_createdAt", "fromAccount", "toAccount", "type", "_id"},
 				"properties": bson.M{
+					"_id": bson.M{
+						"bsonType":    "objectId",
+						"description": "the unique identifier for the transaction [required]",
+					},
 					"amount": bson.M{
 						"bsonType":    "decimal",
-						"description": "the amount transferred",
+						"description": "the amount transferred [required]",
 					},
 					"_createdAt": bson.M{
 						"bsonType":    "timestamp",
-						"description": "the time the transactions has been created",
+						"description": "the time the transactions has been created [required]",
 					},
 					"fromAccount": bson.M{
 						"bsonType":    "objectId",
-						"description": "the account from which the amount is coming",
+						"description": "the account from which the amount is coming [required]",
 					},
 					"toAccount": bson.M{
 						"bsonType":    "objectId",
-						"description": "the account to which the amount is going",
+						"description": "the account to which the amount is going [required]",
+					},
+					"type": bson.M{
+						"bsonType":    "string",
+						"description": "the type of transaction [required]",
+						"enum":        []string{"pending", "realized"},
 					},
 				},
+			},
+
+			// Conditional validation
+			"if": bson.M{
+				"properties": bson.M{
+					"type": bson.M{
+						"enum": []string{"pending"},
+					},
+				},
+			},
+			"then": bson.M{
+				"required": []string{"expirationDate", "status"},
+				"properties": bson.M{
+					"expirationDate": bson.M{
+						"bsonType":    "date",
+						"description": "the date when the pending transaction should be revoked [required]",
+					},
+					"status": bson.M{
+						"bsonType":    "string",
+						"description": "the status of the transaction [required]",
+						"enum":        []string{"active, applied, revoked"},
+					},
+				},
+			},
+			"else": bson.M{
+				// No additional required fields for "realized" transactions
 			},
 		}
 
