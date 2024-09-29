@@ -26,18 +26,18 @@ func CreateNewAccountServiceImpl(
 }
 
 func validateAccountDetails(accountDetails *model.AccountDetails) error {
-	err := validateAccountNumbers(accountDetails.Accounts)
+	err := validateAccountNumbers(accountDetails.BankAccounts)
 	if err != nil {
 		return fmt.Errorf("unable to validate account numbers with error: %w", err)
 	}
-	err = validateAccountTypes(accountDetails.Accounts)
+	err = validateAccountTypes(accountDetails.BankAccounts)
 	if err != nil {
 		return fmt.Errorf("unable to validate account types with error: %w", err)
 	}
 	return nil
 }
 
-func validateAccountNumbers(accounts []model.Account) error {
+func validateAccountNumbers(accounts []model.BankAccount) error {
 	const pattern = `^\d{3}-\d{5}-\d{1}$`
 	var accountNumberRegex, err = regexp.Compile(pattern)
 	if err != nil {
@@ -52,7 +52,7 @@ func validateAccountNumbers(accounts []model.Account) error {
 	return nil
 }
 
-func validateAccountTypes(accounts []model.Account) error {
+func validateAccountTypes(accounts []model.BankAccount) error {
 	for _, account := range accounts {
 		if account.AccountType > model.Investment || account.AccountType < model.Savings {
 			return errors.New("account type is not a valid type of account. " +
@@ -62,33 +62,36 @@ func validateAccountTypes(accounts []model.Account) error {
 	return nil
 }
 
-func (a *AccountServiceImpl) GetAccountDetails(accountId string, ctx context.Context) (*model.AccountDetails, error) {
+func (a *AccountServiceImpl) GetAccountDetailsFromBankAccountId(
+	bankAccountId string,
+	ctx context.Context,
+) (*model.AccountDetails, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
-	accountDetails, err := a.ar.GetAccountDetails(accountId, getCtx)
+	accountDetails, err := a.ar.GetAccountDetailsFromBankAccountId(bankAccountId, getCtx)
 	if err != nil {
-		log.Printf("Unable to get account details for Account %s with error: %v", accountId, err)
+		log.Printf("Unable to get account details for BankAccount %s with error: %v", bankAccountId, err)
 		return nil, fmt.Errorf("unable to get account details with error: %w", err)
 	}
 	err = validateAccountDetails(accountDetails)
 	if err != nil {
-		log.Printf("Unable to successfully validate account details for Account %s with error: "+
-			"%v", accountId, err)
+		log.Printf("Unable to successfully validate account details for BankAccount %s with error: "+
+			"%v", bankAccountId, err)
 		return nil, fmt.Errorf("unable to validate account details with error: %w", err)
 	}
 	return accountDetails, nil
 }
 
-func (a *AccountServiceImpl) GetAccountTransactions(
-	accountId string, ctx context.Context,
-) ([]model.AccountTransaction, error) {
+func (a *AccountServiceImpl) GetBankAccountTransactions(
+	bankAccountId string, ctx context.Context,
+) ([]model.BankAccountTransaction, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
 	txnCtx, err := a.tran.BeginTransaction(getCtx, transactional.IsolationHigh, transactional.DurabilityHigh)
 	if err != nil {
-		log.Printf("Error encountered when starting Get Account Transactions database transaction for "+
-			"Account %s: %v", accountId, err)
+		log.Printf("Error encountered when starting Get BankAccount Transactions database transaction for "+
+			"BankAccount %s: %v", bankAccountId, err)
 		return nil, fmt.Errorf("unable to begin transaction with error: %w", err)
 	}
 
@@ -98,9 +101,9 @@ func (a *AccountServiceImpl) GetAccountTransactions(
 		}
 	}()
 
-	accountTransactions, err := a.tr.GetAccountTransactions(accountId, getCtx)
+	accountTransactions, err := a.tr.GetTransactionsFromBankAccountId(bankAccountId, getCtx)
 	if err != nil {
-		log.Printf("Unable to get transaction details for Account %s with error: %v", accountId, err)
+		log.Printf("Unable to get transaction details for BankAccount %s with error: %v", bankAccountId, err)
 		return nil, fmt.Errorf("unable to get transaction details with error: %w", err)
 	}
 	return accountTransactions, nil

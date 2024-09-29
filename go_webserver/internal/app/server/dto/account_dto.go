@@ -4,9 +4,9 @@ import (
 	"time"
 )
 
-// KnownAccountDTO represents an account known to and recognized by a particular account
-// @swagger:model KnownAccountDTO
-type KnownAccountDTO struct {
+// KnownBankAccountDTO represents an account known to and recognized by a particular account
+// @swagger:model KnownBankAccountDTO
+type KnownBankAccountDTO struct {
 	// The account ID of the known account
 	Id string `json:"id" validate:"required"`
 	// The account number of the known account
@@ -26,10 +26,10 @@ type AccountDetailsDTO struct {
 	Username string `json:"username" validate:"required"`
 	// The account holder associated with the account
 	Person PersonDTO `json:"person" validate:"required"`
-	// The list of accounts associated with the account holder
-	Accounts []AccountDTO `json:"accounts" validate:"required"`
-	// The list of accounts known to and recognized by the account holder
-	KnownAccounts []KnownAccountDTO `json:"knownAccounts" validate:"required"`
+	// The list of bank accounts associated with the account holder
+	BankAccounts []BankAccountDTO `json:"bankAccounts" validate:"required"`
+	// The list of bank accounts known to and recognized by the account holder
+	KnownBankAccounts []KnownBankAccountDTO `json:"knownBankAccounts" validate:"required"`
 	// The creation timestamp of the account
 	CreatedAt time.Time `json:"createdAt" validate:"required"`
 }
@@ -39,10 +39,10 @@ type AccountDetailsDTO struct {
 type AccountTransactionDTO struct {
 	// The unique identifier of the transaction
 	Id string `json:"id" validate:"required"`
-	// The primary account ID associated with the transaction
-	AccountId string `json:"accountId" validate:"required"`
-	// The other account ID involved in the transaction
-	OtherAccountId string `json:"otherAccountId" validate:"required"`
+	// The primary bank account ID associated with the transaction
+	BankAccountId string `json:"bankAccountId" validate:"required"`
+	// The other bank account ID involved in the transaction
+	OtherBankAccountId string `json:"otherBankAccountId" validate:"required"`
 	// The type of the transaction (debit or credit)
 	TransactionType string `json:"transactionType" validate:"required"`
 	// The amount involved in the transaction. Valid to two decimal places.
@@ -60,9 +60,9 @@ type AccountLoginDTO struct {
 	Password string `json:"password" validate:"required"`
 }
 
-// AccountDTO represents an account associated with an account holder
-// @swagger:model AccountDTO
-type AccountDTO struct {
+// BankAccountDTO represents a bank account associated with an account holder
+// @swagger:model BankAccountDTO
+type BankAccountDTO struct {
 	// The unique identifier of the account
 	Id string `json:"id" validate:"required"`
 	// The account number associated with the account

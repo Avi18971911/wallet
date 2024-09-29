@@ -20,8 +20,8 @@ func fromMongoAccountType(accountType string) int {
 	}
 }
 
-func fromMongoKnownAccount(knownAccount []mongodb.KnownBankAccount) ([]model.KnownAccount, error) {
-	var res = make([]model.KnownAccount, len(knownAccount))
+func fromMongoKnownAccount(knownAccount []mongodb.KnownBankAccount) ([]model.KnownBankAccount, error) {
+	var res = make([]model.KnownBankAccount, len(knownAccount))
 	for i, ka := range knownAccount {
 		stringId, err := utils.ObjectIdToString(ka.Id)
 		if err != nil {
@@ -29,7 +29,7 @@ func fromMongoKnownAccount(knownAccount []mongodb.KnownBankAccount) ([]model.Kno
 				"error when converting object ID to string for known account %s: %v", ka.AccountNumber, err,
 			)
 		}
-		res[i] = model.KnownAccount{
+		res[i] = model.KnownBankAccount{
 			Id:            stringId,
 			AccountNumber: ka.AccountNumber,
 			AccountHolder: ka.AccountHolder,
@@ -39,8 +39,8 @@ func fromMongoKnownAccount(knownAccount []mongodb.KnownBankAccount) ([]model.Kno
 	return res, nil
 }
 
-func fromMongoAccounts(accounts []mongodb.BankAccount) ([]model.Account, error) {
-	var res = make([]model.Account, len(accounts))
+func fromMongoAccounts(accounts []mongodb.BankAccount) ([]model.BankAccount, error) {
+	var res = make([]model.BankAccount, len(accounts))
 	for i, a := range accounts {
 		stringId, err := utils.ObjectIdToString(a.Id)
 		if err != nil {
@@ -54,7 +54,7 @@ func fromMongoAccounts(accounts []mongodb.BankAccount) ([]model.Account, error) 
 				"error when converting available balance to decimal for account number %s: %v", a.AccountNumber, err,
 			)
 		}
-		res[i] = model.Account{
+		res[i] = model.BankAccount{
 			Id:               stringId,
 			AccountNumber:    a.AccountNumber,
 			AccountType:      fromMongoAccountType(a.AccountType),
@@ -88,8 +88,8 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountOutput) (*model.Accoun
 			FirstName: details.Person.FirstName,
 			LastName:  details.Person.LastName,
 		},
-		Accounts:      mongoAccounts,
-		KnownAccounts: knownAccounts,
-		CreatedAt:     utils.TimestampToTime(details.CreatedAt),
+		BankAccounts:      mongoAccounts,
+		KnownBankAccounts: knownAccounts,
+		CreatedAt:         utils.TimestampToTime(details.CreatedAt),
 	}, nil
 }

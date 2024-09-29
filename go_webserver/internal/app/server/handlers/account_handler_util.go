@@ -7,14 +7,14 @@ import (
 	"webserver/internal/pkg/domain/model"
 )
 
-func knownAccountToDTO(tx []model.KnownAccount) []dto.KnownAccountDTO {
-	knownAccountDTOList := make([]dto.KnownAccountDTO, len(tx))
+func knownAccountToDTO(tx []model.KnownBankAccount) []dto.KnownBankAccountDTO {
+	knownAccountDTOList := make([]dto.KnownBankAccountDTO, len(tx))
 	for i, element := range tx {
 		accountType, err := accountTypeEnumToString(element.AccountType)
 		if err != nil {
 			log.Printf("Failed to convert account type to string: %v", err)
 		}
-		knownAccountDTOList[i] = dto.KnownAccountDTO{
+		knownAccountDTOList[i] = dto.KnownBankAccountDTO{
 			Id:            element.Id,
 			AccountNumber: element.AccountNumber,
 			AccountHolder: element.AccountHolder,
@@ -24,14 +24,14 @@ func knownAccountToDTO(tx []model.KnownAccount) []dto.KnownAccountDTO {
 	return knownAccountDTOList
 }
 
-func accountsToDTO(tx []model.Account) []dto.AccountDTO {
-	accountDTOList := make([]dto.AccountDTO, len(tx))
+func accountsToDTO(tx []model.BankAccount) []dto.BankAccountDTO {
+	accountDTOList := make([]dto.BankAccountDTO, len(tx))
 	for i, element := range tx {
 		accountType, err := accountTypeEnumToString(element.AccountType)
 		if err != nil {
 			log.Printf("Failed to convert account type to string: %v", err)
 		}
-		accountDTOList[i] = dto.AccountDTO{
+		accountDTOList[i] = dto.BankAccountDTO{
 			Id:               element.Id,
 			AccountNumber:    element.AccountNumber,
 			AccountType:      accountType,
@@ -49,22 +49,22 @@ func accountDetailsToDTO(tx *model.AccountDetails) dto.AccountDetailsDTO {
 			FirstName: tx.Person.FirstName,
 			LastName:  tx.Person.LastName,
 		},
-		Accounts:      accountsToDTO(tx.Accounts),
-		KnownAccounts: knownAccountToDTO(tx.KnownAccounts),
-		CreatedAt:     tx.CreatedAt,
+		BankAccounts:      accountsToDTO(tx.BankAccounts),
+		KnownBankAccounts: knownAccountToDTO(tx.KnownBankAccounts),
+		CreatedAt:         tx.CreatedAt,
 	}
 }
 
-func accountTransactionToDTO(tx []model.AccountTransaction) []dto.AccountTransactionDTO {
+func accountTransactionToDTO(tx []model.BankAccountTransaction) []dto.AccountTransactionDTO {
 	accountTransactionDTOList := make([]dto.AccountTransactionDTO, len(tx))
 	for i, element := range tx {
 		accountTransactionDTOList[i] = dto.AccountTransactionDTO{
-			Id:              element.Id,
-			AccountId:       element.AccountId,
-			OtherAccountId:  element.OtherAccountId,
-			TransactionType: element.TransactionType,
-			Amount:          element.Amount.String(),
-			CreatedAt:       element.CreatedAt,
+			Id:                 element.Id,
+			BankAccountId:      element.BankAccountId,
+			OtherBankAccountId: element.OtherBankAccountId,
+			TransactionType:    element.TransactionType,
+			Amount:             element.Amount.String(),
+			CreatedAt:          element.CreatedAt,
 		}
 	}
 	return accountTransactionDTOList

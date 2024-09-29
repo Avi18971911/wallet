@@ -3,7 +3,7 @@ package model
 import "github.com/shopspring/decimal"
 
 type TransactionDetails struct {
-	FromAccount string
-	ToAccount   string
-	Amount      decimal.Decimal
+	FromBankAccountId string
+	ToBankAccountId   string
+	Amount            decimal.Decimal
 }

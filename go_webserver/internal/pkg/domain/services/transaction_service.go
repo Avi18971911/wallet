@@ -6,8 +6,8 @@ import (
 
 type TransactionService interface {
 	AddTransaction(
-		toAccount string,
-		fromAccount string,
+		toBankAccountId string,
+		fromBankAccountId string,
 		amount string,
 		ctx context.Context,
 	) error

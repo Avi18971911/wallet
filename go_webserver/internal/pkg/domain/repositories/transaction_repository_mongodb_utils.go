@@ -11,13 +11,13 @@ import (
 func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.MongoTransactionInput, error) {
 	var fromAccount, toAccount primitive.ObjectID
 	var err error
-	fromAccount, err = utils.StringToObjectId(details.FromAccount)
+	fromAccount, err = utils.StringToObjectId(details.FromBankAccountId)
 	if err != nil {
-		return nil, fmt.Errorf("error when converting fromAccount %s to ObjectID: %w", details.FromAccount, err)
+		return nil, fmt.Errorf("error when converting fromAccount %s to ObjectID: %w", details.FromBankAccountId, err)
 	}
-	toAccount, err = utils.StringToObjectId(details.ToAccount)
+	toAccount, err = utils.StringToObjectId(details.ToBankAccountId)
 	if err != nil {
-		return nil, fmt.Errorf("error when converting toAccount %s to ObjectID: %w", details.ToAccount, err)
+		return nil, fmt.Errorf("error when converting toAccount %s to ObjectID: %w", details.ToBankAccountId, err)
 	}
 	decimal128Amount, err := utils.FromDecimalToPrimitiveDecimal128(details.Amount)
 	if err != nil {
@@ -33,8 +33,8 @@ func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.M
 
 func fromMongoAccountTransaction(
 	accountTransactions []mongodb.MongoAccountTransaction,
-) ([]model.AccountTransaction, error) {
-	var res = make([]model.AccountTransaction, len(accountTransactions))
+) ([]model.BankAccountTransaction, error) {
+	var res = make([]model.BankAccountTransaction, len(accountTransactions))
 	var err error
 	var transactionId, accountId, otherAccountId string
 	for i, elem := range accountTransactions {
@@ -54,13 +54,13 @@ func fromMongoAccountTransaction(
 		if err != nil {
 			return res, fmt.Errorf("error when converting amount to decimal: %w", err)
 		}
-		res[i] = model.AccountTransaction{
-			Id:              transactionId,
-			AccountId:       accountId,
-			OtherAccountId:  otherAccountId,
-			TransactionType: elem.TransactionType,
-			Amount:          decimalAmount,
-			CreatedAt:       utils.TimestampToTime(elem.CreatedAt),
+		res[i] = model.BankAccountTransaction{
+			Id:                 transactionId,
+			BankAccountId:      accountId,
+			OtherBankAccountId: otherAccountId,
+			TransactionType:    elem.TransactionType,
+			Amount:             decimalAmount,
+			CreatedAt:          utils.TimestampToTime(elem.CreatedAt),
 		}
 	}
 	return res, nil

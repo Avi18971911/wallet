@@ -60,7 +60,7 @@ var SamAccountDetails = mongodb.MongoAccountInput{
 
 var TomAccountDetailsModel = model.AccountDetails{
 	Username: "Tom",
-	Accounts: []model.Account{
+	BankAccounts: []model.BankAccount{
 		{
 			Id:               "UUID",
 			AccountNumber:    "123-45678-9",
@@ -72,7 +72,7 @@ var TomAccountDetailsModel = model.AccountDetails{
 		FirstName: "Tom",
 		LastName:  "Smith",
 	},
-	KnownAccounts: []model.KnownAccount{
+	KnownBankAccounts: []model.KnownBankAccount{
 		{
 			Id:            "UUID",
 			AccountNumber: "987-65432-1",

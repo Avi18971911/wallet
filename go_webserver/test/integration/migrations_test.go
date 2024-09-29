@@ -118,5 +118,6 @@ var sampleTransactionDetails = mongodb.MongoTransactionInput{
 	FromBankAccountId: primitive.NewObjectID(),
 	ToBankAccountId:   primitive.NewObjectID(),
 	Amount:            primitive.NewDecimal128(1000, 0),
+	Type:              "realized",
 	CreatedAt:         pkgutils.GetCurrentTimestamp(),
 }

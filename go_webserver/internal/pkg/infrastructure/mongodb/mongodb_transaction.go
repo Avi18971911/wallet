@@ -9,5 +9,8 @@ type MongoTransactionInput struct {
 	FromBankAccountId primitive.ObjectID   `bson:"fromBankAccountId"`
 	ToBankAccountId   primitive.ObjectID   `bson:"toBankAccountId"`
 	Amount            primitive.Decimal128 `bson:"amount"`
+	Type              string               `bson:"type"`
+	ExpirationDate    primitive.Timestamp  `bson:"expirationDate"`
+	Status            string               `bson:"status"`
 	CreatedAt         primitive.Timestamp  `bson:"_createdAt"`
 }

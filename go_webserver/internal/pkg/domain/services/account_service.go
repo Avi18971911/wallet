@@ -6,7 +6,7 @@ import (
 )
 
 type AccountService interface {
-	GetAccountDetails(accountId string, ctx context.Context) (*model.AccountDetails, error)
-	GetAccountTransactions(accountId string, ctx context.Context) ([]model.AccountTransaction, error)
+	GetAccountDetailsFromBankAccountId(bankAccountId string, ctx context.Context) (*model.AccountDetails, error)
+	GetBankAccountTransactions(bankAccountId string, ctx context.Context) ([]model.BankAccountTransaction, error)
 	Login(username string, password string, ctx context.Context) (*model.AccountDetails, error)
 }

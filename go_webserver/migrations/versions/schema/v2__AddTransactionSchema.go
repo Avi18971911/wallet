@@ -18,63 +18,86 @@ var MigrationSchema2 = versions.Migration{
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, service.MigrationTimeout)
 		defer cancel()
+
+		realizedTransferValidation := bson.M{
+			"bsonType": "object",
+			"required": []string{"amount", "_createdAt", "fromBankAccountId", "toBankAccountId", "type", "_id"},
+			"properties": bson.M{
+				"_id": bson.M{
+					"bsonType":    "objectId",
+					"description": "the unique identifier for the transaction [required]",
+				},
+				"amount": bson.M{
+					"bsonType":    "decimal",
+					"description": "the amount transferred [required]",
+				},
+				"_createdAt": bson.M{
+					"bsonType":    "timestamp",
+					"description": "the time the transactions has been created [required]",
+				},
+				"fromBankAccountId": bson.M{
+					"bsonType":    "objectId",
+					"description": "the bank account ID from which the amount is coming [required]",
+				},
+				"toBankAccountId": bson.M{
+					"bsonType":    "objectId",
+					"description": "the bank account ID to which the amount is going [required]",
+				},
+				"type": bson.M{
+					"bsonType":    "string",
+					"description": "the type of transaction [required]",
+					"enum":        []string{"realized"},
+				},
+			},
+		}
+
+		pendingTransferValidation := bson.M{
+			"bsonType": "object",
+			"required": []string{"amount", "_createdAt", "fromBankAccountId", "toBankAccountId", "type", "_id"},
+			"properties": bson.M{
+				"_id": bson.M{
+					"bsonType":    "objectId",
+					"description": "the unique identifier for the transaction [required]",
+				},
+				"amount": bson.M{
+					"bsonType":    "decimal",
+					"description": "the amount transferred [required]",
+				},
+				"_createdAt": bson.M{
+					"bsonType":    "timestamp",
+					"description": "the time the transactions has been created [required]",
+				},
+				"fromBankAccountId": bson.M{
+					"bsonType":    "objectId",
+					"description": "the bank account ID from which the amount is coming [required]",
+				},
+				"toBankAccountId": bson.M{
+					"bsonType":    "objectId",
+					"description": "the bank account ID to which the amount is going [required]",
+				},
+				"type": bson.M{
+					"bsonType":    "string",
+					"description": "the type of transaction [required]",
+					"enum":        []string{"pending"},
+				},
+				"expirationDate": bson.M{
+					"bsonType":    "timestamp",
+					"description": "the exact moment the transaction will expire [required]",
+				},
+				"status": bson.M{
+					"bsonType":    "string",
+					"description": "the status of the transaction [required]",
+					"enum":        []string{"active", "applied", "revoked"},
+				},
+			},
+		}
+
 		validation := bson.M{
 			"$jsonSchema": bson.M{
-				"bsonType": "object",
-				"required": []string{"amount", "_createdAt", "fromBankAccountId", "toBankAccountId", "type", "_id"},
-				"properties": bson.M{
-					"_id": bson.M{
-						"bsonType":    "objectId",
-						"description": "the unique identifier for the transaction [required]",
-					},
-					"amount": bson.M{
-						"bsonType":    "decimal",
-						"description": "the amount transferred [required]",
-					},
-					"_createdAt": bson.M{
-						"bsonType":    "timestamp",
-						"description": "the time the transactions has been created [required]",
-					},
-					"fromBankAccountId": bson.M{
-						"bsonType":    "objectId",
-						"description": "the bank account ID from which the amount is coming [required]",
-					},
-					"toBankAccountId": bson.M{
-						"bsonType":    "objectId",
-						"description": "the bank account ID to which the amount is going [required]",
-					},
-					"type": bson.M{
-						"bsonType":    "string",
-						"description": "the type of transaction [required]",
-						"enum":        []string{"pending", "realized"},
-					},
+				"oneOf": []bson.M{
+					realizedTransferValidation,
+					pendingTransferValidation,
 				},
-			},
-
-			// Conditional validation
-			"if": bson.M{
-				"properties": bson.M{
-					"type": bson.M{
-						"enum": []string{"pending"},
-					},
-				},
-			},
-			"then": bson.M{
-				"required": []string{"expirationDate", "status"},
-				"properties": bson.M{
-					"expirationDate": bson.M{
-						"bsonType":    "date",
-						"description": "the date when the pending transaction should be revoked [required]",
-					},
-					"status": bson.M{
-						"bsonType":    "string",
-						"description": "the status of the transaction [required]",
-						"enum":        []string{"active, applied, revoked"},
-					},
-				},
-			},
-			"else": bson.M{
-				// No additional required fields for "realized" transactions
 			},
 		}
 

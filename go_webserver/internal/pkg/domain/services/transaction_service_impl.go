@@ -25,8 +25,8 @@ func CreateNewTransactionServiceImpl(
 }
 
 func (t *TransactionServiceImpl) AddTransaction(
-	toAccount string,
-	fromAccount string,
+	toBankAccountId string,
+	fromBankAccountId string,
 	amount string,
 	ctx context.Context,
 ) error {
@@ -36,7 +36,7 @@ func (t *TransactionServiceImpl) AddTransaction(
 	txnCtx, err := t.tran.BeginTransaction(addCtx, transactional.IsolationLow, transactional.DurabilityHigh)
 	if err != nil {
 		log.Printf("Error encountered when starting Add Transaction database transaction from "+
-			"Account %s to Account %s: %v", fromAccount, toAccount, err)
+			"BankAccount %s to BankAccount %s: %v", fromBankAccountId, toBankAccountId, err)
 		return fmt.Errorf("error when starting Add Transaction database transaction: %w", err)
 	}
 
@@ -58,30 +58,30 @@ func (t *TransactionServiceImpl) AddTransaction(
 	}
 
 	transactionDetails := model.TransactionDetails{
-		FromAccount: fromAccount,
-		ToAccount:   toAccount,
-		Amount:      amountDecimal,
+		FromBankAccountId: fromBankAccountId,
+		ToBankAccountId:   toBankAccountId,
+		Amount:            amountDecimal,
 	}
 
-	newBalance, err := t.ar.DeductBalance(fromAccount, amountDecimal, txnCtx)
+	newBalance, err := t.ar.DeductBalance(fromBankAccountId, amountDecimal, txnCtx)
 	if err != nil {
-		log.Printf("Error deducting balance from Account %s: %v", fromAccount, err)
-		return fmt.Errorf("error when deducting balance from Account %s: %w", fromAccount, err)
+		log.Printf("Error deducting balance from BankAccount %s: %v", fromBankAccountId, err)
+		return fmt.Errorf("error when deducting balance from BankAccount %s: %w", fromBankAccountId, err)
 	}
 
 	if newBalance.IsNegative() {
-		log.Printf("Insufficient balance in Account %s", fromAccount)
-		return fmt.Errorf("insufficient balance in Account %s", fromAccount)
+		log.Printf("Insufficient balance in BankAccount %s", fromBankAccountId)
+		return fmt.Errorf("insufficient balance in BankAccount %s", fromBankAccountId)
 	}
 
-	if err = t.ar.AddBalance(toAccount, amountDecimal, txnCtx); err != nil {
-		log.Printf("Error adding balance to Account %s: %v", toAccount, err)
-		return fmt.Errorf("error when adding balance to Account %s: %w", toAccount, err)
+	if err = t.ar.AddBalance(toBankAccountId, amountDecimal, txnCtx); err != nil {
+		log.Printf("Error adding balance to BankAccount %s: %v", toBankAccountId, err)
+		return fmt.Errorf("error when adding balance to BankAccount %s: %w", toBankAccountId, err)
 	}
 
 	if err = t.tr.AddTransaction(&transactionDetails, txnCtx); err != nil {
-		log.Printf("Error adding transaction to the database from Account %s to "+
-			"Account %s: %v", fromAccount, toAccount, err)
+		log.Printf("Error adding transaction to the database from BankAccount %s to "+
+			"BankAccount %s: %v", fromBankAccountId, toBankAccountId, err)
 		return fmt.Errorf("error when adding transaction to the database: %w", err)
 	}
 

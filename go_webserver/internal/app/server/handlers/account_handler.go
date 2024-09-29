@@ -20,16 +20,16 @@ import (
 // @Tags accounts
 // @Accept json
 // @Produce json
-// @Param accountId path string true "Account ID"
+// @Param accountId path string true "BankAccount ID"
 // @Success 200 {object} dto.AccountDetailsDTO "Successful retrieval of account details"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId} [get]
 func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]
-		accountDetails, err := s.GetAccountDetails(accountID, ctx)
+		accountDetails, err := s.GetAccountDetailsFromBankAccountId(accountID, ctx)
 		if err != nil {
-			utils.HttpError(w, "Failed to get Account Details", http.StatusInternalServerError)
+			utils.HttpError(w, "Failed to get BankAccount Details", http.StatusInternalServerError)
 			return
 		}
 		jsonAccountDetails := accountDetailsToDTO(accountDetails)
@@ -48,16 +48,16 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param accountId path string true "Account ID"
+// @Param accountId path string true "BankAccount ID"
 // @Success 200 {object} []dto.AccountTransactionDTO "Successful retrieval of account transactions"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId}/transactions [get]
 func AccountTransactionsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]
-		accountTransactions, err := s.GetAccountTransactions(accountID, ctx)
+		accountTransactions, err := s.GetBankAccountTransactions(accountID, ctx)
 		if err != nil {
-			utils.HttpError(w, "Failed to get Account Transactions", http.StatusInternalServerError)
+			utils.HttpError(w, "Failed to get BankAccount Transactions", http.StatusInternalServerError)
 			return
 		}
 		jsonAccountTransactions := accountTransactionToDTO(accountTransactions)

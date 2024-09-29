@@ -9,8 +9,8 @@ type MongoAccountOutput struct {
 	Username          string              `bson:"username"`
 	Password          string              `bson:"password"`
 	Person            Person              `bson:"person"`
-	BankAccounts      []BankAccount       `bson:"accounts"`
-	KnownBankAccounts []KnownBankAccount  `bson:"knownAccounts"`
+	BankAccounts      []BankAccount       `bson:"bankAccounts"`
+	KnownBankAccounts []KnownBankAccount  `bson:"knownBankAccounts"`
 	CreatedAt         primitive.Timestamp `bson:"_createdAt"`
 }
 

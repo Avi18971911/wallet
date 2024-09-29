@@ -7,13 +7,13 @@ import (
 )
 
 type AccountDetails struct {
-	Id            string
-	Username      string
-	Password      string
-	Person        Person
-	Accounts      []Account
-	KnownAccounts []KnownAccount
-	CreatedAt     time.Time
+	Id                string
+	Username          string
+	Password          string
+	Person            Person
+	BankAccounts      []BankAccount
+	KnownBankAccounts []KnownBankAccount
+	CreatedAt         time.Time
 }
 
 const (
@@ -27,27 +27,27 @@ type Person struct {
 	LastName  string
 }
 
-type Account struct {
+type BankAccount struct {
 	Id               string
 	AccountNumber    string
 	AccountType      int
 	AvailableBalance decimal.Decimal
 }
 
-type KnownAccount struct {
+type KnownBankAccount struct {
 	Id            string
 	AccountNumber string
 	AccountHolder string
 	AccountType   int
 }
 
-type AccountTransaction struct {
-	Id              string
-	AccountId       string
-	OtherAccountId  string
-	TransactionType string
-	Amount          decimal.Decimal
-	CreatedAt       time.Time
+type BankAccountTransaction struct {
+	Id                 string
+	BankAccountId      string
+	OtherBankAccountId string
+	TransactionType    string
+	Amount             decimal.Decimal
+	CreatedAt          time.Time
 }
 
 var (

@@ -27,38 +27,39 @@ func (tr *TransactionRepositoryMongodb) AddTransaction(
 	mongoDetails, err := fromDomainTransactionDetails(details)
 	if err != nil {
 		return fmt.Errorf("error when converting domain TransactionDetails to mongo TransactionDetails "+
-			"from BankAccount %s to BankAccount %s: %w", details.FromAccount, details.ToAccount, err)
+			"from BankAccount %s to BankAccount %s: %w", details.FromBankAccountId, details.ToBankAccountId, err)
 	}
 	_, err = tr.col.InsertOne(ctx, mongoDetails)
 	if err != nil {
 		return fmt.Errorf("error when inserting transaction from BankAccount %s to BankAccount %s: %w",
-			details.FromAccount, details.ToAccount, err)
+			details.FromBankAccountId, details.ToBankAccountId, err)
 	}
 	log.Printf("Successfully inserted transaction from "+
-		"BankAccount %s to BankAccount %s\n", details.FromAccount, details.ToAccount)
+		"BankAccount %s to BankAccount %s\n", details.FromBankAccountId, details.ToBankAccountId)
 	return nil
 }
 
-func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
-	accountId string, ctx context.Context,
-) ([]model.AccountTransaction, error) {
-	var res []model.AccountTransaction
-	objectAccountId, err := utils.StringToObjectId(accountId)
+func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
+	bankAccountId string, ctx context.Context,
+) ([]model.BankAccountTransaction, error) {
+	var res []model.BankAccountTransaction
+	objectAccountId, err := utils.StringToObjectId(bankAccountId)
 	if err != nil {
-		return nil, fmt.Errorf("error when converting account ID to object ID for accountId %s: %w", accountId, err)
+		return nil, fmt.Errorf("error when converting account ID to object ID for "+
+			"bankAccountId %s: %w", bankAccountId, err)
 	}
 	pipeline := mongo.Pipeline{
-		// Match transactions involving the accountId in either fromAccount or toAccount
+		// Match transactions involving the bankAccountId in either fromAccount or toAccount
 		{{"$match", bson.D{
 			{"$or", bson.A{
-				bson.D{{"fromAccount", objectAccountId}},
-				bson.D{{"toAccount", objectAccountId}},
+				bson.D{{"fromBankAccountId", objectAccountId}},
+				bson.D{{"toBankAccountId", objectAccountId}},
 			}},
 		}}},
 		// Add a new field 'transactionType' to indicate debit or credit transaction
 		{{"$addFields", bson.D{
 			{"transactionType", bson.D{{"$cond", bson.A{
-				bson.D{{"$eq", bson.A{"$fromAccount", objectAccountId}}},
+				bson.D{{"$eq", bson.A{"$fromBankAccountId", objectAccountId}}},
 				"credit",
 				"debit",
 			}}}}},
@@ -68,17 +69,17 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 			{"_createdAt", 1},
 			{"amount", 1},
 			{"transactionType", 1},
-			{"accountId", objectAccountId},
-			{"otherAccountId", bson.D{{"$cond", bson.A{
-				bson.D{{"$eq", bson.A{"$fromAccount", objectAccountId}}},
-				"$toAccount",
-				"$fromAccount",
+			{"bankAccountId", objectAccountId},
+			{"otherBankAccountId", bson.D{{"$cond", bson.A{
+				bson.D{{"$eq", bson.A{"$fromBankAccountId", objectAccountId}}},
+				"$toBankAccountId",
+				"$fromBankAccountId",
 			}}}},
 		}}}}
 
 	cursor, err := tr.col.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, fmt.Errorf("error when aggregating transactions for BankAccount %s: %w", accountId, err)
+		return nil, fmt.Errorf("error when aggregating transactions for BankAccount %s: %w", bankAccountId, err)
 	}
 
 	var mongoResults []mongodb.MongoAccountTransaction
@@ -87,18 +88,18 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 		err := cursor.Close(ctx)
 		if err != nil {
 			log.Printf("Error when closing mongo Cursor when getting BankAccount Transactions "+
-				"for BankAccount %s", accountId)
+				"for BankAccount %s", bankAccountId)
 		}
 	}()
 
 	if err = cursor.All(ctx, &mongoResults); err != nil {
 		return nil, fmt.Errorf("error when iterating over mongo Cursor when getting BankAccount Transactions "+
-			"for BankAccount %s: %w", accountId, err)
+			"for BankAccount %s: %w", bankAccountId, err)
 	}
 	if res, err = fromMongoAccountTransaction(mongoResults); err != nil {
 		return nil, fmt.Errorf("error when converting mongo BankAccount Transactions to domain BankAccount "+
-			"Transactions for BankAccount %s: %w", accountId, err)
+			"Transactions for BankAccount %s: %w", bankAccountId, err)
 	}
-	log.Printf("Successfully retrieved BankAccount Transactions for BankAccount %s\n", accountId)
+	log.Printf("Successfully retrieved BankAccount Transactions for BankAccount %s\n", bankAccountId)
 	return res, nil
 }

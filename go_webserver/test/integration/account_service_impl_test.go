@@ -37,20 +37,20 @@ func TestGetAccountDetails(t *testing.T) {
 		knownAccountId, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.KnownBankAccounts[0].Id)
 		service := setupAccountService(mongoClient, tranCollection, accCollection)
 
-		accountDetails, err := service.GetAccountDetails(tomAccountId, ctx)
+		accountDetails, err := service.GetAccountDetailsFromBankAccountId(tomAccountId, ctx)
 		if err != nil {
 			t.Errorf("Error getting Tom's accountDetails: %v", err)
 		}
 		assert.Equal(
 			t,
 			utils.TomAccountDetails.BankAccounts[0].AvailableBalance.String(),
-			accountDetails.Accounts[0].AvailableBalance.String(),
+			accountDetails.BankAccounts[0].AvailableBalance.String(),
 		)
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
 		assert.Equal(t, pkgutils.TimestampToTime(utils.TomAccountDetails.CreatedAt), accountDetails.CreatedAt)
 		assert.Equal(t, utils.TomAccountDetails.Password, accountDetails.Password)
-		assert.Equal(t, knownAccountId, accountDetails.KnownAccounts[0].Id)
-		assert.Equal(t, tomAccountId, accountDetails.Accounts[0].Id)
+		assert.Equal(t, knownAccountId, accountDetails.KnownBankAccounts[0].Id)
+		assert.Equal(t, tomAccountId, accountDetails.BankAccounts[0].Id)
 	})
 }
 
@@ -104,7 +104,7 @@ func TestGetAccountTransactions(t *testing.T) {
 
 			accountService := setupAccountService(mongoClient, tranCollection, accCollection)
 
-			res, _ := accountService.GetAccountTransactions(tomAccountName, ctx)
+			res, _ := accountService.GetBankAccountTransactions(tomAccountName, ctx)
 			expectedCreatedAt := res[0].CreatedAt
 			expectedTransactionTypes := []string{"credit", "debit", "credit"}
 			expectedResults := createExpectedAccountTranResult(
@@ -151,6 +151,7 @@ func makeTransactionsInput(
 			ToBankAccountId:   samAccountId,
 			Amount:            tranAmounts[0],
 			Id:                tranIds[0],
+			Type:              "realized",
 			CreatedAt:         pkgutils.GetCurrentTimestamp(),
 		},
 		mongodb.MongoTransactionInput{
@@ -158,6 +159,7 @@ func makeTransactionsInput(
 			ToBankAccountId:   tomAccountId,
 			Amount:            tranAmounts[1],
 			Id:                tranIds[1],
+			Type:              "realized",
 			CreatedAt:         pkgutils.GetCurrentTimestamp(),
 		},
 		mongodb.MongoTransactionInput{
@@ -165,6 +167,7 @@ func makeTransactionsInput(
 			ToBankAccountId:   samAccountId,
 			Amount:            tranAmounts[2],
 			Id:                tranIds[2],
+			Type:              "realized",
 			CreatedAt:         pkgutils.GetCurrentTimestamp(),
 		},
 	}
@@ -177,16 +180,16 @@ func createExpectedAccountTranResult(
 	tranStrings []string,
 	tranAmounts []decimal.Decimal,
 	transactionTypes []string,
-) []model.AccountTransaction {
-	expectedResults := make([]model.AccountTransaction, len(tranAmounts))
+) []model.BankAccountTransaction {
+	expectedResults := make([]model.BankAccountTransaction, len(tranAmounts))
 	for i, _ := range tranAmounts {
-		expectedResults[i] = model.AccountTransaction{
-			Id:              tranStrings[i],
-			AccountId:       accountId,
-			TransactionType: transactionTypes[i],
-			OtherAccountId:  otherAccountId,
-			Amount:          tranAmounts[i],
-			CreatedAt:       expectedCreatedAt,
+		expectedResults[i] = model.BankAccountTransaction{
+			Id:                 tranStrings[i],
+			BankAccountId:      accountId,
+			TransactionType:    transactionTypes[i],
+			OtherBankAccountId: otherAccountId,
+			Amount:             tranAmounts[i],
+			CreatedAt:          expectedCreatedAt,
 		}
 	}
 	return expectedResults
@@ -194,14 +197,14 @@ func createExpectedAccountTranResult(
 
 func assertExpectedMatchesResult(
 	t *testing.T,
-	expectedResults []model.AccountTransaction,
-	res []model.AccountTransaction,
+	expectedResults []model.BankAccountTransaction,
+	res []model.BankAccountTransaction,
 ) {
 	for i, _ := range expectedResults {
 		assert.Equal(t, expectedResults[i].Id, res[i].Id)
-		assert.Equal(t, expectedResults[i].AccountId, res[i].AccountId)
+		assert.Equal(t, expectedResults[i].BankAccountId, res[i].BankAccountId)
 		assert.Equal(t, expectedResults[i].TransactionType, res[i].TransactionType)
-		assert.Equal(t, expectedResults[i].OtherAccountId, res[i].OtherAccountId)
+		assert.Equal(t, expectedResults[i].OtherBankAccountId, res[i].OtherBankAccountId)
 		assert.Equal(t, expectedResults[i].Amount.String(), res[i].Amount.String())
 		assert.Equal(t, expectedResults[i].CreatedAt, res[i].CreatedAt)
 	}
@@ -223,7 +226,7 @@ func TestLogins(t *testing.T) {
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
 		assert.Equal(
 			t, utils.TomAccountDetails.BankAccounts[0].AvailableBalance.String(),
-			accountDetails.Accounts[0].AvailableBalance.String(),
+			accountDetails.BankAccounts[0].AvailableBalance.String(),
 		)
 	})
 

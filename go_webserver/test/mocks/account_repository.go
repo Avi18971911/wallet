@@ -11,7 +11,7 @@ type MockAccountRepository struct {
 	mock.Mock
 }
 
-func (m *MockAccountRepository) GetAccountDetails(
+func (m *MockAccountRepository) GetAccountDetailsFromBankAccountId(
 	accountId string,
 	ctx context.Context,
 ) (*model.AccountDetails, error) {

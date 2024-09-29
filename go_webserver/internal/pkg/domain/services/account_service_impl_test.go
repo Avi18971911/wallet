@@ -14,27 +14,27 @@ import (
 )
 
 func TestGetAccountDetails(t *testing.T) {
-	t.Run("Doesn't return error if GetAccountDetails is successful", func(t *testing.T) {
+	t.Run("Doesn't return error if GetAccountDetailsFromBankAccountId is successful", func(t *testing.T) {
 		_, mockAccRepo, _, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
 		stubDetails := &utils.TomAccountDetailsModel
-		mockAccRepo.On("GetAccountDetails", mock.Anything, mock.Anything).Return(stubDetails, nil)
+		mockAccRepo.On("GetAccountDetailsFromBankAccountId", mock.Anything, mock.Anything).Return(stubDetails, nil)
 
-		res, err := service.GetAccountDetails("accountId", ctx)
+		res, err := service.GetAccountDetailsFromBankAccountId("accountId", ctx)
 		assert.Nil(t, err)
 		assert.EqualExportedValues(t, stubDetails, res, "The returned account details should match "+
 			"the expected stub details")
 	})
 
-	t.Run("Returns error if GetAccountDetails is unsuccessful", func(t *testing.T) {
+	t.Run("Returns error if GetAccountDetailsFromBankAccountId is unsuccessful", func(t *testing.T) {
 		_, mockAccRepo, _, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		mockAccRepo.On("GetAccountDetails", mock.Anything, mock.Anything).
-			Return(nil, errors.New("cannot GetAccountDetails"))
+		mockAccRepo.On("GetAccountDetailsFromBankAccountId", mock.Anything, mock.Anything).
+			Return(nil, errors.New("cannot GetAccountDetailsFromBankAccountId"))
 
-		res, err := service.GetAccountDetails("accountId", ctx)
+		res, err := service.GetAccountDetailsFromBankAccountId("accountId", ctx)
 		assert.Nil(t, res)
-		assert.Error(t, err, "cannot GetAccountDetails")
+		assert.Error(t, err, "cannot GetAccountDetailsFromBankAccountId")
 	})
 }
 
@@ -42,15 +42,15 @@ func TestGetAccountTransaction(t *testing.T) {
 	t.Run("Returns correct output assuming happy path", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		stubTransactions := []model.AccountTransaction{
-			{Id: "transactionId", AccountId: "accountId", Amount: decimal.NewFromFloat(123.13), CreatedAt: time.Now()},
+		stubTransactions := []model.BankAccountTransaction{
+			{Id: "transactionId", BankAccountId: "accountId", Amount: decimal.NewFromFloat(123.13), CreatedAt: time.Now()},
 		}
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
-		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
+		mockTranRepo.On("GetBankAccountTransactions", mock.Anything, mock.Anything).
 			Return(stubTransactions, nil)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
-		accountTransactions, err := service.GetAccountTransactions("accountId", ctx)
+		accountTransactions, err := service.GetBankAccountTransactions("accountId", ctx)
 		assert.Nil(t, err)
 		assert.Equal(t, stubTransactions, accountTransactions)
 	})
@@ -61,23 +61,23 @@ func TestGetAccountTransaction(t *testing.T) {
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).
 			Return(ctx, errors.New("can't start transaction"))
 
-		_, err := service.GetAccountTransactions("accountId", ctx)
+		_, err := service.GetBankAccountTransactions("accountId", ctx)
 		assert.ErrorContains(t, err, "can't start transaction")
 		mockTran.AssertNumberOfCalls(t, "Rollback", 0)
-		mockTranRepo.AssertNumberOfCalls(t, "GetAccountTransactions", 0)
+		mockTranRepo.AssertNumberOfCalls(t, "GetBankAccountTransactions", 0)
 	})
 
-	t.Run("Returns error if GetAccountTransactions isn't successful", func(t *testing.T) {
+	t.Run("Returns error if GetBankAccountTransactions isn't successful", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
-		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
-			Return(nil, errors.New("can't GetAccountTransactions"))
+		mockTranRepo.On("GetBankAccountTransactions", mock.Anything, mock.Anything).
+			Return(nil, errors.New("can't GetBankAccountTransactions"))
 
-		_, err := service.GetAccountTransactions("accountId", ctx)
-		assert.ErrorContains(t, err, "can't GetAccountTransactions")
-		mockTranRepo.AssertNumberOfCalls(t, "GetAccountTransactions", 1)
+		_, err := service.GetBankAccountTransactions("accountId", ctx)
+		assert.ErrorContains(t, err, "can't GetBankAccountTransactions")
+		mockTranRepo.AssertNumberOfCalls(t, "GetBankAccountTransactions", 1)
 	})
 
 	t.Run("Rollback even if returning an error", func(t *testing.T) {
@@ -85,10 +85,10 @@ func TestGetAccountTransaction(t *testing.T) {
 		defer cancel()
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
-		mockTranRepo.On("GetAccountTransactions", mock.Anything, mock.Anything).
-			Return(nil, errors.New("can't GetAccountTransactions"))
+		mockTranRepo.On("GetBankAccountTransactions", mock.Anything, mock.Anything).
+			Return(nil, errors.New("can't GetBankAccountTransactions"))
 
-		service.GetAccountTransactions("accountId", ctx)
+		service.GetBankAccountTransactions("accountId", ctx)
 		mockTran.AssertNumberOfCalls(t, "Rollback", 1)
 	})
 }
