@@ -46,13 +46,13 @@ func TestAddTransaction(t *testing.T) {
 		assert.Nil(t, err)
 		samFind, tomFind := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.SamAccountDetails.BankAccounts[0].Id},
+			ctx, bson.M{"bankAccounts._id": utils.SamAccountDetails.BankAccounts[0].Id},
 		).Decode(&samFind)
 		if err != nil {
 			t.Errorf("Error in finding Sam's account details: %v", err)
 		}
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.TomAccountDetails.BankAccounts[0].Id},
+			ctx, bson.M{"bankAccounts._id": utils.TomAccountDetails.BankAccounts[0].Id},
 		).Decode(&tomFind)
 		if err != nil {
 			t.Errorf("Error in finding Tom's's account details: %v", err)
@@ -78,7 +78,7 @@ func TestAddTransaction(t *testing.T) {
 
 		var tranRes = mongodb.MongoTransactionInput{}
 		err = tranCollection.FindOne(
-			ctx, bson.M{"fromAccount": utils.TomAccountDetails.BankAccounts[0].Id},
+			ctx, bson.M{"fromBankAccountId": utils.TomAccountDetails.BankAccounts[0].Id},
 		).Decode(&tranRes)
 		if err != nil {
 			t.Errorf("Error in decoding transaction result into tranRes: %v", err)
@@ -113,7 +113,7 @@ func TestAddTransaction(t *testing.T) {
 		samDetails, tomDetails := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.SamAccountDetails.BankAccounts[0].Id},
+			ctx, bson.M{"bankAccounts._id": utils.SamAccountDetails.BankAccounts[0].Id},
 		).Decode(&samDetails)
 
 		if err != nil {
@@ -121,7 +121,7 @@ func TestAddTransaction(t *testing.T) {
 		}
 
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.TomAccountDetails.BankAccounts[0].Id},
+			ctx, bson.M{"bankAccounts._id": utils.TomAccountDetails.BankAccounts[0].Id},
 		).Decode(&tomDetails)
 
 		if err != nil {

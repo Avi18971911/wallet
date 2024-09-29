@@ -3,6 +3,7 @@ package repositories
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/utils"
@@ -23,11 +24,29 @@ func fromDomainTransactionDetails(details *model.TransactionDetailsInput) (*mong
 	if err != nil {
 		return nil, fmt.Errorf("error when converting amount %s to Decimal128: %w", details.Amount, err)
 	}
+
+	expirationDate := utils.TimeToTimestamp(details.ExpirationDate)
+
+	transactionType, err := getStringFromTransactionType(details.Type)
+	if err != nil {
+		log.Printf("Error when converting transaction type: %v", err)
+		return nil, err
+	}
+
+	status := getStringFromPendingTransactionStatus(details.Status)
+	if err != nil {
+		log.Printf("Error when converting pending transaction status: %v", err)
+		return nil, err
+	}
+
 	return &mongodb.MongoTransactionInput{
 		FromBankAccountId: fromAccount,
 		ToBankAccountId:   toAccount,
 		Amount:            decimal128Amount,
 		CreatedAt:         utils.GetCurrentTimestamp(),
+		Type:              transactionType,
+		ExpirationDate:    expirationDate,
+		Status:            status,
 	}, nil
 }
 
@@ -64,4 +83,28 @@ func fromMongoAccountTransaction(
 		}
 	}
 	return res, nil
+}
+
+func getStringFromTransactionType(transactionType model.TransactionType) (string, error) {
+	switch transactionType {
+	case model.Realized:
+		return "realized", nil
+	case model.Pending:
+		return "pending", nil
+	default:
+		return "unknown", fmt.Errorf("unknown transaction type: %s", transactionType)
+	}
+}
+
+func getStringFromPendingTransactionStatus(status model.PendingTransactionStatus) string {
+	switch status {
+	case model.Active:
+		return "active"
+	case model.Applied:
+		return "applied"
+	case model.Revoked:
+		return "revoked"
+	default:
+		return ""
+	}
 }

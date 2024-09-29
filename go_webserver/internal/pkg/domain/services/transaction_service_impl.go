@@ -56,10 +56,14 @@ func (t *TransactionServiceImpl) AddTransaction(input model.TransactionDetailsIn
 		return fmt.Errorf("insufficient balance in BankAccount %s", input.FromBankAccountId)
 	}
 
+	log.Printf("Successfully deducted balance from BankAccount %s", input.FromBankAccountId)
+
 	if err = t.ar.AddBalance(input.ToBankAccountId, input.Amount, txnCtx); err != nil {
 		log.Printf("Error adding balance to BankAccount %s: %v", input.ToBankAccountId, err)
 		return fmt.Errorf("error when adding balance to BankAccount %s: %w", input.ToBankAccountId, err)
 	}
+
+	log.Printf("Successfully added balance to BankAccount %s", input.ToBankAccountId)
 
 	if err = t.tr.AddTransaction(&input, txnCtx); err != nil {
 		log.Printf("Error adding transaction to the database from BankAccount %s to "+
@@ -71,6 +75,11 @@ func (t *TransactionServiceImpl) AddTransaction(input model.TransactionDetailsIn
 		log.Printf("Error committing Add Transaction database transaction: %v", commitErr)
 		return fmt.Errorf("error when committing Add Transaction database transaction: %w", commitErr)
 	}
+
+	log.Printf(
+		"Successfully committed Add Transaction database transaction from "+
+			"BankAccount %s to BankAccount %s", input.FromBankAccountId, input.ToBankAccountId,
+	)
 
 	shouldRollback = false
 	return nil

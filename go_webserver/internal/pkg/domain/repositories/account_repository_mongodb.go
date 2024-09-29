@@ -76,7 +76,6 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 	} else if result.ModifiedCount == 0 {
 		return fmt.Errorf("update failed to the account balance for bankAccountId %s", bankAccountId)
 	} else {
-		log.Printf("Successfully updated balance for account %s\n", bankAccountId)
 		return nil
 	}
 }
