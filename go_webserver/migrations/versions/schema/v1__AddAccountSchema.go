@@ -48,8 +48,8 @@ var MigrationSchema1 = versions.Migration{
 							},
 						},
 					},
-					// Embedded Accounts (Main Accounts for the User)
-					"accounts": bson.M{
+					// Embedded Bank Accounts (Main Bank Accounts for the User)
+					"bankAccounts": bson.M{
 						"bsonType": "array",
 						"items": bson.M{
 							"bsonType": "object",
@@ -74,8 +74,8 @@ var MigrationSchema1 = versions.Migration{
 							},
 						},
 					},
-					// Known Accounts (External or Third-Party Accounts)
-					"knownAccounts": bson.M{
+					// Known Bank Accounts (External or Third-Party Accounts)
+					"knownBankAccounts": bson.M{
 						"bsonType": "array",
 						"items": bson.M{
 							"bsonType": "object",
