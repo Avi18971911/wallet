@@ -7,16 +7,16 @@ import (
 	"webserver/internal/pkg/utils"
 )
 
-func fromMongoAccountType(accountType string) int {
+func fromMongoAccountType(accountType string) (model.BankAccountType, error) {
 	switch accountType {
 	case "savings":
-		return model.Savings
+		return model.Savings, nil
 	case "checking":
-		return model.Checking
+		return model.Checking, nil
 	case "investment":
-		return model.Investment
+		return model.Investment, nil
 	default:
-		return -1
+		return model.Savings, fmt.Errorf("unknown account type %s", accountType)
 	}
 }
 
@@ -29,11 +29,17 @@ func fromMongoKnownAccount(knownAccount []mongodb.KnownBankAccount) ([]model.Kno
 				"error when converting object ID to string for known account %s: %v", ka.AccountNumber, err,
 			)
 		}
+		accountType, err := fromMongoAccountType(ka.AccountType)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"error when converting account type for known account %s: %v", ka.AccountNumber, err,
+			)
+		}
 		res[i] = model.KnownBankAccount{
 			Id:            stringId,
 			AccountNumber: ka.AccountNumber,
 			AccountHolder: ka.AccountHolder,
-			AccountType:   fromMongoAccountType(ka.AccountType),
+			AccountType:   accountType,
 		}
 	}
 	return res, nil
@@ -54,10 +60,16 @@ func fromMongoAccounts(accounts []mongodb.BankAccount) ([]model.BankAccount, err
 				"error when converting available balance to decimal for account number %s: %v", a.AccountNumber, err,
 			)
 		}
+		accountType, err := fromMongoAccountType(a.AccountType)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"error when converting account type for known account %s: %v", a.AccountNumber, err,
+			)
+		}
 		res[i] = model.BankAccount{
 			Id:               stringId,
 			AccountNumber:    a.AccountNumber,
-			AccountType:      fromMongoAccountType(a.AccountType),
+			AccountType:      accountType,
 			AvailableBalance: availableBalanceDecimal,
 		}
 	}

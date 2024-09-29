@@ -33,15 +33,16 @@ func TestAddTransaction(t *testing.T) {
 
 	service := setupTransactionService(mongoClient, tranCollection, accCollection)
 	transferAmount, _ := decimal.NewFromString("100.00")
-	input := model.TransactionDetails{
+	input := model.TransactionDetailsInput{
 		ToBankAccountId:   samAccountName,
 		FromBankAccountId: tomAccountName,
 		Amount:            transferAmount,
+		Type:              model.Realized,
 	}
 
 	t.Run("Should be able to insert transactions", func(t *testing.T) {
 		setupAddTransactionTestCase(tranCollection, accCollection, ctx, t)
-		err := service.AddTransaction(input.ToBankAccountId, input.FromBankAccountId, input.Amount.String(), ctx)
+		err := service.AddTransaction(input, ctx)
 		assert.Nil(t, err)
 		samFind, tomFind := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 		err = accCollection.FindOne(
@@ -88,7 +89,13 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Should not be able to insert transactions with insufficient balance", func(t *testing.T) {
 		setupAddTransactionTestCase(tranCollection, accCollection, ctx, t)
 		reallyHighAmount := "99999999.99"
-		err := service.AddTransaction(input.ToBankAccountId, input.FromBankAccountId, reallyHighAmount, ctx)
+		reallyHighInput := model.TransactionDetailsInput{
+			ToBankAccountId:   samAccountName,
+			FromBankAccountId: tomAccountName,
+			Amount:            decimal.RequireFromString(reallyHighAmount),
+			Type:              model.Realized,
+		}
+		err := service.AddTransaction(reallyHighInput, ctx)
 		assert.NotNil(t, err)
 		assert.EqualError(t, err, "insufficient balance in BankAccount "+tomAccountName)
 	})
@@ -96,7 +103,12 @@ func TestAddTransaction(t *testing.T) {
 	t.Run("Should not carry out transaction if there is an error", func(t *testing.T) {
 		setupAddTransactionTestCase(tranCollection, accCollection, ctx, t)
 		reallyHighAmount := "99999999.99"
-		err := service.AddTransaction(input.ToBankAccountId, input.FromBankAccountId, reallyHighAmount, ctx)
+		reallyHighInput := model.TransactionDetailsInput{
+			ToBankAccountId:   samAccountName,
+			FromBankAccountId: tomAccountName,
+			Amount:            decimal.RequireFromString(reallyHighAmount),
+		}
+		err := service.AddTransaction(reallyHighInput, ctx)
 		assert.NotNil(t, err)
 		samDetails, tomDetails := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 

@@ -65,7 +65,7 @@ var TomAccountDetailsModel = model.AccountDetails{
 			Id:               "UUID",
 			AccountNumber:    "123-45678-9",
 			AvailableBalance: tomBalanceDecimal,
-			AccountType:      1,
+			AccountType:      model.Checking,
 		},
 	},
 	Person: model.Person{
@@ -77,7 +77,7 @@ var TomAccountDetailsModel = model.AccountDetails{
 			Id:            "UUID",
 			AccountNumber: "987-65432-1",
 			AccountHolder: "Sam Jones",
-			AccountType:   0,
+			AccountType:   model.Savings,
 		},
 	},
 	CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),

@@ -30,10 +30,6 @@ func validateAccountDetails(accountDetails *model.AccountDetails) error {
 	if err != nil {
 		return fmt.Errorf("unable to validate account numbers with error: %w", err)
 	}
-	err = validateAccountTypes(accountDetails.BankAccounts)
-	if err != nil {
-		return fmt.Errorf("unable to validate account types with error: %w", err)
-	}
 	return nil
 }
 
@@ -47,16 +43,6 @@ func validateAccountNumbers(accounts []model.BankAccount) error {
 			if !accountNumberRegex.MatchString(account.AccountNumber) {
 				return errors.New("account number does not match expected pattern of XXX-XXXXX-X")
 			}
-		}
-	}
-	return nil
-}
-
-func validateAccountTypes(accounts []model.BankAccount) error {
-	for _, account := range accounts {
-		if account.AccountType > model.Investment || account.AccountType < model.Savings {
-			return errors.New("account type is not a valid type of account. " +
-				"Should be savings, checking, or investment")
 		}
 	}
 	return nil

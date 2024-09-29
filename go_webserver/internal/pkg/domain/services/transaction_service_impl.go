@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"github.com/shopspring/decimal"
 	"log"
 	"webserver/internal/pkg/domain/model"
 	repositories2 "webserver/internal/pkg/domain/repositories"
@@ -24,19 +23,14 @@ func CreateNewTransactionServiceImpl(
 	return &TransactionServiceImpl{tr, ar, transactional}
 }
 
-func (t *TransactionServiceImpl) AddTransaction(
-	toBankAccountId string,
-	fromBankAccountId string,
-	amount string,
-	ctx context.Context,
-) error {
+func (t *TransactionServiceImpl) AddTransaction(input model.TransactionDetailsInput, ctx context.Context) error {
 	addCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
 	txnCtx, err := t.tran.BeginTransaction(addCtx, transactional.IsolationLow, transactional.DurabilityHigh)
 	if err != nil {
 		log.Printf("Error encountered when starting Add Transaction database transaction from "+
-			"BankAccount %s to BankAccount %s: %v", fromBankAccountId, toBankAccountId, err)
+			"BankAccount %s to BankAccount %s: %v", input.FromBankAccountId, input.ToBankAccountId, err)
 		return fmt.Errorf("error when starting Add Transaction database transaction: %w", err)
 	}
 
@@ -51,37 +45,25 @@ func (t *TransactionServiceImpl) AddTransaction(
 		}
 	}()
 
-	amountDecimal, err := convertStringToDecimal(amount)
+	newBalance, err := t.ar.DeductBalance(input.FromBankAccountId, input.Amount, txnCtx)
 	if err != nil {
-		log.Printf("Error converting string to decimal: %v", err)
-		return fmt.Errorf("error when converting string to decimal: %w", err)
-	}
-
-	transactionDetails := model.TransactionDetails{
-		FromBankAccountId: fromBankAccountId,
-		ToBankAccountId:   toBankAccountId,
-		Amount:            amountDecimal,
-	}
-
-	newBalance, err := t.ar.DeductBalance(fromBankAccountId, amountDecimal, txnCtx)
-	if err != nil {
-		log.Printf("Error deducting balance from BankAccount %s: %v", fromBankAccountId, err)
-		return fmt.Errorf("error when deducting balance from BankAccount %s: %w", fromBankAccountId, err)
+		log.Printf("Error deducting balance from BankAccount %s: %v", input.FromBankAccountId, err)
+		return fmt.Errorf("error when deducting balance from BankAccount %s: %w", input.FromBankAccountId, err)
 	}
 
 	if newBalance.IsNegative() {
-		log.Printf("Insufficient balance in BankAccount %s", fromBankAccountId)
-		return fmt.Errorf("insufficient balance in BankAccount %s", fromBankAccountId)
+		log.Printf("Insufficient balance in BankAccount %s", input.FromBankAccountId)
+		return fmt.Errorf("insufficient balance in BankAccount %s", input.FromBankAccountId)
 	}
 
-	if err = t.ar.AddBalance(toBankAccountId, amountDecimal, txnCtx); err != nil {
-		log.Printf("Error adding balance to BankAccount %s: %v", toBankAccountId, err)
-		return fmt.Errorf("error when adding balance to BankAccount %s: %w", toBankAccountId, err)
+	if err = t.ar.AddBalance(input.ToBankAccountId, input.Amount, txnCtx); err != nil {
+		log.Printf("Error adding balance to BankAccount %s: %v", input.ToBankAccountId, err)
+		return fmt.Errorf("error when adding balance to BankAccount %s: %w", input.ToBankAccountId, err)
 	}
 
-	if err = t.tr.AddTransaction(&transactionDetails, txnCtx); err != nil {
+	if err = t.tr.AddTransaction(&input, txnCtx); err != nil {
 		log.Printf("Error adding transaction to the database from BankAccount %s to "+
-			"BankAccount %s: %v", fromBankAccountId, toBankAccountId, err)
+			"BankAccount %s: %v", input.FromBankAccountId, input.ToBankAccountId, err)
 		return fmt.Errorf("error when adding transaction to the database: %w", err)
 	}
 
@@ -92,12 +74,4 @@ func (t *TransactionServiceImpl) AddTransaction(
 
 	shouldRollback = false
 	return nil
-}
-
-func convertStringToDecimal(amount string) (decimal.Decimal, error) {
-	amountDecimal, err := decimal.NewFromString(amount)
-	if err != nil {
-		return decimal.Decimal{}, fmt.Errorf("error converting string to decimal: %w", err)
-	}
-	return amountDecimal, nil
 }

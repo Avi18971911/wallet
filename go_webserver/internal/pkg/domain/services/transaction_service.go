@@ -2,13 +2,12 @@ package services
 
 import (
 	"context"
+	"webserver/internal/pkg/domain/model"
 )
 
 type TransactionService interface {
 	AddTransaction(
-		toBankAccountId string,
-		fromBankAccountId string,
-		amount string,
+		input model.TransactionDetailsInput,
 		ctx context.Context,
 	) error
 }

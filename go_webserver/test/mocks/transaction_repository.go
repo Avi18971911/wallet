@@ -10,7 +10,7 @@ type MockTransactionRepository struct {
 	mock.Mock
 }
 
-func (m *MockTransactionRepository) AddTransaction(details *model.TransactionDetails, ctx context.Context) error {
+func (m *MockTransactionRepository) AddTransaction(details *model.TransactionDetailsInput, ctx context.Context) error {
 	args := m.Called(details, ctx)
 	return args.Error(0)
 }

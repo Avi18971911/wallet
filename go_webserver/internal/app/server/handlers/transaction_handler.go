@@ -38,7 +38,13 @@ func TransactionInsertHandler(s services.TransactionService, ctx context.Context
 			}
 		}(r.Body)
 
-		err = s.AddTransaction(req.ToBankAccountId, req.FromBankAccountId, req.Amount, ctx)
+		transactionInput, err := transactionDetailsToModel(&req)
+		if err != nil {
+			utils.HttpError(w, "Invalid amount given", http.StatusBadRequest)
+			return
+		}
+
+		err = s.AddTransaction(transactionInput, ctx)
 		if err != nil {
 			utils.HttpError(w, "Failed to Add Transaction", http.StatusInternalServerError)
 			return

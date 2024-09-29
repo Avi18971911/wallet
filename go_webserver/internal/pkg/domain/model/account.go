@@ -16,10 +16,12 @@ type AccountDetails struct {
 	CreatedAt         time.Time
 }
 
+type BankAccountType string
+
 const (
-	Savings int = iota
-	Checking
-	Investment
+	Savings    BankAccountType = "savings"
+	Checking   BankAccountType = "checking"
+	Investment BankAccountType = "investment"
 )
 
 type Person struct {
@@ -30,7 +32,7 @@ type Person struct {
 type BankAccount struct {
 	Id               string
 	AccountNumber    string
-	AccountType      int
+	AccountType      BankAccountType
 	AvailableBalance decimal.Decimal
 }
 
@@ -38,7 +40,7 @@ type KnownBankAccount struct {
 	Id            string
 	AccountNumber string
 	AccountHolder string
-	AccountType   int
+	AccountType   BankAccountType
 }
 
 type BankAccountTransaction struct {

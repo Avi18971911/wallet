@@ -8,7 +8,7 @@ import (
 	"webserver/internal/pkg/utils"
 )
 
-func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.MongoTransactionInput, error) {
+func fromDomainTransactionDetails(details *model.TransactionDetailsInput) (*mongodb.MongoTransactionInput, error) {
 	var fromAccount, toAccount primitive.ObjectID
 	var err error
 	fromAccount, err = utils.StringToObjectId(details.FromBankAccountId)

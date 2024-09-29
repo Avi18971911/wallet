@@ -21,12 +21,12 @@ func CreateNewTransactionRepositoryMongodb(col *mongo.Collection) *TransactionRe
 }
 
 func (tr *TransactionRepositoryMongodb) AddTransaction(
-	details *model.TransactionDetails,
+	details *model.TransactionDetailsInput,
 	ctx context.Context,
 ) error {
 	mongoDetails, err := fromDomainTransactionDetails(details)
 	if err != nil {
-		return fmt.Errorf("error when converting domain TransactionDetails to mongo TransactionDetails "+
+		return fmt.Errorf("error when converting domain TransactionDetailsInput to mongo TransactionDetailsInput "+
 			"from BankAccount %s to BankAccount %s: %w", details.FromBankAccountId, details.ToBankAccountId, err)
 	}
 	_, err = tr.col.InsertOne(ctx, mongoDetails)
