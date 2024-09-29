@@ -115,8 +115,8 @@ func TestV2SchemaMigration(t *testing.T) {
 var sampleAccountDetails = utils.TomAccountDetails
 
 var sampleTransactionDetails = mongodb.MongoTransactionInput{
-	FromAccount: primitive.NewObjectID(),
-	ToAccount:   primitive.NewObjectID(),
-	Amount:      primitive.NewDecimal128(1000, 0),
-	CreatedAt:   pkgutils.GetCurrentTimestamp(),
+	FromBankAccountId: primitive.NewObjectID(),
+	ToBankAccountId:   primitive.NewObjectID(),
+	Amount:            primitive.NewDecimal128(1000, 0),
+	CreatedAt:         pkgutils.GetCurrentTimestamp(),
 }

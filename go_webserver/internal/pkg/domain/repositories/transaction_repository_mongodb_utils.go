@@ -24,10 +24,10 @@ func fromDomainTransactionDetails(details *model.TransactionDetails) (*mongodb.M
 		return nil, fmt.Errorf("error when converting amount %s to Decimal128: %w", details.Amount, err)
 	}
 	return &mongodb.MongoTransactionInput{
-		FromAccount: fromAccount,
-		ToAccount:   toAccount,
-		Amount:      decimal128Amount,
-		CreatedAt:   utils.GetCurrentTimestamp(),
+		FromBankAccountId: fromAccount,
+		ToBankAccountId:   toAccount,
+		Amount:            decimal128Amount,
+		CreatedAt:         utils.GetCurrentTimestamp(),
 	}, nil
 }
 
@@ -42,11 +42,11 @@ func fromMongoAccountTransaction(
 		if err != nil {
 			return res, fmt.Errorf("error when converting transaction ID to string: %w", err)
 		}
-		accountId, err = utils.ObjectIdToString(elem.AccountId)
+		accountId, err = utils.ObjectIdToString(elem.BankAccountId)
 		if err != nil {
 			return res, fmt.Errorf("error when converting account ID to string: %w", err)
 		}
-		otherAccountId, err = utils.ObjectIdToString(elem.OtherAccountId)
+		otherAccountId, err = utils.ObjectIdToString(elem.OtherBankAccountId)
 		if err != nil {
 			return res, fmt.Errorf("error when converting other account ID to string: %w", err)
 		}

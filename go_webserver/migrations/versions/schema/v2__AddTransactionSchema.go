@@ -21,7 +21,7 @@ var MigrationSchema2 = versions.Migration{
 		validation := bson.M{
 			"$jsonSchema": bson.M{
 				"bsonType": "object",
-				"required": []string{"amount", "_createdAt", "fromAccount", "toAccount", "type", "_id"},
+				"required": []string{"amount", "_createdAt", "fromBankAccountId", "toBankAccountId", "type", "_id"},
 				"properties": bson.M{
 					"_id": bson.M{
 						"bsonType":    "objectId",
@@ -35,13 +35,13 @@ var MigrationSchema2 = versions.Migration{
 						"bsonType":    "timestamp",
 						"description": "the time the transactions has been created [required]",
 					},
-					"fromAccount": bson.M{
+					"fromBankAccountId": bson.M{
 						"bsonType":    "objectId",
-						"description": "the account from which the amount is coming [required]",
+						"description": "the bank account ID from which the amount is coming [required]",
 					},
-					"toAccount": bson.M{
+					"toBankAccountId": bson.M{
 						"bsonType":    "objectId",
-						"description": "the account to which the amount is going [required]",
+						"description": "the bank account ID to which the amount is going [required]",
 					},
 					"type": bson.M{
 						"bsonType":    "string",

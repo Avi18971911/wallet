@@ -5,9 +5,9 @@ import (
 )
 
 type MongoTransactionInput struct {
-	Id          primitive.ObjectID   `bson:"_id,omitempty"`
-	FromAccount primitive.ObjectID   `bson:"fromAccount"`
-	ToAccount   primitive.ObjectID   `bson:"toAccount"`
-	Amount      primitive.Decimal128 `bson:"amount"`
-	CreatedAt   primitive.Timestamp  `bson:"_createdAt"`
+	Id                primitive.ObjectID   `bson:"_id,omitempty"`
+	FromBankAccountId primitive.ObjectID   `bson:"fromBankAccountId"`
+	ToBankAccountId   primitive.ObjectID   `bson:"toBankAccountId"`
+	Amount            primitive.Decimal128 `bson:"amount"`
+	CreatedAt         primitive.Timestamp  `bson:"_createdAt"`
 }

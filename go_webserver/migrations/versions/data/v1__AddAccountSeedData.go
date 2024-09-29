@@ -35,7 +35,7 @@ var accounts = []interface{}{
 			FirstName: "Olly",
 			LastName:  "OxenFree",
 		},
-		Accounts: []mongodb.Account{
+		BankAccounts: []mongodb.BankAccount{
 			{
 				Id:               accountIds[0],
 				AccountNumber:    "123-12345-0",
@@ -43,8 +43,8 @@ var accounts = []interface{}{
 				AvailableBalance: ollyAmount,
 			},
 		},
-		KnownAccounts: []mongodb.KnownAccount{},
-		CreatedAt:     utils.GetCurrentTimestamp(),
+		KnownBankAccounts: []mongodb.KnownBankAccount{},
+		CreatedAt:         utils.GetCurrentTimestamp(),
 	},
 	mongodb.MongoAccountOutput{
 		Id:       primitive.NewObjectID(),
@@ -54,7 +54,7 @@ var accounts = []interface{}{
 			FirstName: "Bob",
 			LastName:  "Barker",
 		},
-		Accounts: []mongodb.Account{
+		BankAccounts: []mongodb.BankAccount{
 			{
 				Id:               accountIds[1],
 				AccountNumber:    "123-12345-1",
@@ -62,7 +62,7 @@ var accounts = []interface{}{
 				AvailableBalance: bobAmount,
 			},
 		},
-		KnownAccounts: []mongodb.KnownAccount{
+		KnownBankAccounts: []mongodb.KnownBankAccount{
 			{
 				Id:            accountIds[0],
 				AccountNumber: "123-12345-0",
@@ -86,7 +86,7 @@ var accounts = []interface{}{
 			FirstName: "Hilda",
 			LastName:  "Hill",
 		},
-		Accounts: []mongodb.Account{
+		BankAccounts: []mongodb.BankAccount{
 			{
 				Id:               accountIds[2],
 				AccountNumber:    "123-12345-2",
@@ -100,7 +100,7 @@ var accounts = []interface{}{
 				AvailableBalance: hildaAmount2,
 			},
 		},
-		KnownAccounts: []mongodb.KnownAccount{
+		KnownBankAccounts: []mongodb.KnownBankAccount{
 			{
 				Id:            accountIds[0],
 				AccountNumber: "123-12345-0",

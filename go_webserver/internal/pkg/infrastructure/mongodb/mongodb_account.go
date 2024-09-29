@@ -5,22 +5,22 @@ import (
 )
 
 type MongoAccountOutput struct {
-	Id            primitive.ObjectID  `bson:"_id"`
-	Username      string              `bson:"username"`
-	Password      string              `bson:"password"`
-	Person        Person              `bson:"person"`
-	Accounts      []Account           `bson:"accounts"`
-	KnownAccounts []KnownAccount      `bson:"knownAccounts"`
-	CreatedAt     primitive.Timestamp `bson:"_createdAt"`
+	Id                primitive.ObjectID  `bson:"_id"`
+	Username          string              `bson:"username"`
+	Password          string              `bson:"password"`
+	Person            Person              `bson:"person"`
+	BankAccounts      []BankAccount       `bson:"accounts"`
+	KnownBankAccounts []KnownBankAccount  `bson:"knownAccounts"`
+	CreatedAt         primitive.Timestamp `bson:"_createdAt"`
 }
 
 type MongoAccountInput struct {
-	Username      string              `bson:"username"`
-	Password      string              `bson:"password"`
-	Person        Person              `bson:"person"`
-	Accounts      []Account           `bson:"accounts"`
-	KnownAccounts []KnownAccount      `bson:"knownAccounts"`
-	CreatedAt     primitive.Timestamp `bson:"_createdAt"`
+	Username          string              `bson:"username"`
+	Password          string              `bson:"password"`
+	Person            Person              `bson:"person"`
+	BankAccounts      []BankAccount       `bson:"bankAccounts"`
+	KnownBankAccounts []KnownBankAccount  `bson:"knownBankAccounts"`
+	CreatedAt         primitive.Timestamp `bson:"_createdAt"`
 }
 
 type Person struct {
@@ -28,14 +28,14 @@ type Person struct {
 	LastName  string `bson:"lastName"`
 }
 
-type Account struct {
+type BankAccount struct {
 	Id               primitive.ObjectID   `bson:"_id,omitempty"`
 	AccountNumber    string               `bson:"accountNumber"`
 	AccountType      string               `bson:"accountType"`
 	AvailableBalance primitive.Decimal128 `bson:"availableBalance"`
 }
 
-type KnownAccount struct {
+type KnownBankAccount struct {
 	Id            primitive.ObjectID `bson:"_id,omitempty"`
 	AccountNumber string             `bson:"accountNumber"`
 	AccountHolder string             `bson:"accountHolder"`
@@ -43,10 +43,10 @@ type KnownAccount struct {
 }
 
 type MongoAccountTransaction struct {
-	Id              primitive.ObjectID   `bson:"_id"`
-	AccountId       primitive.ObjectID   `bson:"accountId"`
-	OtherAccountId  primitive.ObjectID   `bson:"otherAccountId"`
-	TransactionType string               `bson:"transactionType"`
-	Amount          primitive.Decimal128 `bson:"amount"`
-	CreatedAt       primitive.Timestamp  `bson:"_createdAt"`
+	Id                 primitive.ObjectID   `bson:"_id"`
+	BankAccountId      primitive.ObjectID   `bson:"bankAccountId"`
+	OtherBankAccountId primitive.ObjectID   `bson:"otherBankAccountId"`
+	TransactionType    string               `bson:"transactionType"`
+	Amount             primitive.Decimal128 `bson:"amount"`
+	CreatedAt          primitive.Timestamp  `bson:"_createdAt"`
 }

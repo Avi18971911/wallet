@@ -16,7 +16,7 @@ var tomBalanceDecimal, _ = decimal.NewFromString("231.95")
 var TomAccountDetails = mongodb.MongoAccountInput{
 	Username: "Tom",
 	Password: "pass",
-	Accounts: []mongodb.Account{
+	BankAccounts: []mongodb.BankAccount{
 		{
 			Id:               primitive.NewObjectID(),
 			AccountNumber:    "123-45678-9",
@@ -28,7 +28,7 @@ var TomAccountDetails = mongodb.MongoAccountInput{
 		FirstName: "Tom",
 		LastName:  "Smith",
 	},
-	KnownAccounts: []mongodb.KnownAccount{
+	KnownBankAccounts: []mongodb.KnownBankAccount{
 		{
 			Id:            primitive.NewObjectID(),
 			AccountNumber: "987-65432-1",
@@ -42,7 +42,7 @@ var TomAccountDetails = mongodb.MongoAccountInput{
 var SamAccountDetails = mongodb.MongoAccountInput{
 	Username: "Sam",
 	Password: "word",
-	Accounts: []mongodb.Account{
+	BankAccounts: []mongodb.BankAccount{
 		{
 			Id:               primitive.NewObjectID(),
 			AccountNumber:    "987-65432-1",
@@ -54,8 +54,8 @@ var SamAccountDetails = mongodb.MongoAccountInput{
 		FirstName: "Sam",
 		LastName:  "Jones",
 	},
-	KnownAccounts: []mongodb.KnownAccount{},
-	CreatedAt:     pkgutils.GetCurrentTimestamp(),
+	KnownBankAccounts: []mongodb.KnownBankAccount{},
+	CreatedAt:         pkgutils.GetCurrentTimestamp(),
 }
 
 var TomAccountDetailsModel = model.AccountDetails{

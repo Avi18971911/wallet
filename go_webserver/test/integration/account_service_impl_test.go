@@ -33,8 +33,8 @@ func TestGetAccountDetails(t *testing.T) {
 		if tomErr != nil {
 			t.Errorf("Error inserting Tom's record %v", tomErr)
 		}
-		tomAccountId, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
-		knownAccountId, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.KnownAccounts[0].Id)
+		tomAccountId, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.BankAccounts[0].Id)
+		knownAccountId, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.KnownBankAccounts[0].Id)
 		service := setupAccountService(mongoClient, tranCollection, accCollection)
 
 		accountDetails, err := service.GetAccountDetails(tomAccountId, ctx)
@@ -43,7 +43,7 @@ func TestGetAccountDetails(t *testing.T) {
 		}
 		assert.Equal(
 			t,
-			utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
+			utils.TomAccountDetails.BankAccounts[0].AvailableBalance.String(),
 			accountDetails.Accounts[0].AvailableBalance.String(),
 		)
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
@@ -69,8 +69,8 @@ func TestGetAccountTransactions(t *testing.T) {
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
 
-	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
-	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
+	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.BankAccounts[0].Id)
+	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.BankAccounts[0].Id)
 	tomObjectId, _ := pkgutils.StringToObjectId(tomAccountName)
 	samObjectId, _ := pkgutils.StringToObjectId(samAccountName)
 
@@ -147,25 +147,25 @@ func makeTransactionsInput(
 ) []interface{} {
 	return []interface{}{
 		mongodb.MongoTransactionInput{
-			FromAccount: tomAccountId,
-			ToAccount:   samAccountId,
-			Amount:      tranAmounts[0],
-			Id:          tranIds[0],
-			CreatedAt:   pkgutils.GetCurrentTimestamp(),
+			FromBankAccountId: tomAccountId,
+			ToBankAccountId:   samAccountId,
+			Amount:            tranAmounts[0],
+			Id:                tranIds[0],
+			CreatedAt:         pkgutils.GetCurrentTimestamp(),
 		},
 		mongodb.MongoTransactionInput{
-			FromAccount: samAccountId,
-			ToAccount:   tomAccountId,
-			Amount:      tranAmounts[1],
-			Id:          tranIds[1],
-			CreatedAt:   pkgutils.GetCurrentTimestamp(),
+			FromBankAccountId: samAccountId,
+			ToBankAccountId:   tomAccountId,
+			Amount:            tranAmounts[1],
+			Id:                tranIds[1],
+			CreatedAt:         pkgutils.GetCurrentTimestamp(),
 		},
 		mongodb.MongoTransactionInput{
-			FromAccount: tomAccountId,
-			ToAccount:   samAccountId,
-			Amount:      tranAmounts[2],
-			Id:          tranIds[2],
-			CreatedAt:   pkgutils.GetCurrentTimestamp(),
+			FromBankAccountId: tomAccountId,
+			ToBankAccountId:   samAccountId,
+			Amount:            tranAmounts[2],
+			Id:                tranIds[2],
+			CreatedAt:         pkgutils.GetCurrentTimestamp(),
 		},
 	}
 }
@@ -222,7 +222,7 @@ func TestLogins(t *testing.T) {
 		}
 		assert.Equal(t, utils.TomAccountDetails.Username, accountDetails.Username)
 		assert.Equal(
-			t, utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
+			t, utils.TomAccountDetails.BankAccounts[0].AvailableBalance.String(),
 			accountDetails.Accounts[0].AvailableBalance.String(),
 		)
 	})

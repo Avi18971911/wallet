@@ -27,15 +27,15 @@ func (tr *TransactionRepositoryMongodb) AddTransaction(
 	mongoDetails, err := fromDomainTransactionDetails(details)
 	if err != nil {
 		return fmt.Errorf("error when converting domain TransactionDetails to mongo TransactionDetails "+
-			"from Account %s to Account %s: %w", details.FromAccount, details.ToAccount, err)
+			"from BankAccount %s to BankAccount %s: %w", details.FromAccount, details.ToAccount, err)
 	}
 	_, err = tr.col.InsertOne(ctx, mongoDetails)
 	if err != nil {
-		return fmt.Errorf("error when inserting transaction from Account %s to Account %s: %w",
+		return fmt.Errorf("error when inserting transaction from BankAccount %s to BankAccount %s: %w",
 			details.FromAccount, details.ToAccount, err)
 	}
 	log.Printf("Successfully inserted transaction from "+
-		"Account %s to Account %s\n", details.FromAccount, details.ToAccount)
+		"BankAccount %s to BankAccount %s\n", details.FromAccount, details.ToAccount)
 	return nil
 }
 
@@ -78,7 +78,7 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 
 	cursor, err := tr.col.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, fmt.Errorf("error when aggregating transactions for Account %s: %w", accountId, err)
+		return nil, fmt.Errorf("error when aggregating transactions for BankAccount %s: %w", accountId, err)
 	}
 
 	var mongoResults []mongodb.MongoAccountTransaction
@@ -86,19 +86,19 @@ func (tr *TransactionRepositoryMongodb) GetAccountTransactions(
 	defer func() {
 		err := cursor.Close(ctx)
 		if err != nil {
-			log.Printf("Error when closing mongo Cursor when getting Account Transactions "+
-				"for Account %s", accountId)
+			log.Printf("Error when closing mongo Cursor when getting BankAccount Transactions "+
+				"for BankAccount %s", accountId)
 		}
 	}()
 
 	if err = cursor.All(ctx, &mongoResults); err != nil {
-		return nil, fmt.Errorf("error when iterating over mongo Cursor when getting Account Transactions "+
-			"for Account %s: %w", accountId, err)
+		return nil, fmt.Errorf("error when iterating over mongo Cursor when getting BankAccount Transactions "+
+			"for BankAccount %s: %w", accountId, err)
 	}
 	if res, err = fromMongoAccountTransaction(mongoResults); err != nil {
-		return nil, fmt.Errorf("error when converting mongo Account Transactions to domain Account "+
-			"Transactions for Account %s: %w", accountId, err)
+		return nil, fmt.Errorf("error when converting mongo BankAccount Transactions to domain BankAccount "+
+			"Transactions for BankAccount %s: %w", accountId, err)
 	}
-	log.Printf("Successfully retrieved Account Transactions for Account %s\n", accountId)
+	log.Printf("Successfully retrieved BankAccount Transactions for BankAccount %s\n", accountId)
 	return res, nil
 }

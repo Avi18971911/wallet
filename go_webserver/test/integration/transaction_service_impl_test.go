@@ -28,8 +28,8 @@ func TestAddTransaction(t *testing.T) {
 	tranCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.TransactionCollectionName)
 	accCollection := mongoClient.Database(utils.TestDatabaseName).Collection(schema.AccountCollectionName)
 
-	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.Accounts[0].Id)
-	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.Accounts[0].Id)
+	tomAccountName, _ := pkgutils.ObjectIdToString(utils.TomAccountDetails.BankAccounts[0].Id)
+	samAccountName, _ := pkgutils.ObjectIdToString(utils.SamAccountDetails.BankAccounts[0].Id)
 
 	service := setupTransactionService(mongoClient, tranCollection, accCollection)
 	transferAmount, _ := decimal.NewFromString("100.00")
@@ -45,39 +45,39 @@ func TestAddTransaction(t *testing.T) {
 		assert.Nil(t, err)
 		samFind, tomFind := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.SamAccountDetails.Accounts[0].Id},
+			ctx, bson.M{"accounts._id": utils.SamAccountDetails.BankAccounts[0].Id},
 		).Decode(&samFind)
 		if err != nil {
 			t.Errorf("Error in finding Sam's account details: %v", err)
 		}
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.TomAccountDetails.Accounts[0].Id},
+			ctx, bson.M{"accounts._id": utils.TomAccountDetails.BankAccounts[0].Id},
 		).Decode(&tomFind)
 		if err != nil {
 			t.Errorf("Error in finding Tom's's account details: %v", err)
 		}
 		samBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(
-			utils.SamAccountDetails.Accounts[0].AvailableBalance,
+			utils.SamAccountDetails.BankAccounts[0].AvailableBalance,
 		)
 		samBalance = samBalance.Add(transferAmount)
 		tomBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(
-			utils.TomAccountDetails.Accounts[0].AvailableBalance,
+			utils.TomAccountDetails.BankAccounts[0].AvailableBalance,
 		)
 		tomBalance = tomBalance.Sub(transferAmount)
 		assert.Equal(
 			t,
 			samBalance.String(),
-			samFind.Accounts[0].AvailableBalance.String(),
+			samFind.BankAccounts[0].AvailableBalance.String(),
 		)
 		assert.Equal(
 			t,
 			tomBalance.String(),
-			tomFind.Accounts[0].AvailableBalance.String(),
+			tomFind.BankAccounts[0].AvailableBalance.String(),
 		)
 
 		var tranRes = mongodb.MongoTransactionInput{}
 		err = tranCollection.FindOne(
-			ctx, bson.M{"fromAccount": utils.TomAccountDetails.Accounts[0].Id},
+			ctx, bson.M{"fromAccount": utils.TomAccountDetails.BankAccounts[0].Id},
 		).Decode(&tranRes)
 		if err != nil {
 			t.Errorf("Error in decoding transaction result into tranRes: %v", err)
@@ -90,7 +90,7 @@ func TestAddTransaction(t *testing.T) {
 		reallyHighAmount := "99999999.99"
 		err := service.AddTransaction(input.ToAccount, input.FromAccount, reallyHighAmount, ctx)
 		assert.NotNil(t, err)
-		assert.EqualError(t, err, "insufficient balance in Account "+tomAccountName)
+		assert.EqualError(t, err, "insufficient balance in BankAccount "+tomAccountName)
 	})
 
 	t.Run("Should not carry out transaction if there is an error", func(t *testing.T) {
@@ -101,7 +101,7 @@ func TestAddTransaction(t *testing.T) {
 		samDetails, tomDetails := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
 
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.SamAccountDetails.Accounts[0].Id},
+			ctx, bson.M{"accounts._id": utils.SamAccountDetails.BankAccounts[0].Id},
 		).Decode(&samDetails)
 
 		if err != nil {
@@ -109,7 +109,7 @@ func TestAddTransaction(t *testing.T) {
 		}
 
 		err = accCollection.FindOne(
-			ctx, bson.M{"accounts._id": utils.TomAccountDetails.Accounts[0].Id},
+			ctx, bson.M{"accounts._id": utils.TomAccountDetails.BankAccounts[0].Id},
 		).Decode(&tomDetails)
 
 		if err != nil {
@@ -118,13 +118,13 @@ func TestAddTransaction(t *testing.T) {
 
 		assert.Equal(
 			t,
-			utils.SamAccountDetails.Accounts[0].AvailableBalance.String(),
-			samDetails.Accounts[0].AvailableBalance.String(),
+			utils.SamAccountDetails.BankAccounts[0].AvailableBalance.String(),
+			samDetails.BankAccounts[0].AvailableBalance.String(),
 		)
 		assert.Equal(
 			t,
-			utils.TomAccountDetails.Accounts[0].AvailableBalance.String(),
-			tomDetails.Accounts[0].AvailableBalance.String(),
+			utils.TomAccountDetails.BankAccounts[0].AvailableBalance.String(),
+			tomDetails.BankAccounts[0].AvailableBalance.String(),
 		)
 	})
 }

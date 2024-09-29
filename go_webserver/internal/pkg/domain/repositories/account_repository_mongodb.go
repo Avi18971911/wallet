@@ -133,7 +133,7 @@ func (ar *AccountRepositoryMongodb) GetAccountBalance(accountId string, ctx cont
 		return defaultDecimal,
 			fmt.Errorf("error when finding account by ID %s: %w", accountId, err)
 	}
-	balanceDecimal, err := utils.FromPrimitiveDecimal128ToDecimal(account.Accounts[0].AvailableBalance)
+	balanceDecimal, err := utils.FromPrimitiveDecimal128ToDecimal(account.BankAccounts[0].AvailableBalance)
 	if err != nil {
 		return defaultDecimal,
 			fmt.Errorf("error when converting available balance to decimal for accountId %s: %w", accountId, err)

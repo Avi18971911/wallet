@@ -48,7 +48,7 @@ var MigrationSchema1 = versions.Migration{
 							},
 						},
 					},
-					// Embedded Bank Accounts (Main Bank Accounts for the User)
+					// Embedded Bank BankAccounts (Main Bank BankAccounts for the User)
 					"bankAccounts": bson.M{
 						"bsonType": "array",
 						"items": bson.M{
@@ -57,24 +57,24 @@ var MigrationSchema1 = versions.Migration{
 							"properties": bson.M{
 								"accountNumber": bson.M{
 									"bsonType":    "string",
-									"description": "Account Number for the Account [required]",
+									"description": "Account Number for the Bank Account [required]",
 								},
 								"accountType": bson.M{
 									"bsonType":    "string",
-									"description": "Account Type [required]",
+									"description": "Bank Account Type [required]",
 								},
 								"availableBalance": bson.M{
 									"bsonType":    "decimal",
-									"description": "Available Balance for the Account [required]",
+									"description": "Available Balance for the Bank Account [required]",
 								},
 								"_id": bson.M{
 									"bsonType":    "objectId",
-									"description": "Unique ID for this Account [optional]",
+									"description": "Unique ID for this Bank Account [optional]",
 								},
 							},
 						},
 					},
-					// Known Bank Accounts (External or Third-Party Accounts)
+					// Known Bank BankAccounts (External or Third-Party BankAccounts)
 					"knownBankAccounts": bson.M{
 						"bsonType": "array",
 						"items": bson.M{
@@ -83,20 +83,20 @@ var MigrationSchema1 = versions.Migration{
 							"properties": bson.M{
 								"accountNumber": bson.M{
 									"bsonType":    "string",
-									"description": "Account Number of the Known Account [required]",
+									"description": "Account Number of the Known Bank Account [required]",
 								},
 								"accountHolder": bson.M{
 									"bsonType":    "string",
-									"description": "Account Holder Name of the Known Account [required]",
+									"description": "Account Holder Name of the Known Bank Account [required]",
 								},
 								"accountType": bson.M{
 									"bsonType":    "string",
-									"description": "Type of the Known Account [required]",
+									"description": "Type of the Known Bank Account [required]",
 								},
 								// Optional: Include ID if necessary for future references
 								"_id": bson.M{
 									"bsonType":    "objectId",
-									"description": "Unique ID for this Known Account [optional]",
+									"description": "Unique ID for this Known Bank Account [optional]",
 								},
 							},
 						},
