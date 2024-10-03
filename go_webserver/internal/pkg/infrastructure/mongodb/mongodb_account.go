@@ -32,6 +32,7 @@ type BankAccount struct {
 	Id               primitive.ObjectID   `bson:"_id,omitempty"`
 	AccountNumber    string               `bson:"accountNumber"`
 	AccountType      string               `bson:"accountType"`
+	PendingBalance   primitive.Decimal128 `bson:"pendingBalance"`
 	AvailableBalance primitive.Decimal128 `bson:"availableBalance"`
 }
 

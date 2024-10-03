@@ -60,6 +60,12 @@ func fromMongoAccounts(accounts []mongodb.BankAccount) ([]model.BankAccount, err
 				"error when converting available balance to decimal for account number %s: %v", a.AccountNumber, err,
 			)
 		}
+		pendingBalanceDecimal, err := utils.FromPrimitiveDecimal128ToDecimal(a.PendingBalance)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"error when converting pending balance to decimal for account number %s: %v", a.AccountNumber, err,
+			)
+		}
 		accountType, err := fromMongoAccountType(a.AccountType)
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -70,6 +76,7 @@ func fromMongoAccounts(accounts []mongodb.BankAccount) ([]model.BankAccount, err
 			Id:               stringId,
 			AccountNumber:    a.AccountNumber,
 			AccountType:      accountType,
+			PendingBalance:   pendingBalanceDecimal,
 			AvailableBalance: availableBalanceDecimal,
 		}
 	}

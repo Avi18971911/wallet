@@ -50,6 +50,7 @@ func (ar *AccountRepositoryMongodb) GetAccountDetailsFromBankAccountId(
 func (ar *AccountRepositoryMongodb) AddBalance(
 	bankAccountId string,
 	amount decimal.Decimal,
+	toPending bool,
 	ctx context.Context,
 ) error {
 	objectId, err := utils.StringToObjectId(bankAccountId)
@@ -63,7 +64,12 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 			"bankAccountId %s: %w", bankAccountId, err)
 	}
 	filter := bson.M{"bankAccounts._id": objectId}
-	update := bson.M{"$inc": bson.M{"bankAccounts.$.availableBalance": decimal128Amount}}
+	var update bson.M
+	if toPending {
+		update = bson.M{"$inc": bson.M{"bankAccounts.$.pendingBalance": decimal128Amount}}
+	} else {
+		update = bson.M{"$inc": bson.M{"bankAccounts.$.availableBalance": decimal128Amount}}
+	}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf(
@@ -83,6 +89,7 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 func (ar *AccountRepositoryMongodb) DeductBalance(
 	bankAccountId string,
 	amount decimal.Decimal,
+	toPending bool,
 	ctx context.Context,
 ) (decimal.Decimal, error) {
 	objectId, err := utils.StringToObjectId(bankAccountId)
@@ -99,7 +106,12 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 			fmt.Errorf("error when converting amount to Decimal128 for bankAccountId %s: %w", bankAccountId, err)
 	}
 	filter := bson.M{"bankAccounts._id": objectId}
-	update := bson.M{"$inc": bson.M{"bankAccounts.$.availableBalance": decimal128Amount}}
+	var update bson.M
+	if toPending {
+		update = bson.M{"$inc": bson.M{"bankAccounts.$.pendingBalance": decimal128Amount}}
+	} else {
+		update = bson.M{"$inc": bson.M{"bankAccounts.$.availableBalance": decimal128Amount}}
+	}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return defaultDecimal,

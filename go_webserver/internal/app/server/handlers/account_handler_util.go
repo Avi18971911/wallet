@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"errors"
-	"log"
 	"webserver/internal/app/server/dto"
 	"webserver/internal/pkg/domain/model"
 )
@@ -10,10 +8,7 @@ import (
 func knownAccountToDTO(tx []model.KnownBankAccount) []dto.KnownBankAccountDTO {
 	knownAccountDTOList := make([]dto.KnownBankAccountDTO, len(tx))
 	for i, element := range tx {
-		accountType, err := accountTypeEnumToString(element.AccountType)
-		if err != nil {
-			log.Printf("Failed to convert account type to string: %v", err)
-		}
+		accountType := string(element.AccountType)
 		knownAccountDTOList[i] = dto.KnownBankAccountDTO{
 			Id:            element.Id,
 			AccountNumber: element.AccountNumber,
@@ -27,14 +22,12 @@ func knownAccountToDTO(tx []model.KnownBankAccount) []dto.KnownBankAccountDTO {
 func accountsToDTO(tx []model.BankAccount) []dto.BankAccountDTO {
 	accountDTOList := make([]dto.BankAccountDTO, len(tx))
 	for i, element := range tx {
-		accountType, err := accountTypeEnumToString(element.AccountType)
-		if err != nil {
-			log.Printf("Failed to convert account type to string: %v", err)
-		}
+		accountType := string(element.AccountType)
 		accountDTOList[i] = dto.BankAccountDTO{
 			Id:               element.Id,
 			AccountNumber:    element.AccountNumber,
 			AccountType:      accountType,
+			PendingBalance:   element.PendingBalance.String(),
 			AvailableBalance: element.AvailableBalance.String(),
 		}
 	}
@@ -68,17 +61,4 @@ func accountTransactionToDTO(tx []model.BankAccountTransaction) []dto.AccountTra
 		}
 	}
 	return accountTransactionDTOList
-}
-
-func accountTypeEnumToString(tx int) (string, error) {
-	switch tx {
-	case model.Savings:
-		return "savings", nil
-	case model.Checking:
-		return "checking", nil
-	case model.Investment:
-		return "investment", nil
-	default:
-		return "unknown", errors.New("invalid account type")
-	}
 }

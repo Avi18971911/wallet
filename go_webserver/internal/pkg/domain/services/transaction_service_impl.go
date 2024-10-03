@@ -45,7 +45,8 @@ func (t *TransactionServiceImpl) AddTransaction(input model.TransactionDetailsIn
 		}
 	}()
 
-	newBalance, err := t.ar.DeductBalance(input.FromBankAccountId, input.Amount, txnCtx)
+	toPending := input.Type == model.Pending
+	newBalance, err := t.ar.DeductBalance(input.FromBankAccountId, input.Amount, toPending, txnCtx)
 	if err != nil {
 		log.Printf("Error deducting balance from BankAccount %s: %v", input.FromBankAccountId, err)
 		return fmt.Errorf("error when deducting balance from BankAccount %s: %w", input.FromBankAccountId, err)
@@ -58,7 +59,7 @@ func (t *TransactionServiceImpl) AddTransaction(input model.TransactionDetailsIn
 
 	log.Printf("Successfully deducted balance from BankAccount %s", input.FromBankAccountId)
 
-	if err = t.ar.AddBalance(input.ToBankAccountId, input.Amount, txnCtx); err != nil {
+	if err = t.ar.AddBalance(input.ToBankAccountId, input.Amount, toPending, txnCtx); err != nil {
 		log.Printf("Error adding balance to BankAccount %s: %v", input.ToBankAccountId, err)
 		return fmt.Errorf("error when adding balance to BankAccount %s: %w", input.ToBankAccountId, err)
 	}

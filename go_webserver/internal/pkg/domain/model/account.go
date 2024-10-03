@@ -33,6 +33,7 @@ type BankAccount struct {
 	Id               string
 	AccountNumber    string
 	AccountType      BankAccountType
+	PendingBalance   decimal.Decimal
 	AvailableBalance decimal.Decimal
 }
 

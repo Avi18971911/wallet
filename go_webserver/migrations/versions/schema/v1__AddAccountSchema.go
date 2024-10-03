@@ -63,6 +63,10 @@ var MigrationSchema1 = versions.Migration{
 									"bsonType":    "string",
 									"description": "Bank Account Type [required]",
 								},
+								"pendingBalance": bson.M{
+									"bsonType":    "decimal",
+									"description": "Pending Balance for the Bank Account [required]",
+								},
 								"availableBalance": bson.M{
 									"bsonType":    "decimal",
 									"description": "Available Balance for the Bank Account [required]",

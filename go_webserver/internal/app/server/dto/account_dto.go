@@ -71,6 +71,8 @@ type BankAccountDTO struct {
 	AccountType string `json:"accountType" validate:"required"`
 	// The available balance of the account. Valid to two decimal places.
 	AvailableBalance string `json:"availableBalance" validate:"required"`
+	// The pending balance of the account. Valid to two decimal places.
+	PendingBalance string `json:"pendingBalance" validate:"required"`
 }
 
 // PersonDTO represents an account holder
