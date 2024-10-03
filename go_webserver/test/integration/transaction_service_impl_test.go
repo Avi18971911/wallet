@@ -139,6 +139,67 @@ func TestAddTransaction(t *testing.T) {
 			tomDetails.BankAccounts[0].AvailableBalance.String(),
 		)
 	})
+
+	t.Run("Pending transactions should not be realized", func(t *testing.T) {
+		setupAddTransactionTestCase(tranCollection, accCollection, ctx, t)
+		pendingInput := model.TransactionDetailsInput{
+			ToBankAccountId:   samAccountName,
+			FromBankAccountId: tomAccountName,
+			Amount:            transferAmount,
+			Type:              model.Pending,
+		}
+		err := service.AddTransaction(pendingInput, ctx)
+		assert.Nil(t, err)
+		samFind, tomFind := mongodb.MongoAccountOutput{}, mongodb.MongoAccountOutput{}
+		err = accCollection.FindOne(
+			ctx, bson.M{"bankAccounts._id": utils.SamAccountDetails.BankAccounts[0].Id},
+		).Decode(&samFind)
+		if err != nil {
+			t.Errorf("Error in finding Sam's account details: %v", err)
+		}
+		err = accCollection.FindOne(
+			ctx, bson.M{"bankAccounts._id": utils.TomAccountDetails.BankAccounts[0].Id},
+		).Decode(&tomFind)
+		if err != nil {
+			t.Errorf("Error in finding Tom's's account details: %v", err)
+		}
+		samBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(
+			utils.SamAccountDetails.BankAccounts[0].PendingBalance,
+		)
+		samBalance = samBalance.Add(transferAmount)
+		tomBalance, _ := pkgutils.FromPrimitiveDecimal128ToDecimal(
+			utils.TomAccountDetails.BankAccounts[0].PendingBalance,
+		)
+		tomBalance = tomBalance.Sub(transferAmount)
+		assert.Equal(
+			t,
+			samBalance.String(),
+			formatDecimalString(samFind.BankAccounts[0].PendingBalance.String()),
+		)
+		assert.Equal(
+			t,
+			tomBalance.String(),
+			formatDecimalString(tomFind.BankAccounts[0].PendingBalance.String()),
+		)
+		assert.NotEqual(
+			t,
+			samFind.BankAccounts[0].AvailableBalance.String(),
+			samFind.BankAccounts[0].PendingBalance.String(),
+		)
+		assert.NotEqual(
+			t,
+			tomFind.BankAccounts[0].AvailableBalance.String(),
+			tomFind.BankAccounts[0].PendingBalance.String(),
+		)
+		var tranRes = mongodb.MongoTransactionInput{}
+		err = tranCollection.FindOne(
+			ctx, bson.M{"fromBankAccountId": utils.TomAccountDetails.BankAccounts[0].Id},
+		).Decode(&tranRes)
+		if err != nil {
+			t.Errorf("Error in decoding transaction result into tranRes: %v", err)
+		}
+		assert.Equal(t, string(model.Pending), tranRes.Type)
+	})
 }
 
 func setupAddTransactionTestCase(
@@ -171,4 +232,8 @@ func setupTransactionService(
 	tran := transactional.NewMongoTransactional(mongoClient)
 	service := services.CreateNewTransactionServiceImpl(tr, ar, tran)
 	return service
+}
+
+func formatDecimalString(input string) string {
+	return decimal.RequireFromString(input).String()
 }
