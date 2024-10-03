@@ -8,11 +8,18 @@ import (
 	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
+	"webserver/internal/pkg/domain/model"
 	"webserver/test/mocks"
 )
 
 func TestAddTransaction(t *testing.T) {
 	testAmt, _ := decimal.NewFromString("100.00")
+	input := model.TransactionDetailsInput{
+		ToBankAccountId:   "toAccountID",
+		FromBankAccountId: "fromAccountID",
+		Amount:            testAmt,
+	}
+
 	t.Run("Doesn't return error if transaction is successful", func(t *testing.T) {
 		mockTranRepo, mockAccRepo, mockTran, service, ctx, cancel := initializeTransactionMocks()
 		defer cancel()
@@ -24,7 +31,7 @@ func TestAddTransaction(t *testing.T) {
 			Return(nil)
 		mockTran.On("Commit", mock.Anything).Return(nil)
 
-		err := service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		err := service.AddTransaction(input, ctx)
 		assert.Nil(t, err)
 	})
 
@@ -34,7 +41,7 @@ func TestAddTransaction(t *testing.T) {
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).
 			Return(ctx, errors.New("can't start transaction"))
 
-		err := service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		err := service.AddTransaction(input, ctx)
 		assert.ErrorContains(t, err, "can't start transaction")
 		mockTran.AssertNumberOfCalls(t, "Rollback", 0)
 		mockTranRepo.AssertNumberOfCalls(t, "AddTransaction", 0)
@@ -47,7 +54,7 @@ func TestAddTransaction(t *testing.T) {
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(assert.AnError)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
-		err := service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		err := service.AddTransaction(input, ctx)
 		assert.NotNil(t, err)
 	})
 
@@ -60,7 +67,7 @@ func TestAddTransaction(t *testing.T) {
 			Return(assert.AnError)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
-		err := service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		err := service.AddTransaction(input, ctx)
 		assert.NotNil(t, err)
 	})
 
@@ -75,7 +82,7 @@ func TestAddTransaction(t *testing.T) {
 			Return(assert.AnError)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
-		err := service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		err := service.AddTransaction(input, ctx)
 		assert.NotNil(t, err)
 	})
 
@@ -90,7 +97,7 @@ func TestAddTransaction(t *testing.T) {
 			Return(nil)
 		mockTran.On("Commit", mock.Anything).Return(nil)
 
-		service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		service.AddTransaction(input, ctx)
 		mockTran.AssertNumberOfCalls(t, "Commit", 1)
 		mockTran.AssertNumberOfCalls(t, "Rollback", 0)
 	})
@@ -102,7 +109,7 @@ func TestAddTransaction(t *testing.T) {
 		mockTranRepo.On("AddTransaction", mock.Anything, mock.Anything).Return(assert.AnError)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
-		service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		service.AddTransaction(input, ctx)
 		mockTran.AssertNumberOfCalls(t, "Commit", 0)
 		mockTran.AssertNumberOfCalls(t, "Rollback", 1)
 	})
@@ -118,7 +125,7 @@ func TestAddTransaction(t *testing.T) {
 			Return(nil)
 		mockTran.On("Commit", mock.Anything).Return(errors.New("commit error"))
 
-		err := service.AddTransaction("toAccountID", "fromAccountID", testAmt.String(), ctx)
+		err := service.AddTransaction(input, ctx)
 		assert.Error(t, err)
 		assert.ErrorContains(t, err, "commit error")
 		mockTran.AssertNumberOfCalls(t, "Commit", 1)

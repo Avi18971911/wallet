@@ -16,10 +16,10 @@ func (m *MockTransactionRepository) AddTransaction(details *model.TransactionDet
 }
 
 func (m *MockTransactionRepository) GetTransactionsFromBankAccountId(
-	accountId string,
+	bankAccountId string,
 	ctx context.Context,
 ) ([]model.BankAccountTransaction, error) {
-	args := m.Called(accountId, ctx)
+	args := m.Called(bankAccountId, ctx)
 	var accountTransactions []model.BankAccountTransaction
 	if args.Get(0) != nil {
 		accountTransactions = args.Get(0).([]model.BankAccountTransaction)
