@@ -75,7 +75,16 @@ func TestAddTransaction(t *testing.T) {
 			tomBalance.String(),
 			tomFind.BankAccounts[0].AvailableBalance.String(),
 		)
-
+		assert.Equal(
+			t,
+			samBalance.String(),
+			samFind.BankAccounts[0].PendingBalance.String(),
+		)
+		assert.Equal(
+			t,
+			tomBalance.String(),
+			tomFind.BankAccounts[0].PendingBalance.String(),
+		)
 		var tranRes = mongodb.MongoTransactionInput{}
 		err = tranCollection.FindOne(
 			ctx, bson.M{"fromBankAccountId": utils.TomAccountDetails.BankAccounts[0].Id},

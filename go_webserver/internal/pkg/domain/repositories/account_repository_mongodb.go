@@ -65,10 +65,9 @@ func (ar *AccountRepositoryMongodb) AddBalance(
 	}
 	filter := bson.M{"bankAccounts._id": objectId}
 	var update bson.M
-	if toPending {
-		update = bson.M{"$inc": bson.M{"bankAccounts.$.pendingBalance": decimal128Amount}}
-	} else {
-		update = bson.M{"$inc": bson.M{"bankAccounts.$.availableBalance": decimal128Amount}}
+	update = bson.M{"$inc": bson.M{"bankAccounts.$.pendingBalance": decimal128Amount}}
+	if !toPending {
+		update["$inc"].(bson.M)["bankAccounts.$.availableBalance"] = decimal128Amount
 	}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -107,10 +106,9 @@ func (ar *AccountRepositoryMongodb) DeductBalance(
 	}
 	filter := bson.M{"bankAccounts._id": objectId}
 	var update bson.M
-	if toPending {
-		update = bson.M{"$inc": bson.M{"bankAccounts.$.pendingBalance": decimal128Amount}}
-	} else {
-		update = bson.M{"$inc": bson.M{"bankAccounts.$.availableBalance": decimal128Amount}}
+	update = bson.M{"$inc": bson.M{"bankAccounts.$.pendingBalance": decimal128Amount}}
+	if !toPending {
+		update["$inc"].(bson.M)["bankAccounts.$.availableBalance"] = decimal128Amount
 	}
 	result, err := ar.col.UpdateOne(ctx, filter, update)
 	if err != nil {

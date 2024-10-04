@@ -22,6 +22,7 @@ var TomAccountDetails = mongodb.MongoAccountInput{
 			AccountNumber:    "123-45678-9",
 			AccountType:      "savings",
 			AvailableBalance: tomBalanceDecimal128,
+			PendingBalance:   tomBalanceDecimal128,
 		},
 	},
 	Person: mongodb.Person{
@@ -48,6 +49,7 @@ var SamAccountDetails = mongodb.MongoAccountInput{
 			AccountNumber:    "987-65432-1",
 			AccountType:      "checking",
 			AvailableBalance: samBalanceDecimal128,
+			PendingBalance:   samBalanceDecimal128,
 		},
 	},
 	Person: mongodb.Person{
