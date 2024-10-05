@@ -14,11 +14,11 @@ type MockAccountRepository struct {
 func (m *MockAccountRepository) GetAccountDetailsFromBankAccountId(
 	accountId string,
 	ctx context.Context,
-) (*model.AccountDetails, error) {
+) (*model.AccountDetailsOutput, error) {
 	args := m.Called(accountId, ctx)
-	var accountDetails *model.AccountDetails
+	var accountDetails *model.AccountDetailsOutput
 	if args.Get(0) != nil {
-		accountDetails = args.Get(0).(*model.AccountDetails)
+		accountDetails = args.Get(0).(*model.AccountDetailsOutput)
 	}
 	return accountDetails, args.Error(1)
 }
@@ -46,11 +46,11 @@ func (m *MockAccountRepository) DeductBalance(
 func (m *MockAccountRepository) GetAccountDetailsFromUsername(
 	username string,
 	ctx context.Context,
-) (*model.AccountDetails, error) {
+) (*model.AccountDetailsOutput, error) {
 	args := m.Called(username, ctx)
-	var accountDetails *model.AccountDetails
+	var accountDetails *model.AccountDetailsOutput
 	if args.Get(0) != nil {
-		accountDetails = args.Get(0).(*model.AccountDetails)
+		accountDetails = args.Get(0).(*model.AccountDetailsOutput)
 	}
 	return accountDetails, args.Error(1)
 }

@@ -42,7 +42,7 @@ func TestGetAccountTransaction(t *testing.T) {
 	t.Run("Returns correct output assuming happy path", func(t *testing.T) {
 		mockTranRepo, _, mockTran, service, ctx, cancel := initializeAccountMocks()
 		defer cancel()
-		stubTransactions := []model.BankAccountTransaction{
+		stubTransactions := []model.BankAccountTransactionOutput{
 			{Id: "transactionId", BankAccountId: "accountId", Amount: decimal.NewFromFloat(123.13), CreatedAt: time.Now()},
 		}
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).Return(ctx, nil)

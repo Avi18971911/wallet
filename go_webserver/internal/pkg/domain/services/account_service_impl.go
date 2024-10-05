@@ -26,7 +26,7 @@ func CreateNewAccountServiceImpl(
 	return &AccountServiceImpl{ar: ar, tr: tr, tran: tran}
 }
 
-func validateAccountDetails(accountDetails *model.AccountDetails) error {
+func validateAccountDetails(accountDetails *model.AccountDetailsOutput) error {
 	err := validateAccountNumbers(accountDetails.BankAccounts)
 	if err != nil {
 		return fmt.Errorf("unable to validate account numbers with error: %w", err)
@@ -52,7 +52,7 @@ func validateAccountNumbers(accounts []model.BankAccount) error {
 func (a *AccountServiceImpl) GetAccountDetailsFromBankAccountId(
 	bankAccountId string,
 	ctx context.Context,
-) (*model.AccountDetails, error) {
+) (*model.AccountDetailsOutput, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 	accountDetails, err := a.ar.GetAccountDetailsFromBankAccountId(bankAccountId, getCtx)
@@ -71,7 +71,7 @@ func (a *AccountServiceImpl) GetAccountDetailsFromBankAccountId(
 
 func (a *AccountServiceImpl) GetBankAccountTransactions(
 	bankAccountId string, ctx context.Context,
-) ([]model.BankAccountTransaction, error) {
+) ([]model.BankAccountTransactionOutput, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
@@ -100,7 +100,7 @@ func (a *AccountServiceImpl) Login(
 	username string,
 	password string,
 	ctx context.Context,
-) (*model.AccountDetails, error) {
+) (*model.AccountDetailsOutput, error) {
 	getCtx, cancel := context.WithTimeout(ctx, addTimeout)
 	defer cancel()
 
@@ -153,7 +153,7 @@ func (a *AccountServiceImpl) GetAccountHistoryInMonths(
 }
 
 func getAccountBalanceMonths(
-	transactions []model.BankAccountTransaction,
+	transactions []model.BankAccountTransactionOutput,
 	availableBalance decimal.Decimal,
 	pendingBalance decimal.Decimal,
 ) []model.AccountBalanceMonths {

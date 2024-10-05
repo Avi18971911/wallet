@@ -10,3 +10,14 @@ type TransactionRequest struct {
 	// The amount to be transferred. Valid to two decimal places.
 	Amount string `json:"amount" validate:"required"`
 }
+
+// TransactionsForBankAccountRequest represents a request to retrieve transactions for a bank account.
+// @swagger:model TransactionsForBankAccountRequest
+type TransactionsForBankAccountRequest struct {
+	// The bank account ID of the account for which transactions are to be retrieved
+	BankAccountId string `json:"bankAccountId" validate:"required"`
+	// The earliest time (inclusive) from which transactions are to be retrieved. Format: RFC3339
+	FromTime string `json:"fromTime"`
+	// The latest time (inclusive) from which transactions are to be retrieved. Format: RFC3339
+	ToTime string `json:"toTime"`
+}

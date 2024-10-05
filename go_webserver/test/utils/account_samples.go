@@ -60,7 +60,7 @@ var SamAccountDetails = mongodb.MongoAccountInput{
 	CreatedAt:         pkgutils.GetCurrentTimestamp(),
 }
 
-var TomAccountDetailsModel = model.AccountDetails{
+var TomAccountDetailsModel = model.AccountDetailsOutput{
 	Username: "Tom",
 	BankAccounts: []model.BankAccount{
 		{

@@ -83,7 +83,7 @@ func fromMongoAccounts(accounts []mongodb.BankAccount) ([]model.BankAccount, err
 	return res, nil
 }
 
-func fromMongoAccountDetails(details *mongodb.MongoAccountOutput) (*model.AccountDetails, error) {
+func fromMongoAccountDetails(details *mongodb.MongoAccountOutput) (*model.AccountDetailsOutput, error) {
 	accountId, err := utils.ObjectIdToString(details.Id)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -99,7 +99,7 @@ func fromMongoAccountDetails(details *mongodb.MongoAccountOutput) (*model.Accoun
 		return nil, fmt.Errorf("error when converting mongo known accounts to model known accounts: %v", err)
 	}
 
-	return &model.AccountDetails{
+	return &model.AccountDetailsOutput{
 		Id:       accountId,
 		Username: details.Username,
 		Password: details.Password,

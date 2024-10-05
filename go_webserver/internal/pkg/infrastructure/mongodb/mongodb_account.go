@@ -43,7 +43,7 @@ type KnownBankAccount struct {
 	AccountType   string             `bson:"accountType"`
 }
 
-type MongoAccountTransaction struct {
+type MongoAccountTransactionOutput struct {
 	Id                 primitive.ObjectID   `bson:"_id"`
 	BankAccountId      primitive.ObjectID   `bson:"bankAccountId"`
 	OtherBankAccountId primitive.ObjectID   `bson:"otherBankAccountId"`

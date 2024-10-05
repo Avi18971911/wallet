@@ -18,11 +18,11 @@ func (m *MockTransactionRepository) AddTransaction(details *model.TransactionDet
 func (m *MockTransactionRepository) GetTransactionsFromBankAccountId(
 	bankAccountId string,
 	ctx context.Context,
-) ([]model.BankAccountTransaction, error) {
+) ([]model.BankAccountTransactionOutput, error) {
 	args := m.Called(bankAccountId, ctx)
-	var accountTransactions []model.BankAccountTransaction
+	var accountTransactions []model.BankAccountTransactionOutput
 	if args.Get(0) != nil {
-		accountTransactions = args.Get(0).([]model.BankAccountTransaction)
+		accountTransactions = args.Get(0).([]model.BankAccountTransactionOutput)
 	}
 	return accountTransactions, args.Error(1)
 }

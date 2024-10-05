@@ -180,10 +180,10 @@ func createExpectedAccountTranResult(
 	tranStrings []string,
 	tranAmounts []decimal.Decimal,
 	transactionTypes []string,
-) []model.BankAccountTransaction {
-	expectedResults := make([]model.BankAccountTransaction, len(tranAmounts))
+) []model.BankAccountTransactionOutput {
+	expectedResults := make([]model.BankAccountTransactionOutput, len(tranAmounts))
 	for i, _ := range tranAmounts {
-		expectedResults[i] = model.BankAccountTransaction{
+		expectedResults[i] = model.BankAccountTransactionOutput{
 			Id:                 tranStrings[i],
 			BankAccountId:      accountId,
 			TransactionType:    transactionTypes[i],
@@ -197,8 +197,8 @@ func createExpectedAccountTranResult(
 
 func assertExpectedMatchesResult(
 	t *testing.T,
-	expectedResults []model.BankAccountTransaction,
-	res []model.BankAccountTransaction,
+	expectedResults []model.BankAccountTransactionOutput,
+	res []model.BankAccountTransactionOutput,
 ) {
 	for i, _ := range expectedResults {
 		assert.Equal(t, expectedResults[i].Id, res[i].Id)

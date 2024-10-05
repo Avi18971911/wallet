@@ -26,9 +26,9 @@ func CreateNewAccountRepositoryMongodb(col *mongo.Collection) *AccountRepository
 func (ar *AccountRepositoryMongodb) GetAccountDetailsFromBankAccountId(
 	bankAccountId string,
 	ctx context.Context,
-) (*model.AccountDetails, error) {
+) (*model.AccountDetailsOutput, error) {
 	var accountDetails mongodb.MongoAccountOutput
-	var res *model.AccountDetails
+	var res *model.AccountDetailsOutput
 	objectId, err := utils.StringToObjectId(bankAccountId)
 	if err != nil {
 		return nil, fmt.Errorf("error when converting account ID to object ID for "+
@@ -168,7 +168,7 @@ func (ar *AccountRepositoryMongodb) GetAccountBalance(
 func (ar *AccountRepositoryMongodb) GetAccountDetailsFromUsername(
 	username string,
 	ctx context.Context,
-) (*model.AccountDetails, error) {
+) (*model.AccountDetailsOutput, error) {
 	var accountDetails mongodb.MongoAccountOutput
 	filter := bson.M{"username": username}
 	err := ar.col.FindOne(ctx, filter).Decode(&accountDetails)

@@ -41,8 +41,8 @@ func (tr *TransactionRepositoryMongodb) AddTransaction(
 
 func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 	bankAccountId string, ctx context.Context,
-) ([]model.BankAccountTransaction, error) {
-	var res []model.BankAccountTransaction
+) ([]model.BankAccountTransactionOutput, error) {
+	var res []model.BankAccountTransactionOutput
 	objectAccountId, err := utils.StringToObjectId(bankAccountId)
 	if err != nil {
 		return nil, fmt.Errorf("error when converting account ID to object ID for "+
@@ -82,7 +82,7 @@ func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 		return nil, fmt.Errorf("error when aggregating transactions for BankAccount %s: %w", bankAccountId, err)
 	}
 
-	var mongoResults []mongodb.MongoAccountTransaction
+	var mongoResults []mongodb.MongoAccountTransactionOutput
 
 	defer func() {
 		err := cursor.Close(ctx)

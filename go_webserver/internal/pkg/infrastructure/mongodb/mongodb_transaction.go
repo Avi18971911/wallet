@@ -5,7 +5,6 @@ import (
 )
 
 type MongoTransactionInput struct {
-	Id                primitive.ObjectID   `bson:"_id,omitempty"`
 	FromBankAccountId primitive.ObjectID   `bson:"fromBankAccountId"`
 	ToBankAccountId   primitive.ObjectID   `bson:"toBankAccountId"`
 	Amount            primitive.Decimal128 `bson:"amount"`
@@ -13,4 +12,10 @@ type MongoTransactionInput struct {
 	ExpirationDate    primitive.Timestamp  `bson:"expirationDate,omitempty"`
 	Status            string               `bson:"status,omitempty"`
 	CreatedAt         primitive.Timestamp  `bson:"_createdAt"`
+}
+
+type MongoTransactionForBankAccountInput struct {
+	BankAccountId primitive.ObjectID  `bson:"bankAccountId"`
+	FromTime      primitive.Timestamp `bson:"fromTime"`
+	ToTime        primitive.Timestamp `bson:"toTime"`
 }

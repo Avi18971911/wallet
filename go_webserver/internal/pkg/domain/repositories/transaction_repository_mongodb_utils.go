@@ -51,9 +51,9 @@ func fromDomainTransactionDetails(details *model.TransactionDetailsInput) (*mong
 }
 
 func fromMongoAccountTransaction(
-	accountTransactions []mongodb.MongoAccountTransaction,
-) ([]model.BankAccountTransaction, error) {
-	var res = make([]model.BankAccountTransaction, len(accountTransactions))
+	accountTransactions []mongodb.MongoAccountTransactionOutput,
+) ([]model.BankAccountTransactionOutput, error) {
+	var res = make([]model.BankAccountTransactionOutput, len(accountTransactions))
 	var err error
 	var transactionId, accountId, otherAccountId string
 	for i, elem := range accountTransactions {
@@ -73,7 +73,7 @@ func fromMongoAccountTransaction(
 		if err != nil {
 			return res, fmt.Errorf("error when converting amount to decimal: %w", err)
 		}
-		res[i] = model.BankAccountTransaction{
+		res[i] = model.BankAccountTransactionOutput{
 			Id:                 transactionId,
 			BankAccountId:      accountId,
 			OtherBankAccountId: otherAccountId,

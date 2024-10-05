@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type AccountDetails struct {
+type AccountDetailsOutput struct {
 	Id                string
 	Username          string
 	Password          string
@@ -44,7 +44,7 @@ type KnownBankAccount struct {
 	AccountType   BankAccountType
 }
 
-type BankAccountTransaction struct {
+type BankAccountTransactionOutput struct {
 	Id                 string
 	BankAccountId      string
 	OtherBankAccountId string
