@@ -54,8 +54,14 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 // @Router /accounts/{accountId}/transactions [get]
 func AccountTransactionsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		accountID := mux.Vars(r)["accountId"]
-		accountTransactions, err := s.GetBankAccountTransactions(accountID, ctx)
+		var req dto.AccountTransactionRequestDTO
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+		accountTransactionsInput := accountTransactionRequestToInput(req)
+		accountTransactions, err := s.GetBankAccountTransactions(&accountTransactionsInput, ctx)
 		if err != nil {
 			utils.HttpError(w, "Failed to get BankAccount Transactions", http.StatusInternalServerError)
 			return

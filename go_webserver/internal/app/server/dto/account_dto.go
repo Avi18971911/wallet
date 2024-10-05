@@ -34,6 +34,19 @@ type AccountDetailsResponseDTO struct {
 	CreatedAt time.Time `json:"createdAt" validate:"required"`
 }
 
+// AccountTransactionRequestDTO represents a request to retrieve transactions for a specific account
+// between a given time range.
+// @swagger:model AccountTransactionRequestDTO
+
+type AccountTransactionRequestDTO struct {
+	// The bank account ID of the account associated with the transactions
+	BankAccountId string `json:"bankAccountId" validate:"required"`
+	// The start time of the transactions in an RFC3339 compliant format
+	FromTime time.Time `json:"fromTime" validate:"required"`
+	// The end time of the transactions in an RFC3339 compliant format
+	ToTime time.Time `json:"toTime" validate:"required"`
+}
+
 // AccountTransactionResponseDTO represents a transaction between the given account and another account
 // @swagger:model AccountTransactionResponseDTO
 type AccountTransactionResponseDTO struct {

@@ -62,3 +62,11 @@ func accountTransactionToDTO(tx []model.BankAccountTransactionOutput) []dto.Acco
 	}
 	return accountTransactionDTOList
 }
+
+func accountTransactionRequestToInput(tx dto.AccountTransactionRequestDTO) model.TransactionsForBankAccountInput {
+	return model.TransactionsForBankAccountInput{
+		BankAccountId: tx.BankAccountId,
+		FromTime:      tx.FromTime,
+		ToTime:        tx.ToTime,
+	}
+}

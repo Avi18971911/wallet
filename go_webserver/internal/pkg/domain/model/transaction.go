@@ -39,7 +39,7 @@ const (
 	Revoked PendingTransactionStatus = "revoked"
 )
 
-type TransactionForBankAccountInput struct {
+type TransactionsForBankAccountInput struct {
 	BankAccountId string
 	FromTime      time.Time
 	ToTime        time.Time

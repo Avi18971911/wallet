@@ -8,7 +8,6 @@ import (
 	"log"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/infrastructure/mongodb"
-	"webserver/internal/pkg/utils"
 )
 
 type TransactionRepositoryMongodb struct {
@@ -40,26 +39,33 @@ func (tr *TransactionRepositoryMongodb) AddTransaction(
 }
 
 func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
-	bankAccountId string, ctx context.Context,
+	input *model.TransactionsForBankAccountInput,
+	ctx context.Context,
 ) ([]model.BankAccountTransactionOutput, error) {
 	var res []model.BankAccountTransactionOutput
-	objectAccountId, err := utils.StringToObjectId(bankAccountId)
+	mongoInput, err := fromDomainTransactionForBankAccountInput(input)
 	if err != nil {
-		return nil, fmt.Errorf("error when converting account ID to object ID for "+
-			"bankAccountId %s: %w", bankAccountId, err)
+		return nil, fmt.Errorf("error when converting domain TransactionsForBankAccountInput to mongo "+
+			"TransactionsForBankAccountInput for BankAccount %s: %w", input.BankAccountId, err)
 	}
 	pipeline := mongo.Pipeline{
 		// Match transactions involving the bankAccountId in either fromAccount or toAccount
 		{{"$match", bson.D{
 			{"$or", bson.A{
-				bson.D{{"fromBankAccountId", objectAccountId}},
-				bson.D{{"toBankAccountId", objectAccountId}},
+				bson.D{{"fromBankAccountId", mongoInput.BankAccountId}},
+				bson.D{{"toBankAccountId", mongoInput.BankAccountId}},
+			}},
+			{"gte", bson.D{
+				{"_createdAt", mongoInput.FromTime},
+			}},
+			{"lte", bson.D{
+				{"_createdAt", mongoInput.ToTime},
 			}},
 		}}},
 		// Add a new field 'transactionType' to indicate debit or credit transaction
 		{{"$addFields", bson.D{
 			{"transactionType", bson.D{{"$cond", bson.A{
-				bson.D{{"$eq", bson.A{"$fromBankAccountId", objectAccountId}}},
+				bson.D{{"$eq", bson.A{"$fromBankAccountId", mongoInput.BankAccountId}}},
 				"credit",
 				"debit",
 			}}}}},
@@ -69,9 +75,9 @@ func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 			{"_createdAt", 1},
 			{"amount", 1},
 			{"transactionType", 1},
-			{"bankAccountId", objectAccountId},
+			{"bankAccountId", mongoInput.BankAccountId},
 			{"otherBankAccountId", bson.D{{"$cond", bson.A{
-				bson.D{{"$eq", bson.A{"$fromBankAccountId", objectAccountId}}},
+				bson.D{{"$eq", bson.A{"$fromBankAccountId", mongoInput.BankAccountId}}},
 				"$toBankAccountId",
 				"$fromBankAccountId",
 			}}}},
@@ -79,7 +85,7 @@ func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 
 	cursor, err := tr.col.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, fmt.Errorf("error when aggregating transactions for BankAccount %s: %w", bankAccountId, err)
+		return nil, fmt.Errorf("error when aggregating transactions for BankAccount %s: %w", input.BankAccountId, err)
 	}
 
 	var mongoResults []mongodb.MongoAccountTransactionOutput
@@ -88,18 +94,18 @@ func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 		err := cursor.Close(ctx)
 		if err != nil {
 			log.Printf("Error when closing mongo Cursor when getting BankAccount Transactions "+
-				"for BankAccount %s", bankAccountId)
+				"for BankAccount %s", input.BankAccountId)
 		}
 	}()
 
 	if err = cursor.All(ctx, &mongoResults); err != nil {
 		return nil, fmt.Errorf("error when iterating over mongo Cursor when getting BankAccount Transactions "+
-			"for BankAccount %s: %w", bankAccountId, err)
+			"for BankAccount %s: %w", input.BankAccountId, err)
 	}
 	if res, err = fromMongoAccountTransaction(mongoResults); err != nil {
 		return nil, fmt.Errorf("error when converting mongo BankAccount Transactions to domain BankAccount "+
-			"Transactions for BankAccount %s: %w", bankAccountId, err)
+			"Transactions for BankAccount %s: %w", input.BankAccountId, err)
 	}
-	log.Printf("Successfully retrieved BankAccount Transactions for BankAccount %s\n", bankAccountId)
+	log.Printf("Successfully retrieved BankAccount Transactions for BankAccount %s\n", input.BankAccountId)
 	return res, nil
 }

@@ -75,7 +75,7 @@ func fromMongoAccountTransaction(
 }
 
 func fromDomainTransactionForBankAccountInput(
-	input *model.TransactionForBankAccountInput,
+	input *model.TransactionsForBankAccountInput,
 ) (*mongodb.MongoTransactionForBankAccountInput, error) {
 	bankAccountId, err := utils.StringToObjectId(input.BankAccountId)
 	if err != nil {

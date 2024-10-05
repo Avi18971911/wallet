@@ -7,5 +7,8 @@ import (
 
 type TransactionRepository interface {
 	AddTransaction(details *model.TransactionDetailsInput, ctx context.Context) error
-	GetTransactionsFromBankAccountId(bankAccountId string, ctx context.Context) ([]model.BankAccountTransactionOutput, error)
+	GetTransactionsFromBankAccountId(input *model.TransactionsForBankAccountInput, ctx context.Context) (
+		[]model.BankAccountTransactionOutput,
+		error,
+	)
 }
