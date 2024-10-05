@@ -58,7 +58,7 @@ var (
 	ErrInvalidCredentials = errors.New("invalid username or password")
 )
 
-type AccountBalanceMonths struct {
+type AccountBalanceMonthsOutput struct {
 	BankAccountId string
 	Months        []AccountBalanceMonth
 }

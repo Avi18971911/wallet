@@ -17,9 +17,9 @@ type KnownBankAccountDTO struct {
 	AccountType string `json:"accountType" validate:"required"`
 }
 
-// AccountDetailsDTO represents the confidential details of an account belonging to a customer
-// @swagger:model AccountDetailsDTO
-type AccountDetailsDTO struct {
+// AccountDetailsResponseDTO represents the confidential details of an account belonging to a customer
+// @swagger:model AccountDetailsResponseDTO
+type AccountDetailsResponseDTO struct {
 	// The unique identifier of the account
 	Id string `json:"id" validate:"required"`
 	// The username associated with the account
@@ -34,9 +34,9 @@ type AccountDetailsDTO struct {
 	CreatedAt time.Time `json:"createdAt" validate:"required"`
 }
 
-// AccountTransactionDTO represents a transaction between the given account and another account
-// @swagger:model AccountTransactionDTO
-type AccountTransactionDTO struct {
+// AccountTransactionResponseDTO represents a transaction between the given account and another account
+// @swagger:model AccountTransactionResponseDTO
+type AccountTransactionResponseDTO struct {
 	// The unique identifier of the transaction
 	Id string `json:"id" validate:"required"`
 	// The primary bank account ID associated with the transaction
@@ -51,9 +51,9 @@ type AccountTransactionDTO struct {
 	CreatedAt time.Time `json:"createdAt" validate:"required"`
 }
 
-// AccountLoginDTO represents the login credentials for an account
-// @swagger:model AccountLoginDTO
-type AccountLoginDTO struct {
+// AccountLoginRequestDTO represents the login credentials for an account
+// @swagger:model AccountLoginRequestDTO
+type AccountLoginRequestDTO struct {
 	// The username for the login
 	Username string `json:"username" validate:"required"`
 	// The password for the login

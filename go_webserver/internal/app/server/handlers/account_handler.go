@@ -21,7 +21,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param accountId path string true "BankAccount ID"
-// @Success 200 {object} dto.AccountDetailsDTO "Successful retrieval of account details"
+// @Success 200 {object} dto.AccountDetailsResponseDTO "Successful retrieval of account details"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId} [get]
 func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
@@ -49,7 +49,7 @@ func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.
 // @Accept json
 // @Produce json
 // @Param accountId path string true "BankAccount ID"
-// @Success 200 {object} []dto.AccountTransactionDTO "Successful retrieval of account transactions"
+// @Success 200 {object} []dto.AccountTransactionResponseDTO "Successful retrieval of account transactions"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/{accountId}/transactions [get]
 func AccountTransactionsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
@@ -77,14 +77,14 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 // @Tags accounts
 // @Accept json
 // @Produce json
-// @Param login body dto.AccountLoginDTO true "Login payload"
-// @Success 200 {object} dto.AccountDetailsDTO "Successful login"
+// @Param login body dto.AccountLoginRequestDTO true "Login payload"
+// @Success 200 {object} dto.AccountDetailsResponseDTO "Successful login"
 // @Failure 401 {object} utils.ErrorMessage "Invalid credentials"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/login [post]
 func AccountLoginHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req dto.AccountLoginDTO
+		var req dto.AccountLoginRequestDTO
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)

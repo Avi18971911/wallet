@@ -34,8 +34,8 @@ func accountsToDTO(tx []model.BankAccount) []dto.BankAccountDTO {
 	return accountDTOList
 }
 
-func accountDetailsToDTO(tx *model.AccountDetailsOutput) dto.AccountDetailsDTO {
-	return dto.AccountDetailsDTO{
+func accountDetailsToDTO(tx *model.AccountDetailsOutput) dto.AccountDetailsResponseDTO {
+	return dto.AccountDetailsResponseDTO{
 		Id:       tx.Id,
 		Username: tx.Username,
 		Person: dto.PersonDTO{
@@ -48,10 +48,10 @@ func accountDetailsToDTO(tx *model.AccountDetailsOutput) dto.AccountDetailsDTO {
 	}
 }
 
-func accountTransactionToDTO(tx []model.BankAccountTransactionOutput) []dto.AccountTransactionDTO {
-	accountTransactionDTOList := make([]dto.AccountTransactionDTO, len(tx))
+func accountTransactionToDTO(tx []model.BankAccountTransactionOutput) []dto.AccountTransactionResponseDTO {
+	accountTransactionDTOList := make([]dto.AccountTransactionResponseDTO, len(tx))
 	for i, element := range tx {
-		accountTransactionDTOList[i] = dto.AccountTransactionDTO{
+		accountTransactionDTOList[i] = dto.AccountTransactionResponseDTO{
 			Id:                 element.Id,
 			BankAccountId:      element.BankAccountId,
 			OtherBankAccountId: element.OtherBankAccountId,

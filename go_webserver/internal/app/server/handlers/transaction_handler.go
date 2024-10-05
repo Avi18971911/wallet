@@ -17,14 +17,14 @@ import (
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param transaction body dto.TransactionRequest true "Transaction request"
+// @Param transaction body dto.TransactionRequestDTO true "Transaction request"
 // @Success 202 {string} string "Accepted"
 // @Failure 400 {object} utils.ErrorMessage "Invalid request payload"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /transactions [post]
 func TransactionInsertHandler(s services.TransactionService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req dto.TransactionRequest
+		var req dto.TransactionRequestDTO
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)

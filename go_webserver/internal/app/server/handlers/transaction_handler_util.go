@@ -7,7 +7,7 @@ import (
 	"webserver/internal/pkg/domain/model"
 )
 
-func transactionDetailsToModel(tx *dto.TransactionRequest) (model.TransactionDetailsInput, error) {
+func transactionDetailsToModel(tx *dto.TransactionRequestDTO) (model.TransactionDetailsInput, error) {
 	decimalAmount, err := decimal.NewFromString(tx.Amount)
 	if err != nil {
 		log.Printf("Failed to convert amount %s to decimal: %v", tx.Amount, err)

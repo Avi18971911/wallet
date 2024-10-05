@@ -156,9 +156,9 @@ func getAccountBalanceMonths(
 	transactions []model.BankAccountTransactionOutput,
 	availableBalance decimal.Decimal,
 	pendingBalance decimal.Decimal,
-) []model.AccountBalanceMonths {
-	months := make([]model.AccountBalanceMonths, 0)
-	month := model.AccountBalanceMonths{}
+) []model.AccountBalanceMonthsOutput {
+	months := make([]model.AccountBalanceMonthsOutput, 0)
+	month := model.AccountBalanceMonthsOutput{}
 	for _, transaction := range transactions {
 		if month.Month == transaction.Date.Month() {
 			month.Transactions
