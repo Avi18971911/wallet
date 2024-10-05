@@ -85,13 +85,7 @@ func TestGetAccountTransactions(t *testing.T) {
 		tranAmountsDecimal128[i], _ = pkgutils.FromDecimalToPrimitiveDecimal128(tranAmounts[i])
 	}
 
-	tranIds := make([]primitive.ObjectID, 3)
-	tranStrings := make([]string, 3)
-	for i, _ := range tranIds {
-		tranIds[i] = primitive.NewObjectID()
-		tranStrings[i], _ = pkgutils.ObjectIdToString(tranIds[i])
-	}
-	transactionsInput := makeTransactionsInput(tomObjectId, samObjectId, tranAmountsDecimal128, tranIds)
+	transactionsInput := makeTransactionsInput(tomObjectId, samObjectId, tranAmountsDecimal128)
 
 	t.Run(
 		"Allows the insertion of transactions and the retrieval of all transactions from an account",
@@ -104,14 +98,18 @@ func TestGetAccountTransactions(t *testing.T) {
 
 			accountService := setupAccountService(mongoClient, tranCollection, accCollection)
 
-			res, _ := accountService.GetBankAccountTransactions(tomAccountName, ctx)
-			expectedCreatedAt := res[0].CreatedAt
+			input := model.TransactionsForBankAccountInput{
+				BankAccountId: tomAccountName,
+				FromTime:      time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
+				ToTime:        time.Date(2050, time.December, 31, 23, 59, 59, 0, time.UTC),
+			}
+			res, _ := accountService.GetBankAccountTransactions(&input, ctx)
+			expectedCreatedAts := []time.Time{firstTransactionTime, secondTransactionTime, thirdTransactionTime}
 			expectedTransactionTypes := []string{"credit", "debit", "credit"}
 			expectedResults := createExpectedAccountTranResult(
 				tomAccountName,
 				samAccountName,
-				expectedCreatedAt,
-				tranStrings,
+				expectedCreatedAts,
 				tranAmounts,
 				expectedTransactionTypes,
 			)
@@ -139,36 +137,36 @@ func setupGetAccountTransactionsTestCase(
 	}
 }
 
+var firstTransactionTime = time.Date(2021, time.January, 1, 0, 0, 0, 0, time.UTC)
+var secondTransactionTime = time.Date(2021, time.January, 10, 0, 0, 0, 0, time.UTC)
+var thirdTransactionTime = time.Date(2021, time.January, 20, 0, 0, 0, 0, time.UTC)
+
 func makeTransactionsInput(
 	tomAccountId primitive.ObjectID,
 	samAccountId primitive.ObjectID,
 	tranAmounts []primitive.Decimal128,
-	tranIds []primitive.ObjectID,
 ) []interface{} {
 	return []interface{}{
 		mongodb.MongoTransactionInput{
 			FromBankAccountId: tomAccountId,
 			ToBankAccountId:   samAccountId,
 			Amount:            tranAmounts[0],
-			Id:                tranIds[0],
 			Type:              "realized",
-			CreatedAt:         pkgutils.GetCurrentTimestamp(),
+			CreatedAt:         pkgutils.TimeToTimestamp(firstTransactionTime),
 		},
 		mongodb.MongoTransactionInput{
 			FromBankAccountId: samAccountId,
 			ToBankAccountId:   tomAccountId,
 			Amount:            tranAmounts[1],
-			Id:                tranIds[1],
 			Type:              "realized",
-			CreatedAt:         pkgutils.GetCurrentTimestamp(),
+			CreatedAt:         pkgutils.TimeToTimestamp(secondTransactionTime),
 		},
 		mongodb.MongoTransactionInput{
 			FromBankAccountId: tomAccountId,
 			ToBankAccountId:   samAccountId,
 			Amount:            tranAmounts[2],
-			Id:                tranIds[2],
 			Type:              "realized",
-			CreatedAt:         pkgutils.GetCurrentTimestamp(),
+			CreatedAt:         pkgutils.TimeToTimestamp(thirdTransactionTime),
 		},
 	}
 }
@@ -176,20 +174,18 @@ func makeTransactionsInput(
 func createExpectedAccountTranResult(
 	accountId string,
 	otherAccountId string,
-	expectedCreatedAt time.Time,
-	tranStrings []string,
+	expectedCreatedAts []time.Time,
 	tranAmounts []decimal.Decimal,
 	transactionTypes []string,
 ) []model.BankAccountTransactionOutput {
 	expectedResults := make([]model.BankAccountTransactionOutput, len(tranAmounts))
 	for i, _ := range tranAmounts {
 		expectedResults[i] = model.BankAccountTransactionOutput{
-			Id:                 tranStrings[i],
 			BankAccountId:      accountId,
 			TransactionType:    transactionTypes[i],
 			OtherBankAccountId: otherAccountId,
 			Amount:             tranAmounts[i],
-			CreatedAt:          expectedCreatedAt,
+			CreatedAt:          expectedCreatedAts[i],
 		}
 	}
 	return expectedResults
@@ -201,12 +197,11 @@ func assertExpectedMatchesResult(
 	res []model.BankAccountTransactionOutput,
 ) {
 	for i, _ := range expectedResults {
-		assert.Equal(t, expectedResults[i].Id, res[i].Id)
 		assert.Equal(t, expectedResults[i].BankAccountId, res[i].BankAccountId)
 		assert.Equal(t, expectedResults[i].TransactionType, res[i].TransactionType)
 		assert.Equal(t, expectedResults[i].OtherBankAccountId, res[i].OtherBankAccountId)
 		assert.Equal(t, expectedResults[i].Amount.String(), res[i].Amount.String())
-		assert.Equal(t, expectedResults[i].CreatedAt, res[i].CreatedAt)
+		assert.Equal(t, expectedResults[i].CreatedAt.Unix(), res[i].CreatedAt.Unix())
 	}
 }
 

@@ -55,11 +55,9 @@ func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 				bson.D{{"fromBankAccountId", mongoInput.BankAccountId}},
 				bson.D{{"toBankAccountId", mongoInput.BankAccountId}},
 			}},
-			{"gte", bson.D{
-				{"_createdAt", mongoInput.FromTime},
-			}},
-			{"lte", bson.D{
-				{"_createdAt", mongoInput.ToTime},
+			{"_createdAt", bson.D{
+				{"$gte", mongoInput.FromTime},
+				{"$lte", mongoInput.ToTime},
 			}},
 		}}},
 		// Add a new field 'transactionType' to indicate debit or credit transaction
