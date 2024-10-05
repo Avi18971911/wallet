@@ -116,6 +116,33 @@ func TestGetAccountTransactions(t *testing.T) {
 			assertExpectedMatchesResult(t, expectedResults, res)
 		},
 	)
+
+	t.Run("Does not return transactions outside the specified time range", func(t *testing.T) {
+		setupGetAccountTransactionsTestCase(accCollection, tranCollection, ctx, t)
+		_, err := tranCollection.InsertMany(ctx, transactionsInput)
+		if err != nil {
+			t.Errorf("Error inserting transactions: %v", err)
+		}
+
+		accountService := setupAccountService(mongoClient, tranCollection, accCollection)
+
+		input := model.TransactionsForBankAccountInput{
+			BankAccountId: tomAccountName,
+			FromTime:      secondTransactionTime,
+			ToTime:        thirdTransactionTime,
+		}
+		res, _ := accountService.GetBankAccountTransactions(&input, ctx)
+		expectedCreatedAts := []time.Time{secondTransactionTime, thirdTransactionTime}
+		expectedTransactionTypes := []string{"debit", "credit"}
+		expectedResults := createExpectedAccountTranResult(
+			tomAccountName,
+			samAccountName,
+			expectedCreatedAts,
+			tranAmounts[1:],
+			expectedTransactionTypes,
+		)
+		assertExpectedMatchesResult(t, expectedResults, res)
+	})
 }
 
 func setupGetAccountTransactionsTestCase(
