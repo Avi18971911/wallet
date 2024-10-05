@@ -3,7 +3,6 @@ package repositories
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"log"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/utils"
@@ -26,18 +25,8 @@ func fromDomainTransactionDetails(details *model.TransactionDetailsInput) (*mong
 	}
 
 	expirationDate := utils.TimeToTimestamp(details.ExpirationDate)
-
-	transactionType, err := getStringFromTransactionType(details.Type)
-	if err != nil {
-		log.Printf("Error when converting transaction type: %v", err)
-		return nil, err
-	}
-
-	status := getStringFromPendingTransactionStatus(details.Status)
-	if err != nil {
-		log.Printf("Error when converting pending transaction status: %v", err)
-		return nil, err
-	}
+	transactionType := string(details.Type)
+	status := string(details.Status)
 
 	return &mongodb.MongoTransactionInput{
 		FromBankAccountId: fromAccount,
@@ -85,26 +74,16 @@ func fromMongoAccountTransaction(
 	return res, nil
 }
 
-func getStringFromTransactionType(transactionType model.TransactionType) (string, error) {
-	switch transactionType {
-	case model.Realized:
-		return "realized", nil
-	case model.Pending:
-		return "pending", nil
-	default:
-		return "unknown", fmt.Errorf("unknown transaction type: %s", transactionType)
+func fromDomainTransactionForBankAccountInput(
+	input *model.TransactionForBankAccountInput,
+) (*mongodb.MongoTransactionForBankAccountInput, error) {
+	bankAccountId, err := utils.StringToObjectId(input.BankAccountId)
+	if err != nil {
+		return nil, fmt.Errorf("error when converting bank account ID to ObjectID: %w", err)
 	}
-}
-
-func getStringFromPendingTransactionStatus(status model.PendingTransactionStatus) string {
-	switch status {
-	case model.Active:
-		return "active"
-	case model.Applied:
-		return "applied"
-	case model.Revoked:
-		return "revoked"
-	default:
-		return ""
-	}
+	return &mongodb.MongoTransactionForBankAccountInput{
+		BankAccountId: bankAccountId,
+		FromTime:      utils.TimeToTimestamp(input.FromTime),
+		ToTime:        utils.TimeToTimestamp(input.ToTime),
+	}, nil
 }
