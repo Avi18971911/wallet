@@ -57,3 +57,15 @@ var (
 	ErrNoMatchingUsername = errors.New("no matching username found for account")
 	ErrInvalidCredentials = errors.New("invalid username or password")
 )
+
+type AccountBalanceMonths struct {
+	BankAccountId string
+	Months        []AccountBalanceMonth
+}
+
+type AccountBalanceMonth struct {
+	Month            time.Month
+	Year             int
+	AvailableBalance decimal.Decimal
+	PendingBalance   decimal.Decimal
+}

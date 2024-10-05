@@ -11,7 +11,9 @@ type AccountRepository interface {
 	AddBalance(bankAccountId string, amount decimal.Decimal, toPending bool, ctx context.Context) error
 	DeductBalance(bankAccountId string, amount decimal.Decimal, toPending bool, ctx context.Context) (
 		decimal.Decimal,
+		decimal.Decimal,
 		error,
 	)
 	GetAccountDetailsFromUsername(username string, ctx context.Context) (*model.AccountDetails, error)
+	GetAccountBalance(bankAccountId string, ctx context.Context) (decimal.Decimal, decimal.Decimal, error)
 }

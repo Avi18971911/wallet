@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"log"
 	"regexp"
 	"webserver/internal/pkg/domain/model"
@@ -130,4 +131,37 @@ func (a *AccountServiceImpl) Login(
 		return nil, model.ErrInvalidCredentials
 	}
 	return accountDetails, nil
+}
+
+func (a *AccountServiceImpl) GetAccountHistoryInMonths(
+	bankAccountId string,
+	startMonth
+	ctx context.Context,
+) ([]model.AccountBalanceMonths, error) {
+	transactions, err := a.GetBankAccountTransactions(bankAccountId, ctx)
+	if err != nil {
+		log.Printf("Unable to get Account History for BankAccount %s with error: %v", bankAccountId, err)
+		return nil, fmt.Errorf("unable to get account history with error: %w", err)
+	}
+	availableBalance, pendingBalance, err := a.ar.GetAccountBalance(bankAccountId, ctx)
+	if err != nil {
+		log.Printf("Unable to get Account Balance for BankAccount %s with error: %v", bankAccountId, err)
+		return nil, fmt.Errorf("unable to get account balance with error: %w", err)
+	}
+	months := getAccountBalanceMonths(transactions, availableBalance, pendingBalance)
+	return months, nil
+}
+
+func getAccountBalanceMonths(
+	transactions []model.BankAccountTransaction,
+	availableBalance decimal.Decimal,
+	pendingBalance decimal.Decimal,
+) []model.AccountBalanceMonths {
+	months := make([]model.AccountBalanceMonths, 0)
+	month := model.AccountBalanceMonths{}
+	for _, transaction := range transactions {
+		if month.Month == transaction.Date.Month() {
+			month.Transactions
+		}
+	}
 }

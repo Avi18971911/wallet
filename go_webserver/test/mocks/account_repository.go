@@ -23,17 +23,23 @@ func (m *MockAccountRepository) GetAccountDetailsFromBankAccountId(
 	return accountDetails, args.Error(1)
 }
 
-func (m *MockAccountRepository) AddBalance(accountID string, amount decimal.Decimal, ctx context.Context) error {
-	args := m.Called(accountID, amount, ctx)
+func (m *MockAccountRepository) AddBalance(
+	bankAccountID string,
+	amount decimal.Decimal,
+	toPending bool,
+	ctx context.Context,
+) error {
+	args := m.Called(bankAccountID, amount, toPending, ctx)
 	return args.Error(0)
 }
 
 func (m *MockAccountRepository) DeductBalance(
 	accountID string,
 	amount decimal.Decimal,
+	toPending bool,
 	ctx context.Context,
 ) (decimal.Decimal, error) {
-	args := m.Called(accountID, amount, ctx)
+	args := m.Called(accountID, amount, toPending, ctx)
 	return args.Get(0).(decimal.Decimal), args.Error(1)
 }
 

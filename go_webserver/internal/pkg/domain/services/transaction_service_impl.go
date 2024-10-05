@@ -46,13 +46,13 @@ func (t *TransactionServiceImpl) AddTransaction(input model.TransactionDetailsIn
 	}()
 
 	toPending := input.Type == model.Pending
-	newBalance, err := t.ar.DeductBalance(input.FromBankAccountId, input.Amount, toPending, txnCtx)
+	newBalance, pendingBalance, err := t.ar.DeductBalance(input.FromBankAccountId, input.Amount, toPending, txnCtx)
 	if err != nil {
 		log.Printf("Error deducting balance from BankAccount %s: %v", input.FromBankAccountId, err)
 		return fmt.Errorf("error when deducting balance from BankAccount %s: %w", input.FromBankAccountId, err)
 	}
 
-	if newBalance.IsNegative() {
+	if newBalance.IsNegative() || pendingBalance.IsNegative() {
 		log.Printf("Insufficient balance in BankAccount %s", input.FromBankAccountId)
 		return fmt.Errorf("insufficient balance in BankAccount %s", input.FromBankAccountId)
 	}
