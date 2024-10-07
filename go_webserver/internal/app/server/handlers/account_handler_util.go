@@ -22,11 +22,10 @@ func knownAccountToDTO(tx []model.KnownBankAccount) []dto.KnownBankAccountDTO {
 func accountsToDTO(tx []model.BankAccount) []dto.BankAccountDTO {
 	accountDTOList := make([]dto.BankAccountDTO, len(tx))
 	for i, element := range tx {
-		accountType := string(element.AccountType)
 		accountDTOList[i] = dto.BankAccountDTO{
 			Id:               element.Id,
 			AccountNumber:    element.AccountNumber,
-			AccountType:      accountType,
+			AccountType:      element.AccountType,
 			PendingBalance:   element.PendingBalance.String(),
 			AvailableBalance: element.AvailableBalance.String(),
 		}
@@ -55,7 +54,10 @@ func accountTransactionToDTO(tx []model.BankAccountTransactionOutput) []dto.Acco
 			Id:                 element.Id,
 			BankAccountId:      element.BankAccountId,
 			OtherBankAccountId: element.OtherBankAccountId,
+			TransactionNature:  element.TransactionNature,
 			TransactionType:    element.TransactionType,
+			ExpirationDate:     element.ExpirationDate,
+			Status:             element.Status,
 			Amount:             element.Amount.String(),
 			CreatedAt:          element.CreatedAt,
 		}

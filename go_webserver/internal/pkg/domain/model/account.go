@@ -48,7 +48,10 @@ type BankAccountTransactionOutput struct {
 	Id                 string
 	BankAccountId      string
 	OtherBankAccountId string
-	TransactionType    string
+	TransactionNature  TransactionNature
+	TransactionType    TransactionType
+	ExpirationDate     time.Time
+	Status             PendingTransactionStatus
 	Amount             decimal.Decimal
 	CreatedAt          time.Time
 }

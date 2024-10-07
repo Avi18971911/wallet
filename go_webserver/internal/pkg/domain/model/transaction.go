@@ -44,3 +44,10 @@ type TransactionsForBankAccountInput struct {
 	FromTime      time.Time
 	ToTime        time.Time
 }
+
+type TransactionNature string
+
+const (
+	Debit  TransactionNature = "debit"
+	Credit TransactionNature = "credit"
+)

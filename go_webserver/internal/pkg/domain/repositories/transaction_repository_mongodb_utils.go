@@ -48,25 +48,44 @@ func fromMongoAccountTransaction(
 	for i, elem := range accountTransactions {
 		transactionId, err = utils.ObjectIdToString(elem.Id)
 		if err != nil {
-			return res, fmt.Errorf("error when converting transaction ID to string: %w", err)
+			return res, fmt.Errorf(
+				"error when converting transaction ID to string for accountId %s: %w", accountId, err,
+			)
 		}
 		accountId, err = utils.ObjectIdToString(elem.BankAccountId)
 		if err != nil {
-			return res, fmt.Errorf("error when converting account ID to string: %w", err)
+			return res, fmt.Errorf(
+				"error when converting account ID to string for accountId %s: %w", accountId, err,
+			)
 		}
 		otherAccountId, err = utils.ObjectIdToString(elem.OtherBankAccountId)
 		if err != nil {
-			return res, fmt.Errorf("error when converting other account ID to string: %w", err)
+			return res, fmt.Errorf(
+				"error when converting other account ID to string for accountId %s: %w", accountId, err,
+			)
 		}
 		decimalAmount, err := utils.FromPrimitiveDecimal128ToDecimal(elem.Amount)
 		if err != nil {
-			return res, fmt.Errorf("error when converting amount to decimal: %w", err)
+			return res, fmt.Errorf(
+				"error when converting amount to decimal for accountId %s: %w", accountId, err,
+			)
 		}
+		transactionType, err := toTransactionType(elem.Type)
+		if err != nil {
+			return res, fmt.Errorf("error when parsing transactionType for accountId %s: %w", accountId, err)
+		}
+		pendingTransactionStatus, err := toPendingTransactionStatus(elem.Status)
+		if err != nil {
+			return res, fmt.Errorf("error when parsing pendingTransactionStatus for accountId %s: %w", accountId, err)
+		}
+		expirationDateStamp := utils.TimestampToTime(elem.ExpirationDate)
 		res[i] = model.BankAccountTransactionOutput{
 			Id:                 transactionId,
 			BankAccountId:      accountId,
 			OtherBankAccountId: otherAccountId,
-			TransactionType:    elem.TransactionType,
+			TransactionType:    transactionType,
+			ExpirationDate:     expirationDateStamp,
+			Status:             pendingTransactionStatus,
 			Amount:             decimalAmount,
 			CreatedAt:          utils.TimestampToTime(elem.CreatedAt),
 		}
@@ -86,4 +105,28 @@ func fromDomainTransactionForBankAccountInput(
 		FromTime:      utils.TimeToTimestamp(input.FromTime),
 		ToTime:        utils.TimeToTimestamp(input.ToTime),
 	}, nil
+}
+
+func toTransactionType(transactionType string) (model.TransactionType, error) {
+	switch transactionType {
+	case "realized":
+		return model.Realized, nil
+	case "pending":
+		return model.Pending, nil
+	default:
+		return "", fmt.Errorf("invalid transaction type: %s", transactionType)
+	}
+}
+
+func toPendingTransactionStatus(status string) (model.PendingTransactionStatus, error) {
+	switch status {
+	case "active":
+		return model.Active, nil
+	case "applied":
+		return model.Applied, nil
+	case "revoked":
+		return model.Revoked, nil
+	default:
+		return "", fmt.Errorf("invalid pending transaction status: %s", status)
+	}
 }

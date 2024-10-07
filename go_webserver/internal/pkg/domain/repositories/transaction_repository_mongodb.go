@@ -62,7 +62,7 @@ func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 		}}},
 		// Add a new field 'transactionType' to indicate debit or credit transaction
 		{{"$addFields", bson.D{
-			{"transactionType", bson.D{{"$cond", bson.A{
+			{"transactionNature", bson.D{{"$cond", bson.A{
 				bson.D{{"$eq", bson.A{"$fromBankAccountId", mongoInput.BankAccountId}}},
 				"credit",
 				"debit",
@@ -72,7 +72,10 @@ func (tr *TransactionRepositoryMongodb) GetTransactionsFromBankAccountId(
 			{"_id", 1},
 			{"_createdAt", 1},
 			{"amount", 1},
-			{"transactionType", 1},
+			{"transactionNature", 1},
+			{"type", 1},
+			{"status", 1},
+			{"expirationDate", 1},
 			{"bankAccountId", mongoInput.BankAccountId},
 			{"otherBankAccountId", bson.D{{"$cond", bson.A{
 				bson.D{{"$eq", bson.A{"$fromBankAccountId", mongoInput.BankAccountId}}},

@@ -47,7 +47,10 @@ type MongoAccountTransactionOutput struct {
 	Id                 primitive.ObjectID   `bson:"_id"`
 	BankAccountId      primitive.ObjectID   `bson:"bankAccountId"`
 	OtherBankAccountId primitive.ObjectID   `bson:"otherBankAccountId"`
-	TransactionType    string               `bson:"transactionType"`
+	TransactionNature  string               `bson:"transactionNature"`
+	Type               string               `bson:"type"`
+	ExpirationDate     primitive.Timestamp  `bson:"expirationDate,omitempty"`
+	Status             string               `bson:"status,omitempty"`
 	Amount             primitive.Decimal128 `bson:"amount"`
 	CreatedAt          primitive.Timestamp  `bson:"_createdAt"`
 }

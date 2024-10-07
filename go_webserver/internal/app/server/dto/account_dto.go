@@ -2,6 +2,7 @@ package dto
 
 import (
 	"time"
+	"webserver/internal/pkg/domain/model"
 )
 
 // KnownBankAccountDTO represents an account known to and recognized by a particular account
@@ -56,8 +57,14 @@ type AccountTransactionResponseDTO struct {
 	BankAccountId string `json:"bankAccountId" validate:"required"`
 	// The other bank account ID involved in the transaction
 	OtherBankAccountId string `json:"otherBankAccountId" validate:"required"`
-	// The type of the transaction (debit or credit)
-	TransactionType string `json:"transactionType" validate:"required"`
+	// The nature of the transaction (debit or credit)
+	TransactionNature model.TransactionNature `json:"transactionNature" validate:"required"`
+	// The type of the transaction (realized or pending)
+	TransactionType model.TransactionType `json:"transactionType" validate:"required"`
+	// The expiration date of the pending transaction. Null if not a pending transaction.
+	ExpirationDate time.Time `json:"expirationDate"`
+	// The status of the pending transaction (active, applied, revoked). Null if not a pending transaction.
+	Status model.PendingTransactionStatus `json:"status"`
 	// The amount involved in the transaction. Valid to two decimal places.
 	Amount string `json:"amount" validate:"required"`
 	// The timestamp of when the transaction was created
@@ -81,7 +88,7 @@ type BankAccountDTO struct {
 	// The account number associated with the account
 	AccountNumber string `json:"accountNumber" validate:"required"`
 	// The type of the account (e.g., savings, checking)
-	AccountType string `json:"accountType" validate:"required"`
+	AccountType model.BankAccountType `json:"accountType" validate:"required"`
 	// The available balance of the account. Valid to two decimal places.
 	AvailableBalance string `json:"availableBalance" validate:"required"`
 	// The pending balance of the account. Valid to two decimal places.
