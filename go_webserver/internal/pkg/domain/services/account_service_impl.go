@@ -237,16 +237,16 @@ func undoTransaction(
 	availableBalance decimal.Decimal,
 	pendingBalance decimal.Decimal,
 ) (decimal.Decimal, decimal.Decimal) {
-	amountToUndo := transaction.Amount
+	adjustmentAmount := transaction.Amount
 	if transaction.TransactionNature == model.Debit {
-		amountToUndo = amountToUndo.Neg()
+		adjustmentAmount = adjustmentAmount.Neg()
 	}
 	if transaction.TransactionType == model.Realized {
-		availableBalance = availableBalance.Add(amountToUndo)
-		pendingBalance = pendingBalance.Add(amountToUndo)
+		availableBalance = availableBalance.Add(adjustmentAmount)
+		pendingBalance = pendingBalance.Add(adjustmentAmount)
 	} else {
 		if transaction.Status == model.Active {
-			pendingBalance = pendingBalance.Add(amountToUndo)
+			pendingBalance = pendingBalance.Add(adjustmentAmount)
 		}
 		// Do nothing for revoked transactions or applied transactions
 		// In the former case, the transaction's amount is no longer reflected in the pending balance
