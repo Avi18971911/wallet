@@ -13,6 +13,12 @@ import (
 	"webserver/test/utils"
 )
 
+var input = model.TransactionsForBankAccountInput{
+	BankAccountId: "accountId",
+	FromTime:      time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+	ToTime:        time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+}
+
 func TestGetAccountDetails(t *testing.T) {
 	t.Run("Doesn't return error if GetAccountDetailsFromBankAccountId is successful", func(t *testing.T) {
 		_, mockAccRepo, _, service, ctx, cancel := initializeAccountMocks()
@@ -50,7 +56,7 @@ func TestGetAccountTransaction(t *testing.T) {
 			Return(stubTransactions, nil)
 		mockTran.On("Rollback", mock.Anything).Return(nil)
 
-		accountTransactions, err := service.GetBankAccountTransactions("accountId", ctx)
+		accountTransactions, err := service.GetBankAccountTransactions(&input, ctx)
 		assert.Nil(t, err)
 		assert.Equal(t, stubTransactions, accountTransactions)
 	})
@@ -61,7 +67,7 @@ func TestGetAccountTransaction(t *testing.T) {
 		mockTran.On("BeginTransaction", mock.Anything, mock.Anything, mock.Anything).
 			Return(ctx, errors.New("can't start transaction"))
 
-		_, err := service.GetBankAccountTransactions("accountId", ctx)
+		_, err := service.GetBankAccountTransactions(&input, ctx)
 		assert.ErrorContains(t, err, "can't start transaction")
 		mockTran.AssertNumberOfCalls(t, "Rollback", 0)
 		mockTranRepo.AssertNumberOfCalls(t, "GetBankAccountTransactions", 0)
@@ -75,7 +81,7 @@ func TestGetAccountTransaction(t *testing.T) {
 		mockTranRepo.On("GetBankAccountTransactions", mock.Anything, mock.Anything).
 			Return(nil, errors.New("can't GetBankAccountTransactions"))
 
-		_, err := service.GetBankAccountTransactions("accountId", ctx)
+		_, err := service.GetBankAccountTransactions(&input, ctx)
 		assert.ErrorContains(t, err, "can't GetBankAccountTransactions")
 		mockTranRepo.AssertNumberOfCalls(t, "GetBankAccountTransactions", 1)
 	})
@@ -88,7 +94,7 @@ func TestGetAccountTransaction(t *testing.T) {
 		mockTranRepo.On("GetBankAccountTransactions", mock.Anything, mock.Anything).
 			Return(nil, errors.New("can't GetBankAccountTransactions"))
 
-		service.GetBankAccountTransactions("accountId", ctx)
+		service.GetBankAccountTransactions(&input, ctx)
 		mockTran.AssertNumberOfCalls(t, "Rollback", 1)
 	})
 }

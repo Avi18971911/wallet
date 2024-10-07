@@ -38,9 +38,9 @@ func (m *MockAccountRepository) DeductBalance(
 	amount decimal.Decimal,
 	toPending bool,
 	ctx context.Context,
-) (decimal.Decimal, error) {
+) (decimal.Decimal, decimal.Decimal, error) {
 	args := m.Called(accountID, amount, toPending, ctx)
-	return args.Get(0).(decimal.Decimal), args.Error(1)
+	return args.Get(0).(decimal.Decimal), args.Get(1).(decimal.Decimal), args.Error(2)
 }
 
 func (m *MockAccountRepository) GetAccountDetailsFromUsername(
@@ -55,11 +55,18 @@ func (m *MockAccountRepository) GetAccountDetailsFromUsername(
 	return accountDetails, args.Error(1)
 }
 
-func (m *MockAccountRepository) GetAccountBalance(accountId string, ctx context.Context) (decimal.Decimal, error) {
-	args := m.Called(accountId, ctx)
+func (m *MockAccountRepository) GetAccountBalance(bankAccountId string, ctx context.Context) (
+	decimal.Decimal,
+	decimal.Decimal, error,
+) {
+	args := m.Called(bankAccountId, ctx)
 	var balance decimal.Decimal
 	if args.Get(0) != nil {
 		balance = args.Get(0).(decimal.Decimal)
 	}
-	return balance, args.Error(1)
+	var pendingBalance decimal.Decimal
+	if args.Get(1) != nil {
+		pendingBalance = args.Get(1).(decimal.Decimal)
+	}
+	return balance, pendingBalance, args.Error(1)
 }
