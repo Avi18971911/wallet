@@ -3,6 +3,7 @@ package repositories
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 	"webserver/internal/pkg/domain/model"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/utils"
@@ -74,11 +75,19 @@ func fromMongoAccountTransaction(
 		if err != nil {
 			return res, fmt.Errorf("error when parsing transactionType for accountId %s: %w", accountId, err)
 		}
-		pendingTransactionStatus, err := toPendingTransactionStatus(elem.Status)
+		var pendingTransactionStatus model.PendingTransactionStatus
+		if transactionType == model.Pending {
+			pendingTransactionStatus, err = toPendingTransactionStatus(elem.Status)
+		} else {
+			pendingTransactionStatus = ""
+		}
 		if err != nil {
 			return res, fmt.Errorf("error when parsing pendingTransactionStatus for accountId %s: %w", accountId, err)
 		}
-		expirationDateStamp := utils.TimestampToTime(elem.ExpirationDate)
+		var expirationDateStamp time.Time
+		if transactionType == model.Pending {
+			expirationDateStamp = utils.TimestampToTime(elem.ExpirationDate)
+		}
 		res[i] = model.BankAccountTransactionOutput{
 			Id:                 transactionId,
 			BankAccountId:      accountId,

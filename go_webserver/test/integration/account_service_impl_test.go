@@ -105,12 +105,14 @@ func TestGetAccountTransactions(t *testing.T) {
 			}
 			res, _ := accountService.GetBankAccountTransactions(&input, ctx)
 			expectedCreatedAts := []time.Time{firstTransactionTime, secondTransactionTime, thirdTransactionTime}
-			expectedTransactionTypes := []string{"credit", "debit", "credit"}
+			expectedTransactionNatures := []model.TransactionNature{"credit", "debit", "credit"}
+			expectedTransactionTypes := []model.TransactionType{"realized", "realized", "realized"}
 			expectedResults := createExpectedAccountTranResult(
 				tomAccountName,
 				samAccountName,
 				expectedCreatedAts,
 				tranAmounts,
+				expectedTransactionNatures,
 				expectedTransactionTypes,
 			)
 			assertExpectedMatchesResult(t, expectedResults, res)
@@ -133,12 +135,14 @@ func TestGetAccountTransactions(t *testing.T) {
 		}
 		res, _ := accountService.GetBankAccountTransactions(&input, ctx)
 		expectedCreatedAts := []time.Time{secondTransactionTime, thirdTransactionTime}
-		expectedTransactionTypes := []string{"debit", "credit"}
+		expectedTransactionNatures := []model.TransactionNature{"debit", "credit"}
+		expectedTransactionTypes := []model.TransactionType{"realized", "realized"}
 		expectedResults := createExpectedAccountTranResult(
 			tomAccountName,
 			samAccountName,
 			expectedCreatedAts,
 			tranAmounts[1:],
+			expectedTransactionNatures,
 			expectedTransactionTypes,
 		)
 		assertExpectedMatchesResult(t, expectedResults, res)
@@ -203,12 +207,14 @@ func createExpectedAccountTranResult(
 	otherAccountId string,
 	expectedCreatedAts []time.Time,
 	tranAmounts []decimal.Decimal,
-	transactionTypes []string,
+	transactionNatures []model.TransactionNature,
+	transactionTypes []model.TransactionType,
 ) []model.BankAccountTransactionOutput {
 	expectedResults := make([]model.BankAccountTransactionOutput, len(tranAmounts))
 	for i, _ := range tranAmounts {
 		expectedResults[i] = model.BankAccountTransactionOutput{
 			BankAccountId:      accountId,
+			TransactionNature:  transactionNatures[i],
 			TransactionType:    transactionTypes[i],
 			OtherBankAccountId: otherAccountId,
 			Amount:             tranAmounts[i],
