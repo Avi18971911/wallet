@@ -88,10 +88,15 @@ func fromMongoAccountTransaction(
 		if transactionType == model.Pending {
 			expirationDateStamp = utils.TimestampToTime(elem.ExpirationDate)
 		}
+		transactionNature, err := toTransactionNature(elem.TransactionNature)
+		if err != nil {
+			return res, fmt.Errorf("error when parsing transactionNature for accountId %s: %w", accountId, err)
+		}
 		res[i] = model.BankAccountTransactionOutput{
 			Id:                 transactionId,
 			BankAccountId:      accountId,
 			OtherBankAccountId: otherAccountId,
+			TransactionNature:  transactionNature,
 			TransactionType:    transactionType,
 			ExpirationDate:     expirationDateStamp,
 			Status:             pendingTransactionStatus,
@@ -137,5 +142,16 @@ func toPendingTransactionStatus(status string) (model.PendingTransactionStatus, 
 		return model.Revoked, nil
 	default:
 		return "", fmt.Errorf("invalid pending transaction status: %s", status)
+	}
+}
+
+func toTransactionNature(nature string) (model.TransactionNature, error) {
+	switch nature {
+	case "credit":
+		return model.Credit, nil
+	case "debit":
+		return model.Debit, nil
+	default:
+		return "", fmt.Errorf("invalid transaction nature: %s", nature)
 	}
 }
