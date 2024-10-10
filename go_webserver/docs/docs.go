@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.AccountLoginDTO"
+                            "$ref": "#/definitions/dto.AccountLoginRequestDTO"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Successful login",
                         "schema": {
-                            "$ref": "#/definitions/dto.AccountDetailsDTO"
+                            "$ref": "#/definitions/dto.AccountDetailsResponseDTO"
                         }
                     },
                     "401": {
@@ -77,7 +77,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Account ID",
+                        "description": "BankAccount ID",
                         "name": "accountId",
                         "in": "path",
                         "required": true
@@ -87,7 +87,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Successful retrieval of account details",
                         "schema": {
-                            "$ref": "#/definitions/dto.AccountDetailsDTO"
+                            "$ref": "#/definitions/dto.AccountDetailsResponseDTO"
                         }
                     },
                     "500": {
@@ -115,7 +115,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Account ID",
+                        "description": "BankAccount ID",
                         "name": "accountId",
                         "in": "path",
                         "required": true
@@ -127,7 +127,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.AccountTransactionDTO"
+                                "$ref": "#/definitions/dto.AccountTransactionResponseDTO"
                             }
                         }
                     },
@@ -160,7 +160,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.TransactionRequest"
+                            "$ref": "#/definitions/dto.TransactionRequestDTO"
                         }
                     }
                 ],
@@ -188,49 +188,22 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.AccountDTO": {
+        "dto.AccountDetailsResponseDTO": {
             "type": "object",
             "required": [
-                "accountNumber",
-                "accountType",
-                "availableBalance",
-                "id"
-            ],
-            "properties": {
-                "accountNumber": {
-                    "description": "The account number associated with the account",
-                    "type": "string"
-                },
-                "accountType": {
-                    "description": "The type of the account (e.g., savings, checking)",
-                    "type": "string"
-                },
-                "availableBalance": {
-                    "description": "The available balance of the account. Valid to two decimal places.",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "The unique identifier of the account",
-                    "type": "string"
-                }
-            }
-        },
-        "dto.AccountDetailsDTO": {
-            "type": "object",
-            "required": [
-                "accounts",
+                "bankAccounts",
                 "createdAt",
                 "id",
-                "knownAccounts",
+                "knownBankAccounts",
                 "person",
                 "username"
             ],
             "properties": {
-                "accounts": {
-                    "description": "The list of accounts associated with the account holder",
+                "bankAccounts": {
+                    "description": "The list of bank accounts associated with the account holder",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.AccountDTO"
+                        "$ref": "#/definitions/dto.BankAccountDTO"
                     }
                 },
                 "createdAt": {
@@ -241,11 +214,11 @@ const docTemplate = `{
                     "description": "The unique identifier of the account",
                     "type": "string"
                 },
-                "knownAccounts": {
-                    "description": "The list of accounts known to and recognized by the account holder",
+                "knownBankAccounts": {
+                    "description": "The list of bank accounts known to and recognized by the account holder",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.KnownAccountDTO"
+                        "$ref": "#/definitions/dto.KnownBankAccountDTO"
                     }
                 },
                 "person": {
@@ -262,7 +235,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.AccountLoginDTO": {
+        "dto.AccountLoginRequestDTO": {
             "type": "object",
             "required": [
                 "password",
@@ -279,44 +252,105 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.AccountTransactionDTO": {
+        "dto.AccountTransactionResponseDTO": {
             "type": "object",
             "required": [
-                "accountId",
                 "amount",
+                "bankAccountId",
                 "createdAt",
                 "id",
-                "otherAccountId",
+                "otherBankAccountId",
+                "transactionNature",
                 "transactionType"
             ],
             "properties": {
-                "accountId": {
-                    "description": "The primary account ID associated with the transaction",
-                    "type": "string"
-                },
                 "amount": {
                     "description": "The amount involved in the transaction. Valid to two decimal places.",
+                    "type": "string"
+                },
+                "bankAccountId": {
+                    "description": "The primary bank account ID associated with the transaction",
                     "type": "string"
                 },
                 "createdAt": {
                     "description": "The timestamp of when the transaction was created",
                     "type": "string"
                 },
+                "expirationDate": {
+                    "description": "The expiration date of the pending transaction. Null if not a pending transaction.",
+                    "type": "string"
+                },
                 "id": {
                     "description": "The unique identifier of the transaction",
                     "type": "string"
                 },
-                "otherAccountId": {
-                    "description": "The other account ID involved in the transaction",
+                "otherBankAccountId": {
+                    "description": "The other bank account ID involved in the transaction",
                     "type": "string"
                 },
+                "status": {
+                    "description": "The status of the pending transaction (active, applied, revoked). Null if not a pending transaction.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.PendingTransactionStatus"
+                        }
+                    ]
+                },
+                "transactionNature": {
+                    "description": "The nature of the transaction (debit or credit)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.TransactionNature"
+                        }
+                    ]
+                },
                 "transactionType": {
-                    "description": "The type of the transaction (debit or credit)",
+                    "description": "The type of the transaction (realized or pending)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.TransactionType"
+                        }
+                    ]
+                }
+            }
+        },
+        "dto.BankAccountDTO": {
+            "type": "object",
+            "required": [
+                "accountNumber",
+                "accountType",
+                "availableBalance",
+                "id",
+                "pendingBalance"
+            ],
+            "properties": {
+                "accountNumber": {
+                    "description": "The account number associated with the account",
+                    "type": "string"
+                },
+                "accountType": {
+                    "description": "The type of the account (e.g., savings, checking)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.BankAccountType"
+                        }
+                    ]
+                },
+                "availableBalance": {
+                    "description": "The available balance of the account. Valid to two decimal places.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "The unique identifier of the account",
+                    "type": "string"
+                },
+                "pendingBalance": {
+                    "description": "The pending balance of the account. Valid to two decimal places.",
                     "type": "string"
                 }
             }
         },
-        "dto.KnownAccountDTO": {
+        "dto.KnownBankAccountDTO": {
             "type": "object",
             "required": [
                 "accountHolder",
@@ -360,27 +394,75 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.TransactionRequest": {
+        "dto.TransactionRequestDTO": {
             "type": "object",
             "required": [
                 "amount",
-                "fromAccount",
-                "toAccount"
+                "fromBankAccountId",
+                "toBankAccountId"
             ],
             "properties": {
                 "amount": {
                     "description": "The amount to be transferred. Valid to two decimal places.",
                     "type": "string"
                 },
-                "fromAccount": {
-                    "description": "The account number of the account from which the amount is to be transferred",
+                "fromBankAccountId": {
+                    "description": "The bank account ID of the account from which the amount is to be transferred",
                     "type": "string"
                 },
-                "toAccount": {
-                    "description": "The account number of the account to which the amount is to be transferred",
+                "toBankAccountId": {
+                    "description": "The bank account ID of the account to which the amount is to be transferred",
                     "type": "string"
                 }
             }
+        },
+        "model.BankAccountType": {
+            "type": "string",
+            "enum": [
+                "savings",
+                "checking",
+                "investment"
+            ],
+            "x-enum-varnames": [
+                "Savings",
+                "Checking",
+                "Investment"
+            ]
+        },
+        "model.PendingTransactionStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "applied",
+                "revoked"
+            ],
+            "x-enum-varnames": [
+                "Active",
+                "Applied",
+                "Revoked"
+            ]
+        },
+        "model.TransactionNature": {
+            "type": "string",
+            "enum": [
+                "debit",
+                "credit"
+            ],
+            "x-enum-varnames": [
+                "Debit",
+                "Credit"
+            ]
+        },
+        "model.TransactionType": {
+            "type": "string",
+            "enum": [
+                "realized",
+                "pending"
+            ],
+            "x-enum-varnames": [
+                "Realized",
+                "Pending"
+            ]
         },
         "utils.ErrorMessage": {
             "type": "object",

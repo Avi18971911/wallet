@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import {AccountsService, DtoAccountDetailsDTO, DtoAccountDTO, DtoKnownAccountDTO, DtoPersonDTO} from "../../backend-api";
+import {
+  AccountsService,
+  DtoAccountDetailsResponseDTO,
+  DtoBankAccountDTO,
+  DtoKnownBankAccountDTO,
+  DtoPersonDTO
+} from "../../backend-api";
 import {BehaviorSubject, map, Observable} from "rxjs";
 
 export interface KnownAccount {
@@ -39,7 +45,7 @@ export class AccountService {
 
   constructor(private backendAccountService: AccountsService) { }
 
-  setUserData(data: DtoAccountDetailsDTO): void {
+  setUserData(data: DtoAccountDetailsResponseDTO): void {
     const accountDetails = this.fromDtoAccountDetailsDTO(data)
     this.userDataSubject.next(accountDetails)
   }
@@ -98,18 +104,18 @@ export class AccountService {
     )
   }
 
-  private fromDtoAccountDetailsDTO(dtoAccountDetailsDTO: DtoAccountDetailsDTO): AccountDetails {
+  private fromDtoAccountDetailsDTO(dtoAccountDetailsDTO: DtoAccountDetailsResponseDTO): AccountDetails {
     return {
       accountHolderFirstName: dtoAccountDetailsDTO.person.firstName,
       accountHolderLastName: dtoAccountDetailsDTO.person.lastName,
-      knownAccounts: dtoAccountDetailsDTO.knownAccounts.map(this.fromDtoKnownAccountDTO),
-      accounts: dtoAccountDetailsDTO.accounts.map(
+      knownAccounts: dtoAccountDetailsDTO.knownBankAccounts.map(this.fromDtoKnownAccountDTO),
+      accounts: dtoAccountDetailsDTO.bankAccounts.map(
         (dtoAccountDTO) => this.fromDtoAccountDTO(dtoAccountDTO, dtoAccountDetailsDTO.person)
       )
     }
   }
 
-  private fromDtoKnownAccountDTO(dtoKnownAccountDTO: DtoKnownAccountDTO): KnownAccount {
+  private fromDtoKnownAccountDTO(dtoKnownAccountDTO: DtoKnownBankAccountDTO): KnownAccount {
     return {
       id: dtoKnownAccountDTO.id,
       accountNumber: dtoKnownAccountDTO.accountNumber,
@@ -118,7 +124,7 @@ export class AccountService {
     }
   }
 
-  private fromDtoAccountDTO(dtoAccountDTO: DtoAccountDTO, dtoPersonDTO: DtoPersonDTO): Account {
+  private fromDtoAccountDTO(dtoAccountDTO: DtoBankAccountDTO, dtoPersonDTO: DtoPersonDTO): Account {
     return {
       id: dtoAccountDTO.id,
       accountNumber: dtoAccountDTO.accountNumber,

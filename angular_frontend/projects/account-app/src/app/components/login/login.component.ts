@@ -1,11 +1,11 @@
 import {Component} from '@angular/core';
 import {FormsModule} from "@angular/forms";
-import {DtoAccountDetailsDTO, DtoAccountLoginDTO} from "../../backend-api";
 import {AuthService} from "../../services/account/auth.service";
 import {Router} from "@angular/router";
 import {NgIf} from "@angular/common";
 import {animate, keyframes, style, transition, trigger} from "@angular/animations";
 import {AccountService} from "../../services/account/account.service";
+import {DtoAccountLoginRequestDTO} from "../../backend-api";
 
 @Component({
   selector: 'app-login',
@@ -44,7 +44,7 @@ export class LoginComponent {
   }
 
   validateLoginAndStoreDetails(userId: string, password: string) {
-    const loginPayload: DtoAccountLoginDTO = {
+    const loginPayload: DtoAccountLoginRequestDTO = {
       username: userId,
       password: password
     }

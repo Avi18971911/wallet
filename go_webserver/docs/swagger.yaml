@@ -1,31 +1,11 @@
 basePath: /backendAPI
 definitions:
-  dto.AccountDTO:
+  dto.AccountDetailsResponseDTO:
     properties:
-      accountNumber:
-        description: The account number associated with the account
-        type: string
-      accountType:
-        description: The type of the account (e.g., savings, checking)
-        type: string
-      availableBalance:
-        description: The available balance of the account. Valid to two decimal places.
-        type: string
-      id:
-        description: The unique identifier of the account
-        type: string
-    required:
-    - accountNumber
-    - accountType
-    - availableBalance
-    - id
-    type: object
-  dto.AccountDetailsDTO:
-    properties:
-      accounts:
-        description: The list of accounts associated with the account holder
+      bankAccounts:
+        description: The list of bank accounts associated with the account holder
         items:
-          $ref: '#/definitions/dto.AccountDTO'
+          $ref: '#/definitions/dto.BankAccountDTO'
         type: array
       createdAt:
         description: The creation timestamp of the account
@@ -33,10 +13,11 @@ definitions:
       id:
         description: The unique identifier of the account
         type: string
-      knownAccounts:
-        description: The list of accounts known to and recognized by the account holder
+      knownBankAccounts:
+        description: The list of bank accounts known to and recognized by the account
+          holder
         items:
-          $ref: '#/definitions/dto.KnownAccountDTO'
+          $ref: '#/definitions/dto.KnownBankAccountDTO'
         type: array
       person:
         allOf:
@@ -46,14 +27,14 @@ definitions:
         description: The username associated with the account
         type: string
     required:
-    - accounts
+    - bankAccounts
     - createdAt
     - id
-    - knownAccounts
+    - knownBankAccounts
     - person
     - username
     type: object
-  dto.AccountLoginDTO:
+  dto.AccountLoginRequestDTO:
     properties:
       password:
         description: The password for the login
@@ -65,36 +46,76 @@ definitions:
     - password
     - username
     type: object
-  dto.AccountTransactionDTO:
+  dto.AccountTransactionResponseDTO:
     properties:
-      accountId:
-        description: The primary account ID associated with the transaction
-        type: string
       amount:
         description: The amount involved in the transaction. Valid to two decimal
           places.
         type: string
+      bankAccountId:
+        description: The primary bank account ID associated with the transaction
+        type: string
       createdAt:
         description: The timestamp of when the transaction was created
+        type: string
+      expirationDate:
+        description: The expiration date of the pending transaction. Null if not a
+          pending transaction.
         type: string
       id:
         description: The unique identifier of the transaction
         type: string
-      otherAccountId:
-        description: The other account ID involved in the transaction
+      otherBankAccountId:
+        description: The other bank account ID involved in the transaction
         type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/model.PendingTransactionStatus'
+        description: The status of the pending transaction (active, applied, revoked).
+          Null if not a pending transaction.
+      transactionNature:
+        allOf:
+        - $ref: '#/definitions/model.TransactionNature'
+        description: The nature of the transaction (debit or credit)
       transactionType:
-        description: The type of the transaction (debit or credit)
-        type: string
+        allOf:
+        - $ref: '#/definitions/model.TransactionType'
+        description: The type of the transaction (realized or pending)
     required:
-    - accountId
     - amount
+    - bankAccountId
     - createdAt
     - id
-    - otherAccountId
+    - otherBankAccountId
+    - transactionNature
     - transactionType
     type: object
-  dto.KnownAccountDTO:
+  dto.BankAccountDTO:
+    properties:
+      accountNumber:
+        description: The account number associated with the account
+        type: string
+      accountType:
+        allOf:
+        - $ref: '#/definitions/model.BankAccountType'
+        description: The type of the account (e.g., savings, checking)
+      availableBalance:
+        description: The available balance of the account. Valid to two decimal places.
+        type: string
+      id:
+        description: The unique identifier of the account
+        type: string
+      pendingBalance:
+        description: The pending balance of the account. Valid to two decimal places.
+        type: string
+    required:
+    - accountNumber
+    - accountType
+    - availableBalance
+    - id
+    - pendingBalance
+    type: object
+  dto.KnownBankAccountDTO:
     properties:
       accountHolder:
         description: The name of the account holder
@@ -126,24 +147,60 @@ definitions:
     - firstName
     - lastName
     type: object
-  dto.TransactionRequest:
+  dto.TransactionRequestDTO:
     properties:
       amount:
         description: The amount to be transferred. Valid to two decimal places.
         type: string
-      fromAccount:
-        description: The account number of the account from which the amount is to
+      fromBankAccountId:
+        description: The bank account ID of the account from which the amount is to
           be transferred
         type: string
-      toAccount:
-        description: The account number of the account to which the amount is to be
-          transferred
+      toBankAccountId:
+        description: The bank account ID of the account to which the amount is to
+          be transferred
         type: string
     required:
     - amount
-    - fromAccount
-    - toAccount
+    - fromBankAccountId
+    - toBankAccountId
     type: object
+  model.BankAccountType:
+    enum:
+    - savings
+    - checking
+    - investment
+    type: string
+    x-enum-varnames:
+    - Savings
+    - Checking
+    - Investment
+  model.PendingTransactionStatus:
+    enum:
+    - active
+    - applied
+    - revoked
+    type: string
+    x-enum-varnames:
+    - Active
+    - Applied
+    - Revoked
+  model.TransactionNature:
+    enum:
+    - debit
+    - credit
+    type: string
+    x-enum-varnames:
+    - Debit
+    - Credit
+  model.TransactionType:
+    enum:
+    - realized
+    - pending
+    type: string
+    x-enum-varnames:
+    - Realized
+    - Pending
   utils.ErrorMessage:
     properties:
       message:
@@ -161,7 +218,7 @@ paths:
       - application/json
       description: Retrieves the details of a specific account by its ID.
       parameters:
-      - description: Account ID
+      - description: BankAccount ID
         in: path
         name: accountId
         required: true
@@ -172,7 +229,7 @@ paths:
         "200":
           description: Successful retrieval of account details
           schema:
-            $ref: '#/definitions/dto.AccountDetailsDTO'
+            $ref: '#/definitions/dto.AccountDetailsResponseDTO'
         "500":
           description: Internal server error
           schema:
@@ -187,7 +244,7 @@ paths:
       description: Retrieves a list of transactions for a specific account by its
         ID.
       parameters:
-      - description: Account ID
+      - description: BankAccount ID
         in: path
         name: accountId
         required: true
@@ -199,7 +256,7 @@ paths:
           description: Successful retrieval of account transactions
           schema:
             items:
-              $ref: '#/definitions/dto.AccountTransactionDTO'
+              $ref: '#/definitions/dto.AccountTransactionResponseDTO'
             type: array
         "500":
           description: Internal server error
@@ -219,14 +276,14 @@ paths:
         name: login
         required: true
         schema:
-          $ref: '#/definitions/dto.AccountLoginDTO'
+          $ref: '#/definitions/dto.AccountLoginRequestDTO'
       produces:
       - application/json
       responses:
         "200":
           description: Successful login
           schema:
-            $ref: '#/definitions/dto.AccountDetailsDTO'
+            $ref: '#/definitions/dto.AccountDetailsResponseDTO'
         "401":
           description: Invalid credentials
           schema:
@@ -249,7 +306,7 @@ paths:
         name: transaction
         required: true
         schema:
-          $ref: '#/definitions/dto.TransactionRequest'
+          $ref: '#/definitions/dto.TransactionRequestDTO'
       produces:
       - application/json
       responses:

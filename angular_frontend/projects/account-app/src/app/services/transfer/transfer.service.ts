@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {TransferState} from "../../models/transfer-state";
 import {BehaviorSubject, Subject, throwError} from "rxjs";
-import {DtoTransactionRequest, TransactionsService} from "../../backend-api";
+import {DtoTransactionRequestDTO, TransactionsService} from "../../backend-api";
 
 export interface TransferData {
   toAccountNumber: string;
@@ -55,10 +55,10 @@ export class TransferService {
       return;
     }
 
-    const transactionRequest: DtoTransactionRequest = {
+    const transactionRequest: DtoTransactionRequestDTO = {
       amount: transferData.amount,
-      fromAccount: transferData.fromAccountId,
-      toAccount: transferData.toAccountId,
+      fromBankAccountId: transferData.fromAccountId,
+      toBankAccountId: transferData.toAccountId,
     }
 
     this.transactionsService.transactionsPost(transactionRequest)

@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {AccountsService, DtoAccountDetailsDTO, DtoAccountLoginDTO,} from "../../backend-api";
+import {AccountsService, DtoAccountDetailsResponseDTO, DtoAccountLoginRequestDTO,} from "../../backend-api";
 import {BehaviorSubject, Observable, Observer, Subject, takeUntil} from "rxjs";
 
 @Injectable({
@@ -8,7 +8,7 @@ import {BehaviorSubject, Observable, Observer, Subject, takeUntil} from "rxjs";
 export class AuthService implements OnDestroy {
   private isAuthenticatedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public isAuthenticated$: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
-  public loginResponse$ = new Subject<DtoAccountDetailsDTO>();
+  public loginResponse$ = new Subject<DtoAccountDetailsResponseDTO>();
   private ngUnsubscribe = new Subject<void>();
 
   constructor(
@@ -16,13 +16,13 @@ export class AuthService implements OnDestroy {
   ) {}
 
   login(
-    loginDetails: DtoAccountLoginDTO,
+    loginDetails: DtoAccountLoginRequestDTO,
     successCallback: () => void,
     errorCallback: (error: any) => void
   ){
 
-    const observer: Observer<DtoAccountDetailsDTO> = {
-        next: (data: DtoAccountDetailsDTO) => {
+    const observer: Observer<DtoAccountDetailsResponseDTO> = {
+        next: (data: DtoAccountDetailsResponseDTO) => {
           this.isAuthenticatedSubject.next(true);
           this.loginResponse$.next(data);
           successCallback();
