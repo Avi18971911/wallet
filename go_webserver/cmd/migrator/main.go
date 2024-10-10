@@ -34,14 +34,14 @@ func main() {
 	schemaEndVer := parseEnvAsInt("SCHEMA_END_VER", 2)
 
 	dataStartVer := parseEnvAsInt("DATA_START_VER", 1)
-	dataEndVer := parseEnvAsInt("DATA_END_VER", 1)
+	dataEndVer := parseEnvAsInt("DATA_END_VER", 2)
 
 	ms := service.NewMigrationService(client, ctx, migrationDatabaseName, migrationCollectionName)
 
 	log.Printf("Applying schema migrations to database %s", mainDatabaseName)
 	applyMigrations(ms, mainDatabaseName, schema.SchemaMigrations, schemaStartVer, schemaEndVer)
 	log.Printf("Applying data migrations to database %s", mainDatabaseName)
-	applyMigrations(ms, mainDatabaseName, data.DataMigrations, dataStartVer, dataEndVer)
+	applyMigrations(ms, mainDatabaseName, data.Migrations, dataStartVer, dataEndVer)
 	log.Println("Migrations completed successfully")
 }
 
@@ -54,6 +54,7 @@ func applyMigrations(
 ) {
 	migrationsToRun = migrationsToRun[startVer-1 : endVer]
 	for _, elem := range migrationsToRun {
+		log.Printf("Applying migration %s", elem.Version)
 		err, hasBeenApplied := ms.ApplyMigration(mainDatabaseName, elem)
 		if err != nil {
 			log.Fatalf("Error when applying migration %s: %v", elem.Version, err)
@@ -61,7 +62,7 @@ func applyMigrations(
 		if hasBeenApplied {
 			log.Printf("Migration %s has been applied", elem.Version)
 		} else {
-			log.Printf("Migration %s has not been applied", elem.Version)
+			log.Printf("Migration %s has not been applied by this run", elem.Version)
 		}
 	}
 }

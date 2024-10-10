@@ -1,7 +1,13 @@
 package data
 
-import "webserver/migrations/versions"
+import (
+	"time"
+	"webserver/migrations/versions"
+)
 
-var DataMigrations = []versions.Migration{
+const timeout = time.Minute * 1
+
+var Migrations = []versions.Migration{
 	MigrationData1,
+	MigrationData2,
 }

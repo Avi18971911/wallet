@@ -13,7 +13,7 @@ type AccountService interface {
 	) (
 		[]model.BankAccountTransactionOutput, error)
 	Login(username string, password string, ctx context.Context) (*model.AccountDetailsOutput, error)
-	GetAccountHistoryInMonths(
+	GetAccountBalanceHistoryInMonths(
 		input *model.AccountHistoryInMonthsInput,
 		ctx context.Context,
 	) (model.AccountBalanceMonthsOutput, error)

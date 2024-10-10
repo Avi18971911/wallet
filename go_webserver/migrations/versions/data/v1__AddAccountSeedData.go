@@ -6,20 +6,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"time"
 	"webserver/internal/pkg/infrastructure/mongodb"
 	"webserver/internal/pkg/utils"
 	"webserver/migrations/versions"
+	"webserver/migrations/versions/schema"
 )
 
-const timeout = time.Minute * 1
-
-var accountIds = []primitive.ObjectID{
-	primitive.NewObjectID(),
-	primitive.NewObjectID(),
-	primitive.NewObjectID(),
-	primitive.NewObjectID(),
-}
+var ollyAccountId1 = primitive.NewObjectID()
+var bobAccountId1 = primitive.NewObjectID()
+var hildaAccountId1 = primitive.NewObjectID()
+var hildaAccountId2 = primitive.NewObjectID()
 
 var ollyAmount, _ = primitive.ParseDecimal128("123.23")
 var bobAmount, _ = primitive.ParseDecimal128("275.11")
@@ -37,7 +33,7 @@ var accounts = []interface{}{
 		},
 		BankAccounts: []mongodb.BankAccount{
 			{
-				Id:               accountIds[0],
+				Id:               bobAccountId1,
 				AccountNumber:    "123-12345-0",
 				AccountType:      "checking",
 				PendingBalance:   ollyAmount,
@@ -57,7 +53,7 @@ var accounts = []interface{}{
 		},
 		BankAccounts: []mongodb.BankAccount{
 			{
-				Id:               accountIds[1],
+				Id:               ollyAccountId1,
 				AccountNumber:    "123-12345-1",
 				AccountType:      "savings",
 				PendingBalance:   bobAmount,
@@ -66,13 +62,13 @@ var accounts = []interface{}{
 		},
 		KnownBankAccounts: []mongodb.KnownBankAccount{
 			{
-				Id:            accountIds[0],
+				Id:            ollyAccountId1,
 				AccountNumber: "123-12345-0",
 				AccountHolder: "Olly OxenFree",
 				AccountType:   "checking",
 			},
 			{
-				Id:            accountIds[2],
+				Id:            hildaAccountId1,
 				AccountNumber: "123-12345-2",
 				AccountHolder: "Hilda Hill",
 				AccountType:   "savings",
@@ -90,14 +86,14 @@ var accounts = []interface{}{
 		},
 		BankAccounts: []mongodb.BankAccount{
 			{
-				Id:               accountIds[2],
+				Id:               hildaAccountId1,
 				AccountNumber:    "123-12345-2",
 				AccountType:      "savings",
 				AvailableBalance: hildaAmount1,
 				PendingBalance:   hildaAmount1,
 			},
 			{
-				Id:               accountIds[3],
+				Id:               hildaAccountId2,
 				AccountNumber:    "123-12345-3",
 				AccountType:      "checking",
 				AvailableBalance: hildaAmount2,
@@ -106,7 +102,7 @@ var accounts = []interface{}{
 		},
 		KnownBankAccounts: []mongodb.KnownBankAccount{
 			{
-				Id:            accountIds[0],
+				Id:            ollyAccountId1,
 				AccountNumber: "123-12345-0",
 				AccountHolder: "Olly OxenFree",
 				AccountType:   "checking",
@@ -122,7 +118,7 @@ var MigrationData1 = versions.Migration{
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
-		collectionName := "account"
+		collectionName := schema.AccountCollectionName
 		coll := db.Collection(collectionName)
 
 		_, err := coll.InsertMany(mongoCtx, accounts)
@@ -137,7 +133,7 @@ var MigrationData1 = versions.Migration{
 		db := client.Database(databaseName)
 		mongoCtx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
-		collectionName := "account"
+		collectionName := schema.AccountCollectionName
 		coll := db.Collection(collectionName)
 
 		var ids = make([]primitive.ObjectID, len(accounts))

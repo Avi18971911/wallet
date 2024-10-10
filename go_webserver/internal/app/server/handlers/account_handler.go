@@ -125,7 +125,17 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 	}
 }
 
-func AccountHistoryInMonthsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
+// AccountBalanceHistoryInMonthsHandler creates a handler for fetching account history.
+// @Summary Get account history
+// @Description Retrieves the account month-balance history for a specific account by its ID.
+// @Tags accounts
+// @Accept json
+// @Produce json
+// @Param input body dto.AccountHistoryRequestDTO true "Account history payload"
+// @Success 200 {object} dto.AccountBalanceMonthsResponseDTO "Successful retrieval of account history"
+// @Failure 500 {object} utils.ErrorMessage "Internal server error"
+// @Router /accounts/history [post]
+func AccountBalanceHistoryInMonthsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req dto.AccountHistoryRequestDTO
 		err := json.NewDecoder(r.Body).Decode(&req)
@@ -134,7 +144,7 @@ func AccountHistoryInMonthsHandler(s services.AccountService, ctx context.Contex
 			return
 		}
 		accountHistoryInput := accountHistoryRequestToInput(&req)
-		accountHistory, err := s.GetAccountHistoryInMonths(&accountHistoryInput, ctx)
+		accountHistory, err := s.GetAccountBalanceHistoryInMonths(&accountHistoryInput, ctx)
 		if err != nil {
 			utils.HttpError(w, "Failed to get BankAccount History", http.StatusInternalServerError)
 			return

@@ -139,7 +139,7 @@ func (a *AccountServiceImpl) Login(
 	return accountDetails, nil
 }
 
-func (a *AccountServiceImpl) GetAccountHistoryInMonths(
+func (a *AccountServiceImpl) GetAccountBalanceHistoryInMonths(
 	input *model.AccountHistoryInMonthsInput,
 	ctx context.Context,
 ) (model.AccountBalanceMonthsOutput, error) {

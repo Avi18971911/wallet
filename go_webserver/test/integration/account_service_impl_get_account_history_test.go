@@ -50,7 +50,7 @@ func TestGetAccountHistory(t *testing.T) {
 				ToTime:        time.Date(2021, time.March, 30, 0, 0, 0, 0, time.UTC),
 				FromTime:      time.Date(2020, time.December, 1, 0, 0, 0, 0, time.UTC),
 			}
-			res, _ := accountService.GetAccountHistoryInMonths(&input, ctx)
+			res, _ := accountService.GetAccountBalanceHistoryInMonths(&input, ctx)
 			monthVals := make([]string, 4)
 			for i, month := range res.Months {
 				monthVals[i] = month.AvailableBalance.String()
