@@ -60,7 +60,7 @@ func AccountTransactionsHandler(s services.AccountService, ctx context.Context) 
 			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
-		accountTransactionsInput := accountTransactionRequestToInput(req)
+		accountTransactionsInput := accountTransactionRequestToInput(&req)
 		accountTransactions, err := s.GetBankAccountTransactions(&accountTransactionsInput, ctx)
 		if err != nil {
 			utils.HttpError(w, "Failed to get BankAccount Transactions", http.StatusInternalServerError)
@@ -122,5 +122,30 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 			return
 		}
 
+	}
+}
+
+func AccountHistoryInMonthsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req dto.AccountHistoryRequestDTO
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+		accountHistoryInput := accountHistoryRequestToInput(&req)
+		accountHistory, err := s.GetAccountHistoryInMonths(&accountHistoryInput, ctx)
+		if err != nil {
+			utils.HttpError(w, "Failed to get BankAccount History", http.StatusInternalServerError)
+			return
+		}
+		jsonAccountHistory := accountHistoryToDTO(&accountHistory)
+
+		err = json.NewEncoder(w).Encode(jsonAccountHistory)
+		if err != nil {
+			utils.HttpError(w, "Error encountered during response payload construction",
+				http.StatusInternalServerError)
+			return
+		}
 	}
 }

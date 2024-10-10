@@ -80,6 +80,24 @@ type AccountLoginRequestDTO struct {
 	Password string `json:"password" validate:"required"`
 }
 
+// AccountHistoryRequestDTO represents a request to retrieve the account history in months for a specific account
+// @swagger:model AccountHistoryRequestDTO
+type AccountHistoryRequestDTO struct {
+	// The bank account ID of the account associated with the transactions
+	BankAccountId string `json:"bankAccountId" validate:"required"`
+	// The start time of the transactions in an RFC3339 compliant format
+	FromTime time.Time `json:"fromTime" validate:"required"`
+	// The end time of the transactions in an RFC3339 compliant format
+	ToTime time.Time `json:"toTime" validate:"required"`
+}
+
+type AccountHistoryResultDTO struct {
+	// The bank account ID of the account associated with the transactions
+	BankAccountId string `json:"bankAccountId" validate:"required"`
+	// The list of account balance months
+	Months []AccountBalanceMonthDTO `json:"months" validate:"required"`
+}
+
 // BankAccountDTO represents a bank account associated with an account holder
 // @swagger:model BankAccountDTO
 type BankAccountDTO struct {
@@ -102,4 +120,17 @@ type PersonDTO struct {
 	FirstName string `json:"firstName" validate:"required"`
 	// The last name of the person
 	LastName string `json:"lastName" validate:"required"`
+}
+
+// AccountBalanceMonthDTO represents the series of account balances at the end of each month in the requested time period
+// @swagger:model AccountBalanceMonthDTO
+type AccountBalanceMonthDTO struct {
+	// The month of the account balance
+	Month time.Month `json:"month" validate:"required"`
+	// The year of the account balance
+	Year int `json:"year" validate:"required"`
+	// The available balance of the account at the end of the given month. Valid to two decimal places.
+	AvailableBalance string `json:"availableBalance" validate:"required"`
+	// The pending balance of the account at the end of the given month. Valid to two decimal places.
+	PendingBalance string `json:"pendingBalance" validate:"required"`
 }

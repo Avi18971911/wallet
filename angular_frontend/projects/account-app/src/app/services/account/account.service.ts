@@ -50,6 +50,8 @@ export class AccountService {
     this.userDataSubject.next(accountDetails)
   }
 
+  getEndOfMonthBalances()
+
   refreshUserData(): void {
     if (!this.userDataSubject.value) {
       return;

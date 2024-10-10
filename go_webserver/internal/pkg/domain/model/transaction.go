@@ -45,6 +45,12 @@ type TransactionsForBankAccountInput struct {
 	ToTime        time.Time
 }
 
+type AccountHistoryInMonthsInput struct {
+	BankAccountId string
+	FromTime      time.Time
+	ToTime        time.Time
+}
+
 type TransactionNature string
 
 const (

@@ -140,10 +140,15 @@ func (a *AccountServiceImpl) Login(
 }
 
 func (a *AccountServiceImpl) GetAccountHistoryInMonths(
-	input *model.TransactionsForBankAccountInput,
+	input *model.AccountHistoryInMonthsInput,
 	ctx context.Context,
 ) (model.AccountBalanceMonthsOutput, error) {
-	transactions, err := a.GetBankAccountTransactions(input, ctx)
+	bankAccountTransactionsInput := model.TransactionsForBankAccountInput{
+		BankAccountId: input.BankAccountId,
+		FromTime:      input.FromTime,
+		ToTime:        input.ToTime,
+	}
+	transactions, err := a.GetBankAccountTransactions(&bankAccountTransactionsInput, ctx)
 	defaultOutput := model.AccountBalanceMonthsOutput{}
 	if err != nil {
 		log.Printf("Unable to get Account History for BankAccount %s with error: %v", input.BankAccountId, err)

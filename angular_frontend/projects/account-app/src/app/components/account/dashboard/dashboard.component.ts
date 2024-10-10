@@ -42,9 +42,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe((firstAndLastName) => {
         this.userFirstAndLastName = firstAndLastName?.firstName + " " + firstAndLastName?.lastName
       });
+
     this.accountService.getCurrentBalance$()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((currentBalance) => this.currentBalance = currentBalance)
+
+
   }
 
   get currentMonthAndYear(): CurrentMonthAndYear {
