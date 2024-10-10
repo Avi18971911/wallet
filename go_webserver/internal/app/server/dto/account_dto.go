@@ -91,6 +91,8 @@ type AccountBalanceHistoryRequestDTO struct {
 	ToTime time.Time `json:"toTime" validate:"required"`
 }
 
+// AccountBalanceHistoryResponseDTO represents the account balance history in months for a specific account
+// @swagger:model AccountBalanceHistoryResponseDTO
 type AccountBalanceHistoryResponseDTO struct {
 	// The bank account ID of the account associated with the transactions
 	BankAccountId string `json:"bankAccountId" validate:"required"`

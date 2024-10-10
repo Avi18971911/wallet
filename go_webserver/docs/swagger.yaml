@@ -264,31 +264,6 @@ info:
   title: Wallet API
   version: "1.0"
 paths:
-  /accounts/{accountId}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves the details of a specific account by its ID.
-      parameters:
-      - description: BankAccount ID
-        in: path
-        name: accountId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful retrieval of account details
-          schema:
-            $ref: '#/definitions/dto.AccountDetailsResponseDTO'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.ErrorMessage'
-      summary: Get account details
-      tags:
-      - accounts
   /accounts/{accountId}/transactions:
     get:
       consumes:
@@ -317,6 +292,31 @@ paths:
       summary: Get account transactions
       tags:
       - transactions
+  /accounts/details/{accountId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a specific account by its ID.
+      parameters:
+      - description: BankAccount ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of account details
+          schema:
+            $ref: '#/definitions/dto.AccountDetailsResponseDTO'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+      summary: Get account details
+      tags:
+      - accounts
   /accounts/history:
     post:
       consumes:

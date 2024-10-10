@@ -18,9 +18,13 @@ var hildaAccountId1 = primitive.NewObjectID()
 var hildaAccountId2 = primitive.NewObjectID()
 
 var ollyAmount, _ = primitive.ParseDecimal128("123.23")
+var ollyPendingAmount, _ = primitive.ParseDecimal128("153.54")
 var bobAmount, _ = primitive.ParseDecimal128("275.11")
+var bobPendingAmount, _ = primitive.ParseDecimal128("300.00")
 var hildaAmount1, _ = primitive.ParseDecimal128("1004.55")
+var hildaPendingAmount1, _ = primitive.ParseDecimal128("894.78")
 var hildaAmount2, _ = primitive.ParseDecimal128("100.00")
+var hildaPendingAmount2, _ = primitive.ParseDecimal128("111.53")
 
 var accounts = []interface{}{
 	mongodb.MongoAccountOutput{
@@ -36,8 +40,8 @@ var accounts = []interface{}{
 				Id:               bobAccountId1,
 				AccountNumber:    "123-12345-0",
 				AccountType:      "checking",
-				PendingBalance:   ollyAmount,
 				AvailableBalance: ollyAmount,
+				PendingBalance:   ollyPendingAmount,
 			},
 		},
 		KnownBankAccounts: []mongodb.KnownBankAccount{},
@@ -56,8 +60,8 @@ var accounts = []interface{}{
 				Id:               ollyAccountId1,
 				AccountNumber:    "123-12345-1",
 				AccountType:      "savings",
-				PendingBalance:   bobAmount,
 				AvailableBalance: bobAmount,
+				PendingBalance:   bobPendingAmount,
 			},
 		},
 		KnownBankAccounts: []mongodb.KnownBankAccount{
@@ -90,14 +94,14 @@ var accounts = []interface{}{
 				AccountNumber:    "123-12345-2",
 				AccountType:      "savings",
 				AvailableBalance: hildaAmount1,
-				PendingBalance:   hildaAmount1,
+				PendingBalance:   hildaPendingAmount1,
 			},
 			{
 				Id:               hildaAccountId2,
 				AccountNumber:    "123-12345-3",
 				AccountType:      "checking",
 				AvailableBalance: hildaAmount2,
-				PendingBalance:   hildaAmount2,
+				PendingBalance:   hildaPendingAmount2,
 			},
 		},
 		KnownBankAccounts: []mongodb.KnownBankAccount{

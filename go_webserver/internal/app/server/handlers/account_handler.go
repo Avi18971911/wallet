@@ -23,7 +23,7 @@ import (
 // @Param accountId path string true "BankAccount ID"
 // @Success 200 {object} dto.AccountDetailsResponseDTO "Successful retrieval of account details"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
-// @Router /accounts/{accountId} [get]
+// @Router /accounts/details/{accountId} [get]
 func AccountDetailsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accountID := mux.Vars(r)["accountId"]

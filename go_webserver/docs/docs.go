@@ -15,6 +15,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/accounts/details/{accountId}": {
+            "get": {
+                "description": "Retrieves the details of a specific account by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Get account details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "BankAccount ID",
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of account details",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccountDetailsResponseDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/accounts/history": {
             "post": {
                 "description": "Retrieves the account month-balance history for a specific account by its ID.",
@@ -90,44 +128,6 @@ const docTemplate = `{
                         "description": "Invalid credentials",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorMessage"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorMessage"
-                        }
-                    }
-                }
-            }
-        },
-        "/accounts/{accountId}": {
-            "get": {
-                "description": "Retrieves the details of a specific account by its ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "accounts"
-                ],
-                "summary": "Get account details",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "BankAccount ID",
-                        "name": "accountId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful retrieval of account details",
-                        "schema": {
-                            "$ref": "#/definitions/dto.AccountDetailsResponseDTO"
                         }
                     },
                     "500": {
