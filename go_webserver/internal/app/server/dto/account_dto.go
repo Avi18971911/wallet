@@ -80,9 +80,9 @@ type AccountLoginRequestDTO struct {
 	Password string `json:"password" validate:"required"`
 }
 
-// AccountHistoryRequestDTO represents a request to retrieve the account history in months for a specific account
-// @swagger:model AccountHistoryRequestDTO
-type AccountHistoryRequestDTO struct {
+// AccountBalanceHistoryRequestDTO represents a request to retrieve the account history in months for a specific account
+// @swagger:model AccountBalanceHistoryRequestDTO
+type AccountBalanceHistoryRequestDTO struct {
 	// The bank account ID of the account associated with the transactions
 	BankAccountId string `json:"bankAccountId" validate:"required"`
 	// The start time of the transactions in an RFC3339 compliant format
@@ -91,7 +91,7 @@ type AccountHistoryRequestDTO struct {
 	ToTime time.Time `json:"toTime" validate:"required"`
 }
 
-type AccountHistoryResultDTO struct {
+type AccountBalanceHistoryResponseDTO struct {
 	// The bank account ID of the account associated with the transactions
 	BankAccountId string `json:"bankAccountId" validate:"required"`
 	// The list of account balance months
@@ -126,7 +126,7 @@ type PersonDTO struct {
 // @swagger:model AccountBalanceMonthDTO
 type AccountBalanceMonthDTO struct {
 	// The month of the account balance
-	Month time.Month `json:"month" validate:"required"`
+	Month int `json:"month" validate:"required"`
 	// The year of the account balance
 	Year int `json:"year" validate:"required"`
 	// The available balance of the account at the end of the given month. Valid to two decimal places.

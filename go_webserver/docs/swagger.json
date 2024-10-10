@@ -8,6 +8,46 @@
     },
     "basePath": "/backendAPI",
     "paths": {
+        "/accounts/history": {
+            "post": {
+                "description": "Retrieves the account month-balance history for a specific account by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Get account history",
+                "parameters": [
+                    {
+                        "description": "Account history payload",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccountBalanceHistoryRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of account history",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccountBalanceHistoryResponseDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/accounts/login": {
             "post": {
                 "description": "Logs in a user with the provided username and password.",
@@ -181,6 +221,75 @@
         }
     },
     "definitions": {
+        "dto.AccountBalanceHistoryRequestDTO": {
+            "type": "object",
+            "required": [
+                "bankAccountId",
+                "fromTime",
+                "toTime"
+            ],
+            "properties": {
+                "bankAccountId": {
+                    "description": "The bank account ID of the account associated with the transactions",
+                    "type": "string"
+                },
+                "fromTime": {
+                    "description": "The start time of the transactions in an RFC3339 compliant format",
+                    "type": "string"
+                },
+                "toTime": {
+                    "description": "The end time of the transactions in an RFC3339 compliant format",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AccountBalanceHistoryResponseDTO": {
+            "type": "object",
+            "required": [
+                "bankAccountId",
+                "months"
+            ],
+            "properties": {
+                "bankAccountId": {
+                    "description": "The bank account ID of the account associated with the transactions",
+                    "type": "string"
+                },
+                "months": {
+                    "description": "The list of account balance months",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AccountBalanceMonthDTO"
+                    }
+                }
+            }
+        },
+        "dto.AccountBalanceMonthDTO": {
+            "type": "object",
+            "required": [
+                "availableBalance",
+                "month",
+                "pendingBalance",
+                "year"
+            ],
+            "properties": {
+                "availableBalance": {
+                    "description": "The available balance of the account at the end of the given month. Valid to two decimal places.",
+                    "type": "string"
+                },
+                "month": {
+                    "description": "The month of the account balance",
+                    "type": "integer"
+                },
+                "pendingBalance": {
+                    "description": "The pending balance of the account at the end of the given month. Valid to two decimal places.",
+                    "type": "string"
+                },
+                "year": {
+                    "description": "The year of the account balance",
+                    "type": "integer"
+                }
+            }
+        },
         "dto.AccountDetailsResponseDTO": {
             "type": "object",
             "required": [

@@ -1,5 +1,57 @@
 basePath: /backendAPI
 definitions:
+  dto.AccountBalanceHistoryRequestDTO:
+    properties:
+      bankAccountId:
+        description: The bank account ID of the account associated with the transactions
+        type: string
+      fromTime:
+        description: The start time of the transactions in an RFC3339 compliant format
+        type: string
+      toTime:
+        description: The end time of the transactions in an RFC3339 compliant format
+        type: string
+    required:
+    - bankAccountId
+    - fromTime
+    - toTime
+    type: object
+  dto.AccountBalanceHistoryResponseDTO:
+    properties:
+      bankAccountId:
+        description: The bank account ID of the account associated with the transactions
+        type: string
+      months:
+        description: The list of account balance months
+        items:
+          $ref: '#/definitions/dto.AccountBalanceMonthDTO'
+        type: array
+    required:
+    - bankAccountId
+    - months
+    type: object
+  dto.AccountBalanceMonthDTO:
+    properties:
+      availableBalance:
+        description: The available balance of the account at the end of the given
+          month. Valid to two decimal places.
+        type: string
+      month:
+        description: The month of the account balance
+        type: integer
+      pendingBalance:
+        description: The pending balance of the account at the end of the given month.
+          Valid to two decimal places.
+        type: string
+      year:
+        description: The year of the account balance
+        type: integer
+    required:
+    - availableBalance
+    - month
+    - pendingBalance
+    - year
+    type: object
   dto.AccountDetailsResponseDTO:
     properties:
       bankAccounts:
@@ -265,6 +317,33 @@ paths:
       summary: Get account transactions
       tags:
       - transactions
+  /accounts/history:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves the account month-balance history for a specific account
+        by its ID.
+      parameters:
+      - description: Account history payload
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AccountBalanceHistoryRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful retrieval of account history
+          schema:
+            $ref: '#/definitions/dto.AccountBalanceHistoryResponseDTO'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorMessage'
+      summary: Get account history
+      tags:
+      - accounts
   /accounts/login:
     post:
       consumes:

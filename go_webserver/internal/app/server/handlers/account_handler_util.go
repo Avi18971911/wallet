@@ -73,7 +73,7 @@ func accountTransactionRequestToInput(tx *dto.AccountTransactionRequestDTO) mode
 	}
 }
 
-func accountHistoryRequestToInput(tx *dto.AccountHistoryRequestDTO) model.AccountHistoryInMonthsInput {
+func accountHistoryRequestToInput(tx *dto.AccountBalanceHistoryRequestDTO) model.AccountHistoryInMonthsInput {
 	return model.AccountHistoryInMonthsInput{
 		BankAccountId: tx.BankAccountId,
 		FromTime:      tx.FromTime,
@@ -81,17 +81,17 @@ func accountHistoryRequestToInput(tx *dto.AccountHistoryRequestDTO) model.Accoun
 	}
 }
 
-func accountHistoryToDTO(tx *model.AccountBalanceMonthsOutput) dto.AccountHistoryResultDTO {
+func accountHistoryToDTO(tx *model.AccountBalanceMonthsOutput) dto.AccountBalanceHistoryResponseDTO {
 	months := make([]dto.AccountBalanceMonthDTO, len(tx.Months))
 	for i, element := range tx.Months {
 		months[i] = dto.AccountBalanceMonthDTO{
-			Month:            element.Month,
+			Month:            int(element.Month),
 			Year:             element.Year,
 			AvailableBalance: element.AvailableBalance.String(),
 			PendingBalance:   element.PendingBalance.String(),
 		}
 	}
-	return dto.AccountHistoryResultDTO{
+	return dto.AccountBalanceHistoryResponseDTO{
 		BankAccountId: tx.BankAccountId,
 		Months:        months,
 	}

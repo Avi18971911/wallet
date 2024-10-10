@@ -131,13 +131,13 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 // @Tags accounts
 // @Accept json
 // @Produce json
-// @Param input body dto.AccountHistoryRequestDTO true "Account history payload"
-// @Success 200 {object} dto.AccountBalanceMonthsResponseDTO "Successful retrieval of account history"
+// @Param input body dto.AccountBalanceHistoryRequestDTO true "Account history payload"
+// @Success 200 {object} dto.AccountBalanceHistoryResponseDTO "Successful retrieval of account history"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
 // @Router /accounts/history [post]
 func AccountBalanceHistoryInMonthsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req dto.AccountHistoryRequestDTO
+		var req dto.AccountBalanceHistoryRequestDTO
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			utils.HttpError(w, "Invalid request payload", http.StatusBadRequest)
