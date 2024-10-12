@@ -54,7 +54,7 @@ const docTemplate = `{
             }
         },
         "/accounts/history": {
-            "post": {
+            "get": {
                 "description": "Retrieves the account month-balance history for a specific account by its ID.",
                 "consumes": [
                     "application/json"

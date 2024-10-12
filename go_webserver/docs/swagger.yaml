@@ -318,7 +318,7 @@ paths:
       tags:
       - accounts
   /accounts/history:
-    post:
+    get:
       consumes:
       - application/json
       description: Retrieves the account month-balance history for a specific account

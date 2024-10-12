@@ -134,7 +134,7 @@ func AccountLoginHandler(s services.AccountService, ctx context.Context) http.Ha
 // @Param input body dto.AccountBalanceHistoryRequestDTO true "Account history payload"
 // @Success 200 {object} dto.AccountBalanceHistoryResponseDTO "Successful retrieval of account history"
 // @Failure 500 {object} utils.ErrorMessage "Internal server error"
-// @Router /accounts/history [post]
+// @Router /accounts/history [get]
 func AccountBalanceHistoryInMonthsHandler(s services.AccountService, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req dto.AccountBalanceHistoryRequestDTO

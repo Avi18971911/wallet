@@ -54,7 +54,7 @@ export class AccountService {
     if (!this.userDataSubject.value) {
       return;
     }
-    this.backendAccountService.accountsAccountIdGet(this.userDataSubject.value?.accounts[0].id!)
+    this.backendAccountService.accountsDetailsAccountIdGet(this.userDataSubject.value?.accounts[0].id!)
       .subscribe((data) => {
         this.setUserData(data);
       });
